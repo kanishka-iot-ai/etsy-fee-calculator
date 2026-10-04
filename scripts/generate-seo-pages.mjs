@@ -105,7 +105,8 @@ for (const route of routes) {
   html = replaceOnce(html, /<meta name="twitter:title" content="[^"]*">/, `<meta name="twitter:title" content="${route.title}">`, `${route.file} Twitter title`);
   html = replaceOnce(html, /<meta name="twitter:description" content="[^"]*">/, `<meta name="twitter:description" content="${route.description}">`, `${route.file} Twitter description`);
   html = replaceOnce(html, /<meta name="twitter:image" content="[^"]*">/, `<meta name="twitter:image" content="https://shopprofitcalculator.com/social-preview.png">`, `${route.file} Twitter image`);
-  html = replaceOnce(html, /<h1 id="hero-title">[\s\S]*?<\/h1>/, `<h1 id="hero-title" class="route-h1">${route.h1}</h1>`, `${route.file} H1`);
+  html = replaceOnce(html, /<p class="hero-index">[\s\S]*?<\/p>/, `<p class="hero-index">SHOPPROFIT / ${route.code} &nbsp;—&nbsp; FREE ${route.title.replace(" — ShopProfit", "").toUpperCase()}</p>`, `${route.file} index`);
+  html = replaceOnce(html, /<h2 id="calculator-heading">[\s\S]*?<\/h2>/, `<h2 id="calculator-heading">${route.h1}</h2>`, `${route.file} calculator heading`);
   html = replaceOnce(html, /<p class="hero-description">[\s\S]*?<\/p>/, `<p class="hero-description">${route.intro}</p>`, `${route.file} introduction`);
   html = replaceOnce(html, /<details><summary>What fees does Etsy charge sellers\?<\/summary><p>[\s\S]*?<\/p><\/details>/, `<details><summary>${route.question}</summary><p>${route.answer}</p></details>`, `${route.file} FAQ`);
 

@@ -91,7 +91,7 @@ function applyLanguage() {
   const language = LANGUAGES[activeLanguage] || LANGUAGES.en;
   const hero = $("#hero-title");
   const [firstLine, secondLine] = language.heroLines || LANGUAGES.en.heroLines;
-  if (!routeCountry && hero) {
+  if (hero) {
     const allWords = [
       ...(firstLine ? firstLine.split(/\s+/).filter(Boolean) : []),
       ...(secondLine ? secondLine.split(/\s+/).filter(Boolean) : []),
