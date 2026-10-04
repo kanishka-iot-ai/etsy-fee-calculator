@@ -135,11 +135,102 @@ LANGUAGES["ja-JP"] = {
   },
 };
 
+LANGUAGES["ar"] = {
+  label: "العربية", locale: "ar", dir: "rtl",
+  heroLines: ["اعرف أرباحك", "الحقيقية بدقة."],
+  insightLead: "من كل {gross} إيرادات إجمالية، تحتفظ بمبلغ {kept}.",
+  strings: {
+    "Skip to calculator": "الانتقال إلى الحاسبة", "Seller location": "موقع البائع", Language: "اللغة", Auto: "تلقائي",
+    "Switch to dark mode": "التبديل إلى الوضع الداكن", "Switch to light mode": "التبديل إلى الوضع الفاتح",
+    "Open menu": "فتح القائمة", "Close menu": "إغلاق القائمة", Calculator: "الحاسبة",
+    Fees: "الرسوم", Method: "طريقة الحساب", "How it works": "كيف يعمل", FAQ: "الأسئلة الشائعة",
+    "KNOW WHAT YOU KEEP.": "اعرف أرباحك الحقيقية بدقة.", "Know exactly what you keep.": "اعرف أرباحك الحقيقية بدقة.",
+    "Calculate Etsy fees, processing costs, shipping, expenses, and real take-home profit instantly.": "احسب رسوم Etsy، وتكاليف المعالجة، والشحن، والمصاريف، والأرباح الصافية فوراً.",
+    "No signup": "بدون تسجيل", "No ads": "بدون إعلانات", "100% client-side": "حساب محلي 100%", "Global fee support": "دعم الرسوم عالمياً",
+    "Adjust your sale details to see your real profit.": "أدخل تفاصيل البيع لمعرفة ربحك الفعلي.", "Sale Details": "تفاصيل البيع",
+    "All amounts update your take-home instantly.": "تتحدث جميع المبالغ وربحك الصافي فوراً.",
+    "Item selling price": "سعر بيع السلعة", "Your item price before shipping.": "سعر السلعة قبل إضافة الشحن.",
+    "Shipping charged to buyer": "رسوم الشحن المحصلة من المشتري", "Production / material cost": "تكلفة الإنتاج / المواد",
+    "Packaging & shipping cost": "تكلفة التغليف والشحن", Currency: "العملة",
+    "Offsite Ads": "إعلانات Etsy الخارجية", "Choose the rate that applies to this order.": "اختر النسبة المطبقة على هذا الطلب.", None: "لا يوجد",
+    "Quick price": "سعر سريع", "Digital product": "منتج رقمي", "Include Etsy Plus": "تضمين اشتراك Etsy Plus",
+    "Prorates the monthly subscription across sales.": "توزيع الاشتراك الشهري على المبيعات المقدرة.",
+    "Estimated sales per month": "المبيعات الشهرية المقدرة", "Used to prorate Etsy Plus.": "يُستخدم لتوزيع تكلفة Etsy Plus.",
+    "Download Report (PDF)": "تحميل التقرير (PDF)", "Share via Email": "مشاركة عبر البريد الإلكتروني", "Share via WhatsApp": "مشاركة عبر واتساب",
+    "Show Detailed Analysis": "عرض التحليل المفصل", "Hide Detailed Analysis": "إخفاء التحليل المفصل",
+    "Your Profit": "أرباحك", "Profitable sale": "بيع مربح", "Loss on this sale": "خسارة في هذه البيعة",
+    "Net take-home": "صافي الربح", "profit margin": "هامش الربح",
+    Revenue: "الإيرادات", "Item price": "سعر السلعة", Shipping: "الشحن", "Gross revenue": "إجمالي الإيرادات",
+    "Etsy fees": "رسوم Etsy", "Listing fee": "رسوم الإدراج", "Transaction fee": "رسوم المعاملة",
+    "Payment processing": "معالجة الدفع", "Regulatory fee": "الرسوم التنظيمية", "Your costs": "تكاليفك",
+    Production: "الإنتاج", "Packaging & shipping": "التغليف والشحن", "Total deductions": "إجمالي الخصومات", "Net profit": "صافي الربح",
+    "Copy breakdown": "نسخ التفاصيل", Copy: "نسخ", Reset: "إعادة ضبط", "Break-even price": "سعر نقطة التعادل",
+    "Minimum item price needed to avoid a loss.": "أقل سعر لبيع السلعة لتجنب الخسارة.", "Use price": "استخدام هذا السعر",
+    "Target profit": "الربح المستهدف", "Choose the take-home amount you want from this sale.": "حدد مبلغ الربح الصافي الذي ترغب في تحقيقه.",
+    "Desired profit": "الربح المطلوب", "To keep ": "لتحقيق ربح صافٍ قدره ", "To keep": "لتحقيق ربح صافٍ قدره", ", charge about": "، حدد سعراً يقارب",
+    "Use required price": "استخدام السعر المطلوب", "Profit insights": "تحليلات الأرباح", DETAILS: "التفاصيل",
+    "Platform fees": "رسوم المنصة", "Business costs": "تكاليف النشاط", "Break-even": "نقطة التعادل", "Target price": "السعر المستهدف",
+    "Where the money goes": "أين تذهب الأموال", Costs: "التكاليف", "Your profit": "ربحك",
+    "Compare scenarios": "مقارنة السيناريوهات", "See how Offsite Ads change your take-home.": "شاهد كيف تؤثر إعلانات Offsite Ads على أرباحك.",
+    "Current sale": "البيع الحالي", "No Offsite Ads": "بدون إعلانات خارجية", "15% Offsite Ads": "إعلانات خارجية 15%", "12% Offsite Ads": "إعلانات خارجية 12%",
+    "How Etsy fees vary by country": "كيف تختلف رسوم Etsy حسب البلد",
+    "Published processing and regulatory rates. Fixed charges are shown in estimated local amounts.": "نسب المعالجة والرسوم التنظيمية الرسمية. المبالغ الثابتة موضحة بتقديرات العملة المحلية.",
+    Country: "البلد", "Listing fee*": "رسوم الإدراج*", "Processing fee": "رسوم المعالجة", "Regulatory fee": "الرسوم التنظيمية", Selected: "المحدد",
+    "How much does Etsy take from a sale?": "كم تقتطع Etsy من كل عملية بيع؟", "Transparent methodology": "منهجية حساب واضحة",
+    "How ShopProfit calculates profit": "كيف تحسب ShopProfit الأرباح",
+    "Frequently asked questions": "الأسئلة الشائعة", "Clear answers about fees, shipping, and your data.": "إجابات واضحة حول الرسوم والشحن وحماية بياناتك.",
+    "What fees does Etsy charge sellers?": "ما هي الرسوم التي تفرضها Etsy على البائعين؟", "Does Etsy charge fees on shipping?": "هل تفرض Etsy رسوماً على تكلفة الشحن؟",
+    "How does Etsy Offsite Ads affect profit?": "كيف تؤثر إعلانات Etsy الخارجية على الأرباح؟", "How is payment processing calculated?": "كيف تُحسب رسوم معالجة الدفع؟",
+    "Can I calculate digital product profit?": "هل يمكنني حساب أرباح المنتجات الرقمية؟", "Does ShopProfit store my financial data?": "هل تحفظ ShopProfit بياناتي المالية؟",
+    "Your numbers stay yours.": "أرقامك وبياناتك ملكك وحدك.", "Local calculations": "حسابات محلية في جهازك",
+    "No account required": "لا حاجة لإنشاء حساب", "No financial data storage": "لا يتم تخزين أي بيانات مالية",
+    Tools: "الأدوات", Resources: "المصادر", Legal: "قانوني", "Etsy fee calculator": "حاسبة رسوم Etsy",
+    "Digital product calculator": "حاسبة المنتجات الرقمية", "Break-even calculator": "حاسبة نقطة التعادل",
+    "How Etsy fees work": "كيف تعمل رسوم Etsy", "Seller fee guide": "دليل رسوم البائعين",
+    Privacy: "الخصوصية", Terms: "الشروط", Methodology: "المنهجية",
+    "Independent calculator. Not affiliated with Etsy.": "حاسبة مستقلة، غير تابعة لشركة Etsy.",
+    "Calculated locally": "تم الحساب محلياً", "Profit breakdown copied": "تم نسخ تفاصيل الأرباح", "Breakdown copied": "تم نسخ التفاصيل",
+    "Clipboard access is unavailable.": "تعذر الوصول إلى الحافظة.", "Digital product preset applied": "تم تطبيق إعداد المنتج الرقمي",
+    "Calculator reset": "تمت إعادة ضبط الحاسبة", "Profit report downloaded": "تم تحميل تقرير الأرباح",
+    "Enter an amount between 0 and 99,999,999.": "أدخل مبلغاً بين 0 و99,999,999.",
+    "Advanced options": "خيارات متقدمة", "Break-even, target pricing, and profit insights.": "نقطة التعادل، التسعير المستهدف، وتحليلات الأرباح.",
+    "ShopProfit calculates everything directly in your browser. Your prices, costs, and profit calculations are not sent to a server. Sharing or downloading a report happens only when you choose it.": "تحسب ShopProfit كل شيء محلياً في متصفحك. لا تُرسل بيانات أسعارك أو تكاليفك أو أرباحك إلى أي خادم.",
+    "Rates are estimates. Check Etsy's current seller fee schedule for your account.": "الرسوم تقديرية. تحقق من جدول رسوم Etsy الحالي لحسابك.",
+    "United States": "الولايات المتحدة", "United Kingdom": "المملكة المتحدة", Canada: "كندا", Australia: "أستراليا",
+    "Germany / Eurozone": "ألمانيا / منطقة اليورو", France: "فرنسا", Italy: "إيطاليا", Spain: "إسبانيا", India: "الهند",
+    Japan: "اليابان", "Türkiye": "تركيا", "Global / Other": "عالمي / أخرى",
+    "gross revenue = item price + shipping": "إجمالي الإيرادات = سعر السلعة + الشحن",
+    "platform fees = listing + 6.5% + processing + other fees": "رسوم المنصة = الإدراج + 6.5% + معالجة الدفع + الرسوم الأخرى",
+    "net profit = revenue − fees − business costs": "صافي الربح = الإيرادات − الرسوم − تكاليف النشاط",
+    "Stacked view of Etsy fees, business costs, and your profit": "رسم بياني لرسوم Etsy وتكاليف النشاط وصافي أرباحك",
+    "ShopProfit — Etsy Profit Breakdown": "ShopProfit — تفاصيل أرباح Etsy",
+    "Etsy Plus allocation": "حصة Etsy Plus", "Production cost": "تكلفة الإنتاج",
+    "Calculator benefits": "مميزات الحاسبة", "The short answer": "باختصار",
+  }
+};
+
+export {
+  ALL_LANGUAGES,
+  SUPPORTED_UI_LANGUAGES,
+  LANGUAGE_ALIASES,
+  parseLanguageTag,
+  detectPreferredLanguage,
+  isLanguageSupported,
+  getLanguageDirection,
+  getLanguageLocale,
+  formatNumber,
+  formatCurrency,
+  formatDate
+} from "./i18n.js";
+
+/**
+ * Legacy region language helper maintained for backward compatibility with existing tests.
+ */
 export function languageForRegion(countryCode, timeZone = "", browserLanguage = "") {
   const byCountry = { IN: "hi-IN", FR: "fr-FR", DE: "de-DE", ES: "es-ES", JP: "ja-JP" };
   if (byCountry[countryCode]) return byCountry[countryCode];
   const zone = timeZone.toLowerCase();
   if (zone.startsWith("asia/shanghai") || zone.startsWith("asia/urumqi") || zone.startsWith("asia/chongqing") || zone.startsWith("asia/harbin")) return "zh-CN";
   const browserPrefix = browserLanguage.toLowerCase().split("-")[0];
-  return ({ zh: "zh-CN", hi: "hi-IN", fr: "fr-FR", de: "de-DE", es: "es-ES", ja: "ja-JP" })[browserPrefix] || "en";
+  return ({ zh: "zh-CN", hi: "hi-IN", fr: "fr-FR", de: "de-DE", es: "es-ES", ja: "ja-JP", ar: "ar" })[browserPrefix] || "en";
 }

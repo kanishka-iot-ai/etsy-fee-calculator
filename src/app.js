@@ -1,6 +1,11 @@
 import { COUNTRIES, COUNTRY_ORDER, countryFromTimeZone } from "./countries.js";
 import { asCents, calculateRequiredPrice, calculateSale, formatMoney, TRANSACTION_RATE } from "./calculator.js";
-import { LANGUAGES, languageForRegion } from "./translations.js";
+import {
+  LANGUAGES,
+  detectPreferredLanguage,
+  getLanguageDirection,
+  isLanguageSupported
+} from "./translations.js";
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -22,11 +27,12 @@ const countrySelects = [$("#country"), $("#country-nav")];
 let activeCountryCode = routeCountry || store.get("shopprofit-country") || countryFromTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
 if (!COUNTRIES[activeCountryCode]) activeCountryCode = "US";
 const languageSelect = $("#language-nav");
-let languagePreference = store.get("shopprofit-language") || "auto";
-if (languagePreference !== "auto" && !LANGUAGES[languagePreference]) languagePreference = "auto";
-let activeLanguage = languagePreference === "auto"
-  ? languageForRegion(activeCountryCode, Intl.DateTimeFormat().resolvedOptions().timeZone, navigator.language)
-  : languagePreference;
+let languagePreference = store.get("shopprofit.language") || store.get("shopprofit-language") || "auto";
+if (languagePreference !== "auto" && !isLanguageSupported(languagePreference)) languagePreference = "auto";
+let activeLanguage = detectPreferredLanguage({
+  savedLanguage: languagePreference === "auto" ? null : languagePreference,
+  languages: typeof navigator !== "undefined" ? (navigator.languages || (navigator.language ? [navigator.language] : [])) : [],
+});
 let digitalMode = routeCountry === "OTHER";
 let physicalSnapshot = null;
 let toastTimer;
@@ -89,6 +95,8 @@ function translatePage() {
 }
 function applyLanguage() {
   const language = LANGUAGES[activeLanguage] || LANGUAGES.en;
+  document.documentElement.lang = language.locale || "en";
+  document.documentElement.dir = getLanguageDirection(activeLanguage);
   const hero = $("#hero-title");
   const [firstLine, secondLine] = language.heroLines || LANGUAGES.en.heroLines;
   if (hero) {
@@ -108,16 +116,30 @@ function applyLanguage() {
   fitHeroHeading();
   const analysisButton = $("#show-analysis");
   if (analysisButton) analysisButton.textContent = translate($(".scenarios-panel")?.open ? "Hide Detailed Analysis" : "Show Detailed Analysis");
-  const titles = { en: "Etsy Profit Calculator — Fees, Costs & Net Profit | ShopProfit", "zh-CN": "免费 Etsy 利润计算器 — ShopProfit", "hi-IN": "मुफ़्त Etsy लाभ कैलकुलेटर — ShopProfit", "fr-FR": "Calculateur de bénéfice Etsy gratuit — ShopProfit", "de-DE": "Kostenloser Etsy-Gewinnrechner — ShopProfit", "es-ES": "Calculadora gratuita de beneficios de Etsy — ShopProfit", "ja-JP": "無料 Etsy 利益計算機 — ShopProfit" };
+  const titles = {
+    en: "Etsy Profit Calculator — Fees, Costs & Net Profit | ShopProfit",
+    "zh-CN": "免费 Etsy 利润计算器 — ShopProfit",
+    "hi-IN": "मुफ़्त Etsy लाभ कैलकुलेटर — ShopProfit",
+    "fr-FR": "Calculateur de bénéfice Etsy gratuit — ShopProfit",
+    "de-DE": "Kostenloser Etsy-Gewinnrechner — ShopProfit",
+    "es-ES": "Calculadora gratuita de beneficios de Etsy — ShopProfit",
+    "ja-JP": "無料 Etsy 利益計算機 — ShopProfit",
+    ar: "حاسبة أرباح Etsy — الرسوم والتكاليف وصافي الربح | ShopProfit"
+  };
   const routeTitles = {
-    UK: { en: "Etsy Fee Calculator UK — ShopProfit", "zh-CN": "英国 Etsy 费用计算器 — ShopProfit", "hi-IN": "Etsy शुल्क कैलकुलेटर यूके — ShopProfit", "fr-FR": "Calculateur de frais Etsy Royaume-Uni — ShopProfit", "de-DE": "Etsy-Gebührenrechner Großbritannien — ShopProfit", "es-ES": "Calculadora de tarifas Etsy Reino Unido — ShopProfit" },
-    CA: { en: "Etsy Fee Calculator Canada — ShopProfit", "zh-CN": "加拿大 Etsy 费用计算器 — ShopProfit", "hi-IN": "Etsy शुल्क कैलकुलेटर कनाडा — ShopProfit", "fr-FR": "Calculateur de frais Etsy Canada — ShopProfit", "de-DE": "Etsy-Gebührenrechner Kanada — ShopProfit", "es-ES": "Calculadora de tarifas Etsy Canadá — ShopProfit" },
-    AU: { en: "Etsy Fee Calculator Australia — ShopProfit", "zh-CN": "澳大利亚 Etsy 费用计算器 — ShopProfit", "hi-IN": "Etsy शुल्क कैलकुलेटर ऑस्ट्रेलिया — ShopProfit", "fr-FR": "Calculateur de frais Etsy Australie — ShopProfit", "de-DE": "Etsy-Gebührenrechner Australien — ShopProfit", "es-ES": "Calculadora de tarifas Etsy Australia — ShopProfit" },
-    OTHER: { en: "Etsy Digital Download Fee Calculator — ShopProfit", "zh-CN": "Etsy 数字下载费用计算器 — ShopProfit", "hi-IN": "Etsy डिजिटल डाउनलोड शुल्क कैलकुलेटर — ShopProfit", "fr-FR": "Calculateur de frais Etsy pour produits numériques — ShopProfit", "de-DE": "Etsy-Gebührenrechner für digitale Produkte — ShopProfit", "es-ES": "Calculadora de tarifas Etsy para descargas digitales — ShopProfit" },
+    UK: { en: "Etsy Fee Calculator UK — ShopProfit", "zh-CN": "英国 Etsy 费用计算器 — ShopProfit", "hi-IN": "Etsy शुल्क कैलकुलेटर यूके — ShopProfit", "fr-FR": "Calculateur de frais Etsy Royaume-Uni — ShopProfit", "de-DE": "Etsy-Gebührenrechner Großbritannien — ShopProfit", "es-ES": "Calculadora de tarifas Etsy Reino Unido — ShopProfit", ar: "حاسبة رسوم Etsy المملكة المتحدة — ShopProfit" },
+    CA: { en: "Etsy Fee Calculator Canada — ShopProfit", "zh-CN": "加拿大 Etsy 费用计算器 — ShopProfit", "hi-IN": "Etsy शुल्क कैलकुलेटर कनाडा — ShopProfit", "fr-FR": "Calculateur de frais Etsy Canada — ShopProfit", "de-DE": "Etsy-Gebührenrechner Kanada — ShopProfit", "es-ES": "Calculadora de tarifas Etsy Canadá — ShopProfit", ar: "حاسبة رسوم Etsy كندا — ShopProfit" },
+    AU: { en: "Etsy Fee Calculator Australia — ShopProfit", "zh-CN": "澳大利亚 Etsy 费用计算器 — ShopProfit", "hi-IN": "Etsy शुल्क कैलकुलेटर ऑस्ट्रेलिया — ShopProfit", "fr-FR": "Calculateur de frais Etsy Australie — ShopProfit", "de-DE": "Etsy-Gebührenrechner Australien — ShopProfit", "es-ES": "Calculadora de tarifas Etsy Australia — ShopProfit", ar: "حاسبة رسوم Etsy أستراليا — ShopProfit" },
+    OTHER: { en: "Etsy Digital Download Fee Calculator — ShopProfit", "zh-CN": "Etsy 数字下载费用计算器 — ShopProfit", "hi-IN": "Etsy डिजिटल डाउनलोड शुल्क कैलकुलेटर — ShopProfit", "fr-FR": "Calculateur de frais Etsy pour produits numériques — ShopProfit", "de-DE": "Etsy-Gebührenrechner für digitale Produkte — ShopProfit", "es-ES": "Calculadora de tarifas Etsy para descargas digitales — ShopProfit", ar: "حاسبة رسوم التنزيل الرقمي Etsy — ShopProfit" },
   };
   document.title = routeTitles[routeCountry]?.[activeLanguage] || routeTitles[routeCountry]?.en || titles[activeLanguage] || titles.en;
-  const autoLabels = { en: "Auto", "zh-CN": "自动", "hi-IN": "स्वचालित", "fr-FR": "Auto", "de-DE": "Automatisch", "es-ES": "Auto", "ja-JP": "自動" };
-  languageSelect.querySelector('[value="auto"]').textContent = autoLabels[activeLanguage] || autoLabels.en;
+  const autoLabels = { en: "Auto", "zh-CN": "自动", "hi-IN": "स्वचालित", "fr-FR": "Auto", "de-DE": "Automatisch", "es-ES": "Auto", "ja-JP": "自動", ar: "تلقائي" };
+  const autoOption = languageSelect.querySelector('[value="auto"]');
+  if (autoOption) {
+    const baseAuto = autoLabels[activeLanguage] || autoLabels.en;
+    const currentName = language.label || "English";
+    autoOption.textContent = languagePreference === "auto" ? `${baseAuto} (${currentName})` : baseAuto;
+  }
   translatePage();
 }
 function formatCents(value) { return formatMoney(value, COUNTRIES[activeCountryCode]); }
@@ -263,10 +285,6 @@ function syncCountry(code, persist = true) {
   activeCountryCode = code;
   countrySelects.forEach((select) => { select.value = code; });
   if (persist && !routeCountry) store.set("shopprofit-country", code);
-  if (languagePreference === "auto") {
-    activeLanguage = languageForRegion(code, Intl.DateTimeFormat().resolvedOptions().timeZone, navigator.language);
-    applyLanguage();
-  }
   renderFeeTable();
   render();
 }
@@ -498,13 +516,28 @@ renderFeeTable();
 countrySelects.forEach((select) => select.addEventListener("change", () => syncCountry(select.value)));
 languageSelect.addEventListener("change", () => {
   languagePreference = languageSelect.value;
+  store.set("shopprofit.language", languagePreference);
   store.set("shopprofit-language", languagePreference);
-  activeLanguage = languagePreference === "auto"
-    ? languageForRegion(activeCountryCode, Intl.DateTimeFormat().resolvedOptions().timeZone, navigator.language)
-    : languagePreference;
+  activeLanguage = detectPreferredLanguage({
+    savedLanguage: languagePreference === "auto" ? null : languagePreference,
+    languages: typeof navigator !== "undefined" ? (navigator.languages || (navigator.language ? [navigator.language] : [])) : [],
+  });
   applyLanguage();
   render();
 });
+
+if (typeof window !== "undefined") {
+  window.addEventListener("languagechange", () => {
+    if (languagePreference === "auto") {
+      activeLanguage = detectPreferredLanguage({
+        savedLanguage: null,
+        languages: typeof navigator !== "undefined" ? (navigator.languages || (navigator.language ? [navigator.language] : [])) : [],
+      });
+      applyLanguage();
+      render();
+    }
+  });
+}
 $("#sale-form").addEventListener("submit", (event) => event.preventDefault());
 $("#sale-form").addEventListener("input", (event) => { if (event.target.matches("input")) render(); });
 $("#target-profit").addEventListener("input", render);

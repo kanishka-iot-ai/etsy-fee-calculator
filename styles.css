@@ -604,7 +604,23 @@ body.dark .legend-profit { background: #f5f5f0; }
 body.dark .breakeven-panel .row-label, body.dark .breakeven-panel p { color: #080808; }
 
 /* Pixel typography is reserved for identity, figures, and instrument labels. */
-:root { --font-display: "Silkscreen", "IBM Plex Mono", "JetBrains Mono", monospace; --font-functional: Arial, Helvetica, sans-serif; }
+:root {
+  --font-display: "Silkscreen", "IBM Plex Mono", "JetBrains Mono", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Arabic", "Noto Sans Devanagari", "Noto Sans SC", "Noto Sans JP", sans-serif;
+  --font-functional: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Arabic", "Noto Sans Devanagari", "Noto Sans SC", "Noto Sans JP", Arial, Helvetica, sans-serif;
+}
+:lang(ar), [dir="rtl"] {
+  --font-display: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Arabic", "Geeza Pro", Arial, sans-serif;
+  --font-functional: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Arabic", "Geeza Pro", Arial, sans-serif;
+}
+:lang(hi) {
+  --font-display: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Devanagari", "Kohinoor Devanagari", sans-serif;
+}
+:lang(ja) {
+  --font-display: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans JP", "Hiragino Sans", "Meiryo", sans-serif;
+}
+:lang(zh) {
+  --font-display: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
 body { font-family: var(--font-functional); }
 .brand, .brand-mark, .hero h1, .net-number, .secondary-number,
 .footer-brand::after,
@@ -989,4 +1005,56 @@ img, svg, video { max-width: 100%; }
 .noscript-note { padding: 12px 20px; color: var(--ink); background: var(--accent); font-size: 13px; }
 @media (max-width: 699px) {
   .hero h1.route-h1 { display: block; width: 100%; font-size: clamp(25px, 8vw, 44px); line-height: 1; }
+}
+
+/* ============================================================
+   RTL (Right-to-Left) Language Architecture
+   ============================================================ */
+[dir="rtl"] {
+  text-align: right;
+}
+[dir="rtl"] .money-input .currency-prefix {
+  padding-left: 0;
+  padding-right: 12px;
+}
+[dir="rtl"] .input-suffix {
+  border-left: none;
+  border-right: 1px solid var(--border);
+}
+[dir="rtl"] .preset-buttons .digital-preset {
+  margin-left: 0;
+  margin-right: 4px;
+}
+[dir="rtl"] .report-actions .button span {
+  margin-right: 0;
+  margin-left: 5px;
+}
+[dir="rtl"] .hero-title {
+  direction: ltr; /* Keeps the brand banner in one horizontal row */
+}
+[dir="rtl"] table th,
+[dir="rtl"] table td {
+  text-align: right;
+}
+[dir="rtl"] .scenario-table td:first-child,
+[dir="rtl"] .fee-table td:first-child {
+  text-align: right;
+}
+[dir="rtl"] .ledger-row output,
+[dir="rtl"] .net-total output,
+[dir="rtl"] .flow-legend output {
+  text-align: left;
+  direction: ltr;
+}
+[dir="rtl"] .toast {
+  left: auto;
+  right: 24px;
+}
+[dir="rtl"] .section-heading::after {
+  right: auto;
+  left: 2px;
+}
+[dir="rtl"] .formula-panel::after {
+  right: auto;
+  left: 13px;
 }
