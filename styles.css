@@ -856,20 +856,84 @@ img, svg, video { max-width: 100%; }
   .language-nav { width: 68px; }
 }
 
-/* Final editorial hierarchy and mobile calculator shortcut. */
+/* Final editorial hierarchy: single-row hero and above-the-fold calculator. */
+.hero {
+  min-height: 0 !important;
+  padding-block: 14px 10px !important;
+  gap: 0 !important;
+}
+.hero-copy {
+  width: 100%;
+}
+.hero-index {
+  margin: 0 0 5px !important;
+  font-size: 8px !important;
+  letter-spacing: .12em !important;
+}
 .hero h1 {
-  display: block;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: baseline !important;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
   width: max-content;
   max-width: 100%;
-  font-size: clamp(42px, 8vw, 112px);
+  font-size: clamp(22px, 3.8vw, 42px) !important;
   font-weight: 900;
-  line-height: .86;
-  letter-spacing: -.075em;
-  white-space: normal;
+  line-height: 1.05 !important;
+  letter-spacing: -.035em !important;
+  gap: 0.28em !important;
+  margin: 0 0 6px !important;
 }
-.hero h1 .hero-line { display: block; }
-.hero h1 .hero-word { display: inline-block; }
-.hero h1 .hero-keep { width: max-content; padding: .02em .08em .07em; margin: 0; }
+.hero h1 .hero-line {
+  display: inline-flex !important;
+  align-items: baseline !important;
+  gap: 0.28em !important;
+  white-space: nowrap !important;
+}
+.hero h1 .hero-word {
+  display: inline-block !important;
+  white-space: nowrap !important;
+}
+.hero h1 .hero-keep {
+  display: inline-block !important;
+  white-space: nowrap !important;
+  width: auto !important;
+  padding: .04em .16em .06em !important;
+  margin: 0 !important;
+  color: #080808 !important;
+  background: #c8ff00 !important;
+}
+.hero-description {
+  max-width: 720px;
+  margin: 0 0 6px !important;
+  font-size: 13px !important;
+  line-height: 1.35 !important;
+}
+.trust-row {
+  margin: 0 !important;
+  gap: 4px 14px !important;
+}
+.trust-row li {
+  font-size: 9px !important;
+}
+#calculator .section-heading {
+  min-height: 0 !important;
+  padding: 0 0 8px 0 !important;
+  margin-bottom: 12px !important;
+}
+#calculator .section-heading::before {
+  display: none !important;
+}
+#calculator .section-heading h2 {
+  font-size: clamp(16px, 2.4vw, 22px) !important;
+  line-height: 1 !important;
+  margin: 0 0 3px !important;
+}
+#calculator .section-heading p {
+  font-size: 11px !important;
+  margin: 0 !important;
+}
 .net-number, .net-meta, .ledger-row output, .net-total output { font-variant-numeric: tabular-nums; }
 .currency-display { color: var(--muted); background: var(--bg); border-style: dashed; box-shadow: none; pointer-events: none; }
 .money-input:focus-within, .select-wrap:focus-within { border-color: #c8ff00; box-shadow: 3px 3px 0 #c8ff00; }
@@ -897,15 +961,26 @@ img, svg, video { max-width: 100%; }
   .calculator-grid { grid-template-columns: minmax(0, 1.38fr) minmax(380px, 1fr); }
 }
 @media (max-width: 699px) {
-  .hero h1 { display: flex; width: 100%; flex-direction: column; align-items: flex-start; gap: 0; }
-  .hero h1 .hero-line { display: contents; }
-  .hero h1 .hero-word { display: block; }
-  .hero h1 .hero-keep { width: max-content; }
+  .hero { padding-block: 10px 8px !important; }
+  .hero h1 {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: baseline !important;
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
+    width: 100%;
+    font-size: clamp(14px, 4.2vw, 24px) !important;
+    gap: 0.2em !important;
+  }
+  .hero h1 .hero-line { display: inline-flex !important; }
+  .hero h1 .hero-word { display: inline-block !important; }
+  .hero h1 .hero-keep { width: auto !important; padding: .03em .12em !important; }
   .mobile-action-bar { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, .75fr) minmax(0, .65fr); gap: 5px; }
   .mobile-profit output { font-size: 9px; }
   .mobile-action-bar .button { min-width: 0; padding-inline: 3px; font-size: 8px; }
 }
 @media (max-width: 380px) {
+  .hero h1 { font-size: clamp(12px, 3.8vw, 16px) !important; gap: 0.16em !important; }
   .mobile-action-bar { gap: 3px; padding-inline: 7px; }
   .mobile-action-bar .button { font-size: 7px; }
   .mobile-profit output { font-size: 8px; }

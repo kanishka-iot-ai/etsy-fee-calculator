@@ -38,20 +38,20 @@ const translatedAttributes = new WeakMap();
 function translate(value) { return LANGUAGES[activeLanguage]?.strings[value] || value; }
 function fitHeroHeading() {
   const hero = $("#hero-title");
-  if (!hero) return;
+  if (!hero || hero.classList.contains("route-h1")) return;
   hero.style.removeProperty("font-size");
   const style = getComputedStyle(hero);
   const baseSize = Number.parseFloat(style.fontSize);
   const available = hero.parentElement.clientWidth;
+  if (!available) return;
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
   context.font = `${style.fontWeight} ${baseSize}px ${style.fontFamily}`;
-  const mobile = matchMedia("(max-width: 699px)").matches;
-  const runs = mobile
-    ? [...hero.querySelectorAll(".hero-word")].map((word) => word.textContent)
-    : [...hero.querySelectorAll(".hero-line")].map((line) => line.textContent);
-  const textWidth = Math.max(...(runs.length ? runs : [hero.textContent]).map((text) => context.measureText(text).width), 0) + baseSize * 0.4;
-  if (textWidth > available && available > 0) hero.style.fontSize = `${Math.max(14, baseSize * (available - 8) / textWidth)}px`;
+  const text = hero.textContent.replace(/\s+/g, " ").trim();
+  const textWidth = context.measureText(text).width + baseSize * 0.3;
+  if (textWidth > available && available > 0) {
+    hero.style.fontSize = `${Math.max(14, Math.floor((baseSize * (available - 8)) / textWidth))}px`;
+  }
 }
 function translatePage() {
   document.documentElement.lang = LANGUAGES[activeLanguage]?.locale || "en";
@@ -91,20 +91,20 @@ function applyLanguage() {
   const language = LANGUAGES[activeLanguage] || LANGUAGES.en;
   const hero = $("#hero-title");
   const [firstLine, secondLine] = language.heroLines || LANGUAGES.en.heroLines;
-  const lines = [firstLine, secondLine].map((text, lineIndex) => {
-    const line = document.createElement("span");
-    line.className = "hero-line";
-    const words = text.split(/\s+/).filter(Boolean);
-    words.forEach((word, index) => {
+  if (!routeCountry && hero) {
+    const allWords = [
+      ...(firstLine ? firstLine.split(/\s+/).filter(Boolean) : []),
+      ...(secondLine ? secondLine.split(/\s+/).filter(Boolean) : []),
+    ];
+    hero.replaceChildren();
+    allWords.forEach((word, index) => {
       const part = document.createElement("span");
-      part.className = `hero-word${lineIndex === 1 && index === words.length - 1 ? " hero-keep" : ""}`;
+      part.className = `hero-word${index === allWords.length - 1 ? " hero-keep" : ""}`;
       part.textContent = word;
-      line.append(part);
-      if (index < words.length - 1) line.append(" ");
+      hero.append(part);
+      if (index < allWords.length - 1) hero.append(" ");
     });
-    return line;
-  });
-  if (!routeCountry) hero.replaceChildren(lines[0], document.createElement("br"), lines[1]);
+  }
   fitHeroHeading();
   const analysisButton = $("#show-analysis");
   if (analysisButton) analysisButton.textContent = translate($(".scenarios-panel")?.open ? "Hide Detailed Analysis" : "Show Detailed Analysis");
