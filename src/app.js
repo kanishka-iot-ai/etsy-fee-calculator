@@ -15,6 +15,9 @@ const getCountryRoute = () => {
   if (path.includes("etsy-fee-calculator-canada")) return "CA";
   if (path.includes("etsy-fee-calculator-australia")) return "AU";
   if (path.includes("etsy-digital-download-fee-calculator")) return "OTHER";
+  // Fallback: read data-route-country injected by the build into each regional page's <body>
+  const bodyAttr = document.body?.dataset?.routeCountry;
+  if (bodyAttr && ["UK", "CA", "AU", "OTHER"].includes(bodyAttr)) return bodyAttr;
   return null;
 };
 

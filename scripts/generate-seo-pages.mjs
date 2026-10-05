@@ -109,6 +109,13 @@ for (const route of routes) {
   html = replaceOnce(html, /<h2 id="calculator-heading">[\s\S]*?<\/h2>/, `<h2 id="calculator-heading">${route.h1}</h2>`, `${route.file} calculator heading`);
   html = replaceOnce(html, /<p class="hero-description">[\s\S]*?<\/p>/, `<p class="hero-description">${route.intro}</p>`, `${route.file} introduction`);
   html = replaceOnce(html, /<details><summary>What fees does Etsy charge sellers\?<\/summary><p>[\s\S]*?<\/p><\/details>/, `<details><summary>${route.question}</summary><p>${route.answer}</p></details>`, `${route.file} FAQ`);
+  // Inject data-route-country on <body> so JS can read it as a reliable fallback (no pathname dependency)
+  html = html.replace(/<body>/, `<body data-route-country="${route.code}">`);
+  // Pre-select the correct country in both dropdowns in the static HTML
+  html = html.replace(/(<select class="country-nav"[^>]*>)([\s\S]*?)(<\/select>)/, (m, open, inner, close) =>
+    open + inner.replace(/value="([A-Z]+)"/g, (_, c) => c === route.code ? `value="${c}" selected` : `value="${c}"`) + close);
+  html = html.replace(/(<select id="country"[^>]*>)([\s\S]*?)(<\/select>)/, (m, open, inner, close) =>
+    open + inner.replace(/value="([A-Z]+)"/g, (_, c) => c === route.code ? `value="${c}" selected` : `value="${c}"`) + close);
 
   const graphTag = html.match(/<script type="application\/ld\+json" id="structured-data">\s*([\s\S]*?)\s*<\/script>/);
   if (!graphTag) throw new Error(`Missing WebApplication schema in ${route.file}`);
