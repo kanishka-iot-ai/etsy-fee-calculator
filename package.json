@@ -7,6 +7,7 @@
     "build": "node scripts/generate-seo-pages.mjs",
     "build:seo": "node scripts/generate-seo-pages.mjs",
     "test": "node --test",
-    "check:launch": "node scripts/check-launch-readiness.mjs"
+    "verify:fees": "node scripts/verify-etsy-fees.mjs",
+    "check:launch": "node scripts/verify-etsy-fees.mjs && node scripts/check-launch-readiness.mjs"
   }
 }
