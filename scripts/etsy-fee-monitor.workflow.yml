@@ -1,0 +1,70 @@
+name: Etsy Fee Policy Monitor
+
+on:
+  schedule:
+    # Run automatically every Monday at 08:00 UTC
+    - cron: '0 8 * * 1'
+  workflow_dispatch: # Allows manual trigger from GitHub UI anytime
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check-fees:
+    name: Monitor Official Etsy Fee Policies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run Fee Policy Check
+        id: fee_check
+        run: node scripts/check-etsy-fee-updates.mjs
+        continue-on-error: true
+
+      - name: Alert via GitHub Issue if Fee Update Detected
+        if: steps.fee_check.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = "⚠️ Etsy Fee Policy Update Detected on help.etsy.com";
+            const body = `## 🚨 Official Etsy Fee Schedule Update Detected
+            
+            The automated policy monitor detected that one or more official Etsy Help Center policy articles have been updated by Etsy:
+            
+            - **Payment Processing Fees:** https://help.etsy.com/hc/en-us/articles/115015628847
+            - **Regulatory Operating Fees:** https://help.etsy.com/hc/en-us/articles/1500011073202
+            - **General Fees and Taxes:** https://help.etsy.com/hc/en-us/articles/115014483627
+            - **Offsite Ads Policy:** https://help.etsy.com/hc/en-us/articles/360000338367
+            
+            ### Action Required:
+            1. Open the links above to review any rate adjustments.
+            2. If any country's fee schedule changed, update \`src/countries.js\`.
+            3. Run \`npm test\` and \`npm run build:seo\`.
+            4. Run \`node scripts/check-etsy-fee-updates.mjs --update\` to record the new baseline.
+            5. Commit and push.
+            `;
+            
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open'
+            });
+            const existing = issues.data.find(i => i.title === title);
+            if (!existing) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body
+              });
+              console.log("Created GitHub issue alert.");
+            } else {
+              console.log("Existing alert issue already open. Skipping duplicate.");
+            }
