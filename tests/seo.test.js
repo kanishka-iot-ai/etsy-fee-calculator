@@ -228,7 +228,7 @@ test("contact information is configured through SUPPORT_EMAIL and missing config
   assert.match(build, /SUPPORT_EMAIL is unset/);
   assert.ok(pkg.scripts["check:launch"]);
   const siteConfig = JSON.parse(await read("../config/site-config.json"));
-  assert.equal(siteConfig.SUPPORT_EMAIL, "support@shopprofitcalculator.com");
+  assert.equal(siteConfig.SUPPORT_EMAIL, "info@shopprofitcalculator.com");
 });
 
 test("contact page, official fee references, and transparent country assumptions are crawlable", async () => {
