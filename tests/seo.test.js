@@ -114,12 +114,13 @@ test("brand mark and favicon share a crisp pixel SVG without replacing bitmap ty
   assert.match(css, /--font-display:\s*"Silkscreen"/);
 });
 
-test("methodology and FAQ routes are indexable, crawlable resources with canonical metadata", async () => {
+test("fees, methodology and FAQ routes are indexable, crawlable resources with canonical metadata", async () => {
   const redirects = await read("../_redirects");
   const sitemap = await read("../sitemap.xml");
   for (const [file, route, expectedTitle] of [
-    ["../methodology.html", "/methodology", "Etsy Profit Calculator Methodology | ShopProfit"],
-    ["../faq.html", "/faq", "Etsy Profit Calculator FAQ | ShopProfit"],
+    ["../fees.html", "/fees/", "Etsy Fees Calculator &amp; Complete Seller Fees Guide | ShopProfit"],
+    ["../methodology.html", "/methodology/", "Etsy Profit Calculator Methodology | How ShopProfit Calculates Profit"],
+    ["../faq.html", "/faq/", "Etsy Profit Calculator FAQ – Etsy Fees &amp; Profit Questions | ShopProfit"],
   ]) {
     const html = await read(file);
     assert.equal(attr(html, /<link rel="canonical" href="([^"]+)"\s*>/), `https://shopprofitcalculator.com${route}`);
@@ -129,8 +130,9 @@ test("methodology and FAQ routes are indexable, crawlable resources with canonic
     assert.ok(html.includes('social-preview.png'));
     assert.ok(sitemap.includes(`<loc>https://shopprofitcalculator.com${route}</loc>`));
     assert.ok(!redirects.includes(`${route} ${route}.html 200`), "no looping 200 rewrite rules in _redirects");
-    const dirIndex = await read(`..${route}/index.html`);
-    assert.ok(dirIndex.includes(expectedTitle), `${route}/index.html served natively`);
+    const dir = route.replace(/\/$/, "");
+    const dirIndex = await read(`..${dir}/index.html`);
+    assert.ok(dirIndex.includes(expectedTitle), `${route} index.html served natively`);
     const scripts = [...html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)];
     for (const [, json] of scripts) assert.doesNotThrow(() => JSON.parse(json));
     assert.ok(html.includes('href="/#calculator"'));
@@ -141,7 +143,7 @@ test("methodology and FAQ routes are indexable, crawlable resources with canonic
   const methodology = await read("../methodology.html");
   assert.match(methodology, /net profit = gross revenue − platform fees − production cost − packaging\/shipping cost − Etsy Plus allocation/);
   for (const [path, target] of [
-    ["/etsy-profit-calculator", "/ 301"], ["/etsy-fee-calculator", "/#fees 301"],
+    ["/etsy-profit-calculator", "/ 301"], ["/etsy-fee-calculator", "/fees/ 301"],
     ["/etsy-pricing-calculator", "/#target-pricing 301"], ["/etsy-break-even-calculator", "/#break-even-tool 301"],
     ["/etsy-offsite-ads-calculator", "/#offsite-ads 301"],
     ["/etsy-digital-product-calculator", "/etsy-digital-download-fee-calculator 301"],
@@ -245,3 +247,32 @@ test("contact page, official fee references, and transparent country assumptions
   assert.match(methodology, /1500011073202-What-is-a-Regulatory-Operating-Fee/);
   assert.match(app, /c\.processingNote/);
 });
+
+test("dedicated /fees/ route satisfies all AEO, GEO, schema, and internal linking standards", async () => {
+  const [fees, feesDir, home, sitemap] = await Promise.all([
+    read("../fees.html"), read("../fees/index.html"), read("../index.html"), read("../sitemap.xml"),
+  ]);
+  assert.equal(attr(fees, /<link rel="canonical" href="([^"]+)"/), "https://shopprofitcalculator.com/fees/");
+  assert.match(fees, /<h1>Etsy Fees Calculator &amp; Complete Etsy Seller Fees Guide<\/h1>/);
+  assert.ok(fees.includes("Direct Answer:"), "contains direct answer block for AEO");
+  assert.ok(fees.includes("fee-stat-grid"), "contains key rate visual callouts");
+  assert.ok(fees.includes("Scenario 1: $10 Digital Download"), "contains worked example 1");
+  assert.ok(fees.includes("Scenario 2: $35 Handmade Ceramic Mug"), "contains worked example 2");
+  assert.ok(fees.includes("Scenario 3: £28 Handmade Item with 0.48% Regulatory Fee"), "contains worked example 3");
+  assert.ok(fees.includes('href="/#calculator"'), "links directly to homepage calculator");
+  assert.ok(fees.includes('href="/methodology/"'), "links to methodology");
+  assert.ok(fees.includes('href="/faq/"'), "links to faq");
+  assert.ok(home.includes('href="/fees/"'), "homepage links to /fees/");
+  assert.ok(sitemap.includes("<loc>https://shopprofitcalculator.com/fees/</loc>"), "sitemap lists /fees/");
+  assert.equal(fees, feesDir, "fees/index.html matches fees.html for native Cloudflare Pages directory serving");
+  
+  const faqMatch = fees.match(/<script type="application\/ld\+json" id="fees-faq-schema">([\s\S]*?)<\/script>/);
+  assert.ok(faqMatch, "has dedicated FAQPage schema");
+  const faqSchema = JSON.parse(faqMatch[1]);
+  assert.equal(faqSchema["@type"], "FAQPage");
+  assert.ok(faqSchema.mainEntity.length >= 6, "has at least 6 FAQs");
+  for (const q of faqSchema.mainEntity) {
+    assert.ok(q.name && q.acceptedAnswer?.text);
+  }
+});
+

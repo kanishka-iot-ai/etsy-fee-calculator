@@ -32,7 +32,9 @@ const noScriptNote = `<noscript><p class="noscript-note">The fee guide, methodol
 if (/<noscript>[\s\S]*?<\/noscript>/.test(base)) base = base.replace(/<noscript>[\s\S]*?<\/noscript>/, noScriptNote);
 else base = replaceOnce(base, /<\/main>/, `</main>\n  ${noScriptNote}`, "main closing tag");
 base = replaceOnce(base, /<div class="footer-column"><strong>Tools<\/strong>[\s\S]*?<\/div><div class="footer-column"><strong>Resources<\/strong>/,
-  `<div class="footer-column"><strong>Tools</strong><a href="/#calculator">Etsy profit calculator</a><a href="/#fees">Etsy fee calculator</a><a href="/#target-pricing">Etsy pricing calculator</a><a href="/#break-even-tool">Etsy break-even calculator</a><a href="/#offsite-ads">Etsy Offsite Ads calculator</a><a href="/etsy-digital-download-fee-calculator">Etsy digital product calculator</a><strong>Regional calculators</strong><a href="/etsy-fee-calculator-uk">United Kingdom</a><a href="/etsy-fee-calculator-canada">Canada</a><a href="/etsy-fee-calculator-australia">Australia</a></div><div class="footer-column"><strong>Resources</strong>`, "footer tool links");
+  `<div class="footer-column"><strong>Tools</strong><a href="/#calculator">Etsy profit calculator</a><a href="/fees/">Etsy fee calculator</a><a href="/#target-pricing">Etsy pricing calculator</a><a href="/#break-even-tool">Etsy break-even calculator</a><a href="/#offsite-ads">Etsy Offsite Ads calculator</a><a href="/etsy-digital-download-fee-calculator">Etsy digital product calculator</a><strong>Regional calculators</strong><a href="/etsy-fee-calculator-uk">United Kingdom</a><a href="/etsy-fee-calculator-canada">Canada</a><a href="/etsy-fee-calculator-australia">Australia</a></div><div class="footer-column"><strong>Resources</strong>`, "footer tool links");
+base = replaceOnce(base, /<div class="footer-column"><strong>Resources<\/strong>[\s\S]*?<\/div><div class="footer-column"><strong>Legal<\/strong>/,
+  `<div class="footer-column"><strong>Resources</strong><a href="/fees/">Etsy fees guide</a><a href="/methodology/">Methodology</a><a href="/faq/">FAQ</a></div><div class="footer-column"><strong>Legal</strong>`, "footer resource links");
 base = replaceOnce(base, /<div class="footer-column"><strong>Legal<\/strong>[\s\S]*?<\/div>/,
   `<div class="footer-column"><strong>Legal</strong><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/contact">Contact</a>${supportContactHtml()}</div>`, "footer contact link");
 
@@ -169,8 +171,8 @@ contactPage = contactPage.replace(/(<p>For questions about the calculator, site 
 await mkdir(new URL("../contact/", import.meta.url), { recursive: true });
 await writeFile(new URL("../contact.html", import.meta.url), contactPage);
 await writeFile(new URL("../contact/index.html", import.meta.url), contactPage);
-// Write methodology and faq to subdirectories so Cloudflare serves them natively (no 200-rewrite loop)
-for (const page of ["methodology", "faq"]) {
+// Write fees, methodology, and faq to subdirectories so Cloudflare serves them natively (no 200-rewrite loop)
+for (const page of ["fees", "methodology", "faq"]) {
   const content = await readFile(new URL(`../${page}.html`, import.meta.url), "utf8");
   await mkdir(new URL(`../${page}/`, import.meta.url), { recursive: true });
   await writeFile(new URL(`../${page}/index.html`, import.meta.url), content);

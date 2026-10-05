@@ -1,15 +1,313 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Clear answers about Etsy fees, shipping, Offsite Ads, profit margin, break-even prices, digital products, and ShopProfit privacy.">
-  <link rel="canonical" href="https://shopprofitcalculator.com/faq">
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/styles.css">
-  <meta property="og:type" content="article"><meta property="og:site_name" content="ShopProfit"><meta property="og:title" content="Etsy Profit Calculator FAQ | ShopProfit"><meta property="og:description" content="Answers to common questions about Etsy fees and estimating seller profit."><meta property="og:url" content="https://shopprofitcalculator.com/faq"><meta property="og:image" content="https://shopprofitcalculator.com/social-preview.png"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="ShopProfit Etsy profit calculator — Know what you keep">
-  <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Etsy Profit Calculator FAQ | ShopProfit"><meta name="twitter:description" content="Answers to common questions about Etsy fees and estimating seller profit."><meta name="twitter:image" content="https://shopprofitcalculator.com/social-preview.png">
-  <title>Etsy Profit Calculator FAQ | ShopProfit</title>
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://shopprofitcalculator.com/#organization","name":"ShopProfit","url":"https://shopprofitcalculator.com/","logo":"https://shopprofitcalculator.com/logo-mark.svg"},{"@type":"WebSite","@id":"https://shopprofitcalculator.com/#website","name":"ShopProfit","alternateName":"ShopProfit Calculator","url":"https://shopprofitcalculator.com/","publisher":{"@id":"https://shopprofitcalculator.com/#organization"}},{"@type":"WebPage","name":"Etsy Profit Calculator FAQ","url":"https://shopprofitcalculator.com/faq","isPartOf":{"@id":"https://shopprofitcalculator.com/#website"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://shopprofitcalculator.com/"},{"@type":"ListItem","position":2,"name":"FAQ","item":"https://shopprofitcalculator.com/faq"}]}]}</script>
-  <script type="application/ld+json" id="faq-schema">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How much does Etsy charge?","acceptedAnswer":{"@type":"Answer","text":"Etsy charges listing, transaction, and country-specific payment processing fees. Some sellers also have a regulatory fee or an attributed Offsite Ads fee."}},{"@type":"Question","name":"How do I calculate Etsy profit?","acceptedAnswer":{"@type":"Answer","text":"Add item price and buyer shipping, then subtract modeled Etsy fees, production costs, packaging and shipping costs, and any Etsy Plus allocation."}},{"@type":"Question","name":"Does Etsy charge a transaction fee on shipping?","acceptedAnswer":{"@type":"Answer","text":"The calculator applies its transaction rate to item price plus shipping charged to the buyer."}},{"@type":"Question","name":"How do Offsite Ads affect profit?","acceptedAnswer":{"@type":"Answer","text":"An attributed sale can include the selected 12% or 15% Offsite Ads rate, subject to the fee cap modeled for the selected country."}},{"@type":"Question","name":"What fees apply to digital products?","acceptedAnswer":{"@type":"Answer","text":"Digital products still incur listing, transaction, payment processing, and possibly advertising fees. Production and packaging costs can be set to zero when appropriate."}},{"@type":"Question","name":"Does ShopProfit send my financial inputs to a server?","acceptedAnswer":{"@type":"Answer","text":"Calculator inputs and results are calculated locally in your browser and are not sent to ShopProfit servers. Sharing a report only happens when you choose a share action."}}]}</script>
-  <style>.resource-page{width:min(100% - 32px,1040px);margin:48px auto 90px}.resource-nav{display:flex;justify-content:space-between;align-items:center;gap:20px;border-bottom:2px solid currentColor;padding:16px 0}.resource-nav a{color:inherit}.resource-copy{margin-top:42px;padding:clamp(24px,5vw,56px);border:2px solid currentColor;box-shadow:8px 8px 0 var(--lime,#c8ff00)}.resource-copy h1{font:700 clamp(32px,7vw,64px)/1.05 var(--font-display,"Silkscreen",monospace)}.resource-copy p{line-height:1.7}.resource-copy details{padding:18px 0;border-top:1px solid currentColor}.resource-copy summary{cursor:pointer;font-weight:700}.resource-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}.resource-links a{padding:12px;border:2px solid currentColor;color:inherit}</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#F2F1EC">
+  <title>Etsy Profit Calculator FAQ – Etsy Fees &amp; Profit Questions | ShopProfit</title>
+  <meta name="description" content="Direct, accurate answers to common questions about Etsy seller fees, payment processing, shipping deductions, profit margins, break-even prices, and ShopProfit.">
+  <link rel="canonical" href="https://shopprofitcalculator.com/faq/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="ShopProfit">
+  <meta property="og:title" content="Etsy Profit Calculator FAQ – Etsy Fees &amp; Profit Questions | ShopProfit">
+  <meta property="og:description" content="Answers to common questions about Etsy fees, payment processing, profit calculations, and how ShopProfit works.">
+  <meta property="og:url" content="https://shopprofitcalculator.com/faq/">
+  <meta property="og:image" content="https://shopprofitcalculator.com/social-preview.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="ShopProfit Etsy Profit Calculator FAQ">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Etsy Profit Calculator FAQ – Etsy Fees &amp; Profit Questions | ShopProfit">
+  <meta name="twitter:description" content="Answers to common questions about Etsy fees, payment processing, profit calculations, and how ShopProfit works.">
+  <meta name="twitter:image" content="https://shopprofitcalculator.com/social-preview.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://shopprofitcalculator.com/#organization",
+        "name": "ShopProfit",
+        "url": "https://shopprofitcalculator.com/",
+        "logo": "https://shopprofitcalculator.com/logo-mark.svg"
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://shopprofitcalculator.com/#website",
+        "name": "ShopProfit",
+        "alternateName": "ShopProfit Calculator",
+        "url": "https://shopprofitcalculator.com/",
+        "publisher": { "@id": "https://shopprofitcalculator.com/#organization" }
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://shopprofitcalculator.com/faq/#webpage",
+        "url": "https://shopprofitcalculator.com/faq/",
+        "name": "Etsy Profit Calculator FAQ",
+        "description": "Frequently asked questions and direct answers about Etsy fees, profit margins, and ShopProfit.",
+        "isPartOf": { "@id": "https://shopprofitcalculator.com/#website" }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://shopprofitcalculator.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "FAQ",
+            "item": "https://shopprofitcalculator.com/faq/"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json" id="faq-schema">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How much does Etsy charge sellers?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Etsy charges a $0.20 USD listing fee per item, a flat 6.5% transaction fee on gross order revenue (including shipping), and payment processing fees (typically 3% to 6.5% + fixed fee). In select countries, regulatory operating fees (0.05% to 1.67%) apply, and attributed Offsite Ads add 12% or 15%."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is Etsy's transaction fee?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Etsy's transaction fee is 6.5% of the total amount charged to the buyer, including item price, shipping fees, and gift wrapping charges."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does Etsy charge a listing fee?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Etsy charges $0.20 USD per listing. The listing remains active for 4 months or until sold, auto-renewing upon sale or expiration."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is Etsy payment processing?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Etsy Payments processing is a combined percentage plus flat fee per order based on the seller's country (e.g., 3% + $0.25 in the US, 4% + £0.20 in the UK)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are Etsy Offsite Ads?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Offsite Ads is Etsy's advertising program on Google, Facebook, Instagram, Pinterest, and Bing. Sellers pay 15% (optional under $10,000 USD/year) or 12% (mandatory over $10,000 USD/year) on attributed sales, capped at $100 per order."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I calculate Etsy profit?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Net profit = (Item price + Buyer shipping) − (Etsy listing fee + 6.5% transaction fee + payment processing + regulatory fee + Offsite Ads) − (Production materials + Packaging & shipping costs)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does Etsy charge different fees by country?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Payment processing rates vary by seller bank country (from 3% to 6.5%), and 7 countries have regulatory operating fees (e.g., UK 0.48%, France 1.14%, Canada 0.50%, Turkey 1.67%)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does shipping affect Etsy profit?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Etsy charges both its 6.5% transaction fee and payment processing fee on the shipping amount charged to the buyer. If your actual postal shipping cost exceeds what you charge the buyer, it further reduces net profit."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I calculate my Etsy profit margin?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Divide net profit by gross revenue (item price plus buyer shipping) and multiply by 100 to get your profit margin percentage."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the Etsy break-even price?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The break-even price is the exact minimum selling price that covers all platform fees and production/shipping costs with zero net profit ($0.00)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is ShopProfit free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. ShopProfit is 100% free with no account creation, no subscriptions, and no advertisements."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does ShopProfit store my financial data?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. All calculations run strictly in your web browser. ShopProfit never transmits, stores, or logs your pricing, costs, or financial results."
+        }
+      }
+    ]
+  }
+  </script>
+  <style>
+    .resource-page { width: min(100% - 32px, 1040px); margin: 40px auto 90px; }
+    .resource-nav { display: flex; justify-content: space-between; align-items: center; gap: 20px; border-bottom: 2px solid currentColor; padding: 16px 0; }
+    .resource-nav a { color: inherit; text-decoration: none; font-weight: 700; }
+    .resource-nav-links { display: flex; gap: 18px; align-items: center; font-size: 13px; }
+    .resource-nav-links a:hover { text-decoration: underline; }
+    .breadcrumb { font-size: 12px; margin-top: 24px; color: var(--muted, #666); font-family: var(--mono, monospace); }
+    .breadcrumb a { color: inherit; text-decoration: underline; }
+    .resource-copy { margin-top: 28px; padding: clamp(24px, 5vw, 56px); border: 2px solid currentColor; box-shadow: 8px 8px 0 var(--lime, #c8ff00); background: var(--surface, #fff); }
+    .resource-copy h1 { font: 700 clamp(28px, 6vw, 52px)/1.08 var(--font-display, "Silkscreen", monospace); margin: 16px 0 24px; }
+    .resource-copy h2 { font: 700 clamp(20px, 3.5vw, 26px)/1.2 var(--font-display, "Silkscreen", monospace); margin-top: 36px; margin-bottom: 14px; border-bottom: 2px solid var(--border, #080808); padding-bottom: 6px; }
+    .resource-copy p { max-width: 76ch; line-height: 1.7; font-size: 15px; margin-bottom: 12px; }
+    .direct-answer { background: color-mix(in srgb, var(--lime, #c8ff00) 15%, transparent); border-left: 4px solid var(--ink, #080808); padding: 20px; margin: 24px 0 32px; font-size: 16px; line-height: 1.7; }
+    .faq-list details { padding: 18px 0; border-top: 1px solid var(--border, #ccc); }
+    .faq-list summary { cursor: pointer; font-weight: 700; font-size: 17px; }
+    .faq-list p { margin-top: 10px; }
+    .resource-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
+    .resource-links a { padding: 12px 16px; border: 2px solid currentColor; color: inherit; text-decoration: none; font-weight: 600; font-size: 13px; }
+    .resource-links a:hover { background: var(--lime, #c8ff00); }
+    .resource-foot { margin-top: 30px; font-size: 13px; color: var(--muted, #666); }
+    .resource-foot a { color: inherit; }
+  </style>
 </head>
-<body><main class="resource-page"><nav class="resource-nav" aria-label="Page"><a href="/" aria-label="ShopProfit home">SHOPPROFIT</a><a href="/#calculator">Open calculator</a></nav><article class="resource-copy"><p class="eyebrow">Seller help</p><h1>Etsy profit calculator FAQs</h1><p>Quick answers about estimated fees, prices, and what the ShopProfit calculator includes.</p><details open><summary>How much does Etsy charge?</summary><p>Etsy charges listing, transaction, and country-specific payment-processing fees. Some sellers also have a regulatory fee or an Offsite Ads fee when Etsy attributes a sale to an ad.</p></details><details><summary>How do I calculate Etsy profit?</summary><p>Add item price and buyer-paid shipping, then subtract modeled Etsy fees, production costs, packaging and shipping costs, and any allocated Etsy Plus subscription cost.</p></details><details><summary>How do I calculate Etsy fees?</summary><p>Estimate the listing fee, 6.5% transaction fee, seller-country payment-processing fee, any modeled regulatory operating fee, and any attributed Offsite Ads fee.</p></details><details><summary>How do I calculate profit margin?</summary><p>Divide net profit by gross revenue (item price plus buyer-paid shipping) and multiply by 100.</p></details><details><summary>What is an Etsy break-even price?</summary><p>It is the lowest item price that covers the modeled fees and costs with your shipping, seller country, and ad settings held constant.</p></details><details><summary>How do Offsite Ads affect profit?</summary><p>An attributed order may incur a 12% or 15% fee according to the selected calculator setting, subject to the modeled country fee cap.</p></details><details><summary>What fees apply to Etsy digital products?</summary><p>Listing, transaction, payment-processing, and attributed advertising fees can still apply. Set production and packaging to zero only if they do not apply to your product.</p></details><details><summary>Does ShopProfit store my financial data?</summary><p>No. Calculations happen in your browser. Inputs and results are not sent to ShopProfit servers; report sharing happens only when you choose it.</p></details><div class="resource-links"><a href="/#calculator">Open the calculator</a><a href="/#fees">View country fee table</a><a href="/methodology">Read methodology</a><a href="/etsy-digital-download-fee-calculator">Digital product calculator</a></div></article></main></body></html>
+<body>
+  <main class="resource-page">
+    <nav class="resource-nav" aria-label="Page navigation">
+      <a href="/" aria-label="ShopProfit home">SHOPPROFIT</a>
+      <div class="resource-nav-links">
+        <a href="/#calculator">Calculator</a>
+        <a href="/fees/">Fees</a>
+        <a href="/methodology/">Methodology</a>
+        <a href="/faq/">FAQ</a>
+      </div>
+    </nav>
+
+    <nav aria-label="Breadcrumb" class="breadcrumb">
+      <a href="/">Home</a> / <span>FAQ</span>
+    </nav>
+
+    <article class="resource-copy">
+      <p class="eyebrow">Seller Knowledgebase · Updated October 2026</p>
+      <h1>Etsy Profit Calculator FAQ</h1>
+
+      <div class="direct-answer" role="region" aria-label="FAQ Summary">
+        <strong>Direct Answers First:</strong> Clear, authoritative answers to common questions about Etsy seller fees, payment processing rates, shipping fee impacts, profit margin formulas, and how ShopProfit helps you calculate true take-home earnings.
+      </div>
+
+      <div class="faq-list">
+        <h2>Platform Fees &amp; Costs</h2>
+
+        <details open>
+          <summary>How much does Etsy charge sellers?</summary>
+          <p>Etsy charges three standard deductions on every completed sale: a <strong>$0.20 USD listing fee</strong> per item (renewed every 4 months or upon sale), a <strong>6.5% transaction fee</strong> on the total sale price (including shipping and gift wrap), and country-specific <strong>payment processing fees</strong> (typically 3% to 6.5% + a fixed fee). Sellers in select countries also pay a regulatory operating fee (0.05% to 1.67%), and attributed Offsite Ads add 12% or 15%.</p>
+        </details>
+
+        <details>
+          <summary>What is Etsy's transaction fee?</summary>
+          <p>Etsy's transaction fee is <strong>6.5%</strong>. It is charged on the total payment collected from the buyer for the order, including the item selling price, the shipping cost charged to the buyer, and any optional gift wrapping charges. Sales tax collected directly by Etsy is excluded.</p>
+        </details>
+
+        <details>
+          <summary>Does Etsy charge a listing fee?</summary>
+          <p>Yes. Etsy charges <strong>$0.20 USD</strong> per listing published. The listing remains active for four months or until the inventory sells out. When an item sells, Etsy charges another $0.20 auto-renewal fee to re-list the remaining quantity.</p>
+        </details>
+
+        <details>
+          <summary>What is Etsy payment processing?</summary>
+          <p>Payment processing covers credit card, debit card, Apple Pay, and PayPal transactions through Etsy Payments. It consists of a percentage plus a fixed flat fee per transaction based on the seller's country (e.g., 3.0% + $0.25 USD in the US, 4.0% + £0.20 in the UK, 3.0% + CA$0.25 in Canada).</p>
+        </details>
+
+        <details>
+          <summary>What are Etsy Offsite Ads?</summary>
+          <p>Offsite Ads is Etsy's marketing program where products are advertised on Google Shopping, Facebook, Instagram, Pinterest, and Bing. Sellers pay a <strong>15% fee</strong> (optional if trailing 12-month sales are under $10,000 USD) or a <strong>12% fee</strong> (mandatory if trailing sales exceed $10,000 USD). The fee is charged only when a shopper clicks an ad and purchases from your shop within 30 days, strictly capped at $100.00 USD per order.</p>
+        </details>
+
+        <h2>Profit Calculations &amp; Margin Strategy</h2>
+
+        <details><summary>How do I calculate Etsy profit?</summary>
+          <p>Net profit = (Item Price + Buyer-Paid Shipping) − Platform Fees (Listing + 6.5% Transaction + Payment Processing + Regulatory + Offsite Ads) − Business Costs (Materials &amp; Production + Packaging &amp; Postal Shipping). What remains is your net seller take-home.</p>
+        </details>
+
+        <details>
+          <summary>Does Etsy charge different fees by country?</summary>
+          <p>Yes. While the $0.20 listing fee and 6.5% transaction fee are standard worldwide, payment processing rates vary by bank location (3% to 6.5%), and 7 countries have regulatory operating fees (UK 0.48%, France 1.14%, Italy 0.80%, Spain 0.88%, Canada 0.50%, Turkey 1.67%, India 0.05%). View the full table in our <a href="/fees/">Etsy Fees Guide</a>.</p>
+        </details>
+
+        <details>
+          <summary>Does shipping affect Etsy profit?</summary>
+          <p>Yes. Etsy charges both its 6.5% transaction fee and payment processing fee on the shipping amount charged to the buyer. If you offer free shipping or charge less for shipping than you pay at the post office, that shortfall reduces your net profit.</p>
+        </details>
+
+        <details>
+          <summary>How do I calculate my Etsy profit margin?</summary>
+          <p>Divide net profit by gross revenue (item price plus buyer-paid shipping) and multiply by 100. For example, if an order generates $40 in gross revenue and leaves you with $24.75 in net profit, your margin is 61.88%.</p>
+        </details>
+
+        <details>
+          <summary>What is an Etsy break-even price?</summary>
+          <p>The break-even price is the exact lowest item selling price that will cover all estimated Etsy platform fees, payment processing, material costs, and packaging/shipping costs with zero net profit ($0.00). Selling below this price results in a financial loss.</p>
+        </details>
+
+        <details>
+          <summary>What fees apply to Etsy digital products?</summary>
+          <p>Digital downloads incur the standard $0.20 listing fee, 6.5% transaction fee, and payment processing fees. Because there are no physical shipping boxes or postal postage fees, profit margins on digital products are typically high (80% to 88%).</p>
+        </details>
+
+        <h2>About ShopProfit</h2>
+
+        <details>
+          <summary>Is ShopProfit free?</summary>
+          <p>Yes. ShopProfit is completely free for all Etsy sellers. There are no subscriptions, no accounts required, and no advertisements.</p>
+        </details>
+
+        <details>
+          <summary>Does ShopProfit store my financial data?</summary>
+          <p>No. ShopProfit calculates all fees and margins locally inside your browser using client-side JavaScript. None of your prices, costs, or shop details are ever sent to a server or stored in a database.</p>
+        </details>
+      </div>
+
+      <div class="resource-links" aria-label="Explore more seller resources">
+        <a href="/#calculator">Open Calculator</a>
+        <a href="/fees/">Etsy Fees Guide</a>
+        <a href="/methodology/">Calculation Methodology</a>
+        <a href="/etsy-digital-download-fee-calculator">Digital Product Calculator</a>
+        <a href="/etsy-fee-calculator-uk">UK Fee Calculator</a>
+      </div>
+    </article>
+
+    <p class="resource-foot">
+      <a href="/">ShopProfit</a> · Independent calculator. Not affiliated with Etsy, Inc.
+    </p>
+  </main>
+</body>
+</html>
