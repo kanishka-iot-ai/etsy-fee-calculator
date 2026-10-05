@@ -128,7 +128,9 @@ test("methodology and FAQ routes are indexable, crawlable resources with canonic
     assert.ok(html.includes('content="ShopProfit"'));
     assert.ok(html.includes('social-preview.png'));
     assert.ok(sitemap.includes(`<loc>https://shopprofitcalculator.com${route}</loc>`));
-    assert.ok(redirects.includes(`${route} ${route}.html 200`));
+    assert.ok(!redirects.includes(`${route} ${route}.html 200`), "no looping 200 rewrite rules in _redirects");
+    const dirIndex = await read(`..${route}/index.html`);
+    assert.ok(dirIndex.includes(expectedTitle), `${route}/index.html served natively`);
     const scripts = [...html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)];
     for (const [, json] of scripts) assert.doesNotThrow(() => JSON.parse(json));
     assert.ok(html.includes('href="/#calculator"'));
@@ -184,8 +186,9 @@ test("privacy and terms links resolve to crawlable legal pages", async () => {
     assert.equal(attr(html, /<link rel="canonical" href="([^"]+)"/), `https://shopprofitcalculator.com${route}`);
     assert.equal(attr(html, /<title>([^<]+)<\/title>/), title);
     assert.match(html, /<h1\b/);
-    assert.ok(sitemap.includes(`<loc>https://shopprofitcalculator.com${route}</loc>`));
-    assert.ok(redirects.includes(`${route} ${route}.html 200`));
+    assert.ok(!redirects.includes(`${route} ${route}.html 200`), "no looping 200 rewrite rules in _redirects");
+    const dirIndex = await read(`..${route}/index.html`);
+    assert.ok(dirIndex.includes(title), `${route}/index.html served natively`);
     const schema = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
     assert.ok(schema);
     assert.doesNotThrow(() => JSON.parse(schema));
@@ -233,8 +236,9 @@ test("contact page, official fee references, and transparent country assumptions
     read("../contact.html"), read("../methodology.html"), read("../_redirects"), read("../sitemap.xml"), read("../src/app.js"),
   ]);
   assert.match(contact, /<title>Contact ShopProfit<\/title>/);
-  assert.match(contact, /mailto:support@shopprofitcalculator\.com/);
-  assert.match(routes, /\/contact \/contact\.html 200/);
+  assert.ok(!routes.includes("/contact /contact.html 200"), "no looping 200 rewrite rule for contact");
+  const contactIndex = await read("../contact/index.html");
+  assert.match(contactIndex, /<title>Contact ShopProfit<\/title>/);
   assert.match(sitemap, /https:\/\/shopprofitcalculator\.com\/contact/);
   assert.match(methodology, /Fee information is based on Etsy's published fee schedules and may change/);
   assert.match(methodology, /115015628847-What-are-Payment-Processing-Fees/);

@@ -139,6 +139,11 @@ for (const route of routes) {
     .replace('id="digital-preset" aria-pressed="false"', 'id="digital-preset" aria-pressed="true"')
     .replace('id="digital-mode-note" hidden', 'id="digital-mode-note"');
   await writeFile(new URL(`../${route.file}`, import.meta.url), html);
+  // Also write to slug/index.html so Cloudflare Pages serves the clean URL natively
+  // (avoids _redirects 200-rewrite loops caused by Cloudflare's Pretty URLs feature)
+  const slugDir = route.file.replace(/\.html$/, "");
+  await mkdir(new URL(`../${slugDir}/`, import.meta.url), { recursive: true });
+  await writeFile(new URL(`../${slugDir}/index.html`, import.meta.url), html);
 }
 
 await writeFile(htmlFile, base);
@@ -164,5 +169,12 @@ contactPage = contactPage.replace(/(<p>For questions about the calculator, site 
 await mkdir(new URL("../contact/", import.meta.url), { recursive: true });
 await writeFile(new URL("../contact.html", import.meta.url), contactPage);
 await writeFile(new URL("../contact/index.html", import.meta.url), contactPage);
+// Write methodology and faq to subdirectories so Cloudflare serves them natively (no 200-rewrite loop)
+for (const page of ["methodology", "faq"]) {
+  const content = await readFile(new URL(`../${page}.html`, import.meta.url), "utf8");
+  await mkdir(new URL(`../${page}/`, import.meta.url), { recursive: true });
+  await writeFile(new URL(`../${page}/index.html`, import.meta.url), content);
+}
 console.log(`Generated ${routes.length} static SEO routes and populated the static fee table.`);
 if (!SUPPORT_EMAIL) console.warn("LAUNCH BLOCKER: SUPPORT_EMAIL is unset; generated contact pages show a setup notice. Set it in Cloudflare Pages and rebuild before launch.");
+
