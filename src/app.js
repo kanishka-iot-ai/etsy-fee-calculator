@@ -595,7 +595,48 @@ $("#theme-toggle").addEventListener("click", () => {
   setTheme(next); store.set("shopprofit-theme", next);
 });
 $("#copyright-year").textContent = new Date().getFullYear();
-setupMenu(); setupPointerEffects();
+function setupInstantNavigation() {
+  const prefetched = new Set();
+  const prefetch = (href) => {
+    if (!href || prefetched.has(href)) return;
+    try {
+      const url = new URL(href, location.origin);
+      if (url.origin !== location.origin || url.pathname === location.pathname || url.hash) return;
+      prefetched.add(href);
+      const link = document.createElement("link");
+      link.rel = "prefetch";
+      link.href = url.pathname;
+      document.head.appendChild(link);
+    } catch { /* ignore */ }
+  };
+
+  document.addEventListener("pointerover", (event) => {
+    const link = event.target.closest("a");
+    if (link) prefetch(link.getAttribute("href"));
+  }, { passive: true });
+
+  document.addEventListener("touchstart", (event) => {
+    const link = event.target.closest("a");
+    if (link) prefetch(link.getAttribute("href"));
+  }, { passive: true });
+
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest('a[href^="/#"]');
+    if (!link) return;
+    const isHome = location.pathname === "/" || location.pathname === "" || location.pathname === "/index.html";
+    if (isHome) {
+      const hash = link.getAttribute("href").slice(1);
+      const target = $(hash);
+      if (target) {
+        event.preventDefault();
+        target.scrollIntoView({ behavior: "smooth" });
+        history.pushState(null, "", hash);
+      }
+    }
+  });
+}
+
+setupMenu(); setupPointerEffects(); setupInstantNavigation();
 window.addEventListener("scroll", () => $(".site-header").classList.toggle("scrolled", window.scrollY > 10), { passive: true });
 let headingResizeFrame = 0;
 window.addEventListener("resize", () => {

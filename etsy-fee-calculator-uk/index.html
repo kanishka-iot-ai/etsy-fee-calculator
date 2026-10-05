@@ -26,6 +26,33 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
+  <link rel="modulepreload" href="/src/app.js">
+  <link rel="modulepreload" href="/src/calculator.js">
+  <link rel="modulepreload" href="/src/countries.js">
+  <link rel="modulepreload" href="/src/translations.js">
+  <link rel="modulepreload" href="/src/i18n.js">
+  <script type="speculationrules">
+  {
+    "prerender": [
+      {
+        "source": "list",
+        "urls": [
+          "/",
+          "/etsy-fee-calculator-uk",
+          "/etsy-fee-calculator-canada",
+          "/etsy-fee-calculator-australia",
+          "/etsy-digital-download-fee-calculator",
+          "/methodology",
+          "/faq",
+          "/privacy",
+          "/terms",
+          "/contact"
+        ],
+        "eagerness": "moderate"
+      }
+    ]
+  }
+  </script>
   <script type="application/ld+json" id="structured-data">
 {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://shopprofitcalculator.com/#organization","name":"ShopProfit","url":"https://shopprofitcalculator.com/","logo":"https://shopprofitcalculator.com/logo-mark.svg"},{"@type":"WebSite","@id":"https://shopprofitcalculator.com/#website","name":"ShopProfit","alternateName":"ShopProfit Calculator","url":"https://shopprofitcalculator.com/","publisher":{"@id":"https://shopprofitcalculator.com/#organization"}},{"@type":"WebApplication","name":"Etsy Fee Calculator UK","url":"https://shopprofitcalculator.com/etsy-fee-calculator-uk","applicationCategory":"FinanceApplication","operatingSystem":"Any","description":"Estimate Etsy fees and take-home profit in GBP for UK sellers, including payment processing and the UK regulatory operating fee.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://shopprofitcalculator.com/"},{"@type":"ListItem","position":2,"name":"Etsy Fee Calculator UK","item":"https://shopprofitcalculator.com/etsy-fee-calculator-uk"}]}]}
   </script>
