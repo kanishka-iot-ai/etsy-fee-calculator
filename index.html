@@ -27,8 +27,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
   <link rel="modulepreload" href="/src/app.js">
-  <link rel="modulepreload" href="/src/calculator.js">
-  <link rel="modulepreload" href="/src/countries.js">
+  <link rel="modulepreload" href="/src/fee-intelligence-client.js">
+  <link rel="modulepreload" href="/src/compatibility.js">
+  <link rel="modulepreload" href="/src/fee-engine.js">
   <link rel="modulepreload" href="/src/translations.js">
   <link rel="modulepreload" href="/src/i18n.js">
   <script type="speculationrules">
@@ -92,7 +93,7 @@
     <section class="hero page-width" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="hero-index">SHOPPROFIT / 001 &nbsp;—&nbsp; FREE ETSY PROFIT, FEE &amp; PRICING CALCULATOR</p>
-        <h1 id="hero-title"><span class="hero-word">KNOW</span> <span class="hero-word">WHAT</span> <span class="hero-word">YOU</span> <span class="hero-word hero-keep">KEEP.</span></h1>
+        <div class="hero-title" id="hero-title" aria-label="Know what you keep."><span class="hero-word">KNOW</span> <span class="hero-word">WHAT</span> <span class="hero-word">YOU</span> <span class="hero-word hero-keep">KEEP.</span></div>
         <p class="hero-description">Calculate your Etsy fees, costs, profit margin and break-even price instantly.</p>
         <ul class="trust-row" aria-label="Calculator benefits">
           <li>No signup</li><li>No ads</li><li>100% client-side</li><li>Global fee support</li>
@@ -103,7 +104,7 @@
 
     <section class="calculator-section page-width" id="calculator" aria-labelledby="calculator-heading">
       <div class="section-heading">
-        <div><h2 id="calculator-heading">Calculator</h2><p>Adjust your sale details to see your real profit.</p></div>
+        <div><h1 id="calculator-heading">Etsy Profit Calculator</h1><p>Adjust your sale details to see your real profit.</p></div>
       </div>
       <div class="calculator-grid">
         <form class="panel input-panel spotlight" id="sale-form" novalidate>
@@ -206,6 +207,45 @@
     <section class="answer-formula page-width" id="how-it-works" aria-label="Etsy fees and calculation method">
       <article class="panel answer-panel"><p class="eyebrow">The short answer</p><h2>How much does Etsy take from a sale?</h2><p>Etsy charges a 6.5% transaction fee on the order total, plus a $0.20 USD listing fee and country-specific payment processing. Some sellers also pay a regulatory operating fee or an Offsite Ads fee of 12% or 15% when Etsy attributes the order to an ad.</p><p class="answer-footnote">Your exact total depends on seller location, order value, and ad attribution.</p></article>
       <article class="panel formula-panel"><p class="eyebrow">Transparent methodology</p><h2>How ShopProfit calculates profit</h2><div class="formula-code" aria-label="Profit formulas"><code>gross revenue = item price + shipping</code><code>platform fees = listing + 6.5% + processing + other fees</code><code>net profit = revenue − fees − business costs</code></div><p class="formula-note">Fee information is based on Etsy's published fee schedules and may change. Check Etsy's current fee policy for the latest applicable fees. Sales tax, VAT on seller fees, refunds, currency-conversion charges, and account-specific adjustments are not modeled. Fixed local amounts are estimates; currency conversion is not modeled. <a href="/methodology/">Read our complete methodology and official fee sources</a>.</p></article>
+    </section>
+
+    <section class="content-section page-width" id="seller-guides" aria-labelledby="guides-heading">
+      <div class="section-heading"><div><h2 id="guides-heading">Etsy Pricing, Break-Even &amp; Fee Strategy</h2><p>Essential frameworks for pricing backward, absorbing fees, and protecting take-home margins.</p></div></div>
+      <div class="calculator-grid" style="align-items: stretch; margin-bottom: 24px;">
+        <article class="panel input-panel">
+          <p class="eyebrow">Pricing Strategy</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Target Pricing: How to Price Backward on Etsy</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Most sellers guess a retail price and hope there is profit left over after Etsy takes its cut. Target pricing reverses that formula: you specify the exact dollar profit you want to bank, and calculate backward through Etsy’s tiered fee structure.</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Because Etsy's 6.5% transaction fee, payment processing (e.g., 3% + $0.25 in the US), and potential Offsite Ads fees (12% or 15%) scale with your final listing price, a linear markup always undercuts your actual take-home. ShopProfit uses an exact binary search solver to determine the precise listing price that hits your target profit after every fee is satisfied.</p>
+        </article>
+        <article class="panel input-panel">
+          <p class="eyebrow">Break-Even Analysis</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Unit Break-Even Floor vs. Monthly Volume</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">There are two distinct break-even numbers every Etsy seller must monitor: <strong>Per-Order Break-Even Price</strong> and <strong>Monthly Volume Break-Even</strong>.</p>
+          <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; line-height: 1.6; margin: 8px 0;">
+            <li><strong>Per-Order Break-Even (Active Tool):</strong> The absolute minimum listing price required for a single order so that Revenue − Etsy Fees − Production − Shipping = $0.00. Selling below this price loses cash on every shipment.</li>
+            <li><strong>Monthly Volume Break-Even:</strong> The number of units you must sell each month to cover fixed shop overhead (such as Etsy Plus subscriptions, photo staging, listing renewal cadences, and studio rent).</li>
+          </ul>
+        </article>
+      </div>
+      <div class="calculator-grid" style="align-items: stretch;">
+        <article class="panel input-panel">
+          <p class="eyebrow">Advertising Economics</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Offsite Ads: 12% vs. 15% &amp; The $100 Per-Order Cap</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Etsy advertises seller listings on Google, Facebook, Instagram, and Bing. When a shopper clicks an offsite ad and buys from your shop within 30 days, Etsy charges an advertising fee on the entire order total (item price + buyer shipping):</p>
+          <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; line-height: 1.6; margin: 8px 0;">
+            <li><strong>15% Fee (Optional):</strong> Standard rate for shops making under $10,000 USD in trailing 12-month sales. Sellers can toggle this off in Shop Manager.</li>
+            <li><strong>12% Fee (Mandatory):</strong> Applies once a shop surpasses $10,000 USD in 12-month sales. Participation is mandatory for the lifetime of the shop.</li>
+            <li><strong>The $100 Fee Cap:</strong> Regardless of order size, Etsy caps the maximum Offsite Ads fee at $100 USD per order. ShopProfit models this cap accurately, whereas many competing calculators erroneously charge uncapped percentages on high-value orders.</li>
+          </ul>
+        </article>
+        <article class="panel input-panel">
+          <p class="eyebrow">Shipping Profitability</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">The Real Cost of "Free Shipping" &amp; Postage Fees</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">A common pitfall on Etsy is assuming fees only apply to the item price. In reality, Etsy levies the full 6.5% transaction fee and payment processing fee on <em>both the item price and the shipping amount charged to the buyer</em>.</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">If you offer "Free Shipping" by baking $8 postage into a $40 retail price, Etsy takes 6.5% on the entire $40. If you charge $32 + $8 shipping, Etsy still takes 6.5% on $40. However, if your actual carrier label costs $9.50 and packaging costs $1.50, you absorb an extra $3 deduction that must be accounted for in your net margin calculation.</p>
+        </article>
+      </div>
     </section>
 
     <section class="faq-section page-width" id="faq" aria-labelledby="faq-heading">

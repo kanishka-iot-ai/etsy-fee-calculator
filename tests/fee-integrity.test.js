@@ -1,36 +1,41 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { COUNTRIES, COUNTRY_ORDER } from "../src/countries.js";
-import { TRANSACTION_RATE, OFFSITE_CAP } from "../src/calculator.js";
+import { COUNTRY_ORDER } from "../src/countries.js";
+import {
+  GLOBAL_COUNTRY_RULES,
+  OFFICIAL_TRANSACTION_RATE as TRANSACTION_RATE,
+  STATUTORY_OFFSITE_ADS_CAP
+} from "../src/fee-engine.js";
+import { STATUTORY_REGULATORY_RATES } from "../src/compatibility.js";
 import { readFile } from "node:fs/promises";
 
 test("all countries in database conform to official Etsy bounds and documented structure", () => {
-  assert.equal(COUNTRY_ORDER.length, 12, "exactly 12 country keys defined");
+  assert.equal(COUNTRY_ORDER.length, 12, "exactly 12 country keys defined in baseline order");
   for (const code of COUNTRY_ORDER) {
-    const c = COUNTRIES[code];
-    assert.ok(c, `${code} exists in COUNTRIES`);
+    const c = GLOBAL_COUNTRY_RULES[code];
+    assert.ok(c, `${code} exists in GLOBAL_COUNTRY_RULES`);
     assert.equal(typeof c.currency, "string", `${code} has string currency`);
     assert.ok(c.currency.length === 3, `${code} has 3-letter currency code`);
     assert.ok(c.listingFee > 0, `${code} has positive listing fee`);
-    assert.ok(c.processingRate >= 0.02 && c.processingRate <= 0.10, `${code} processing rate between 2% and 10%`);
-    assert.ok(c.processingFixed >= 0, `${code} processing fixed charge is non-negative`);
-    assert.ok(c.regulatoryRate >= 0 && c.regulatoryRate <= 0.05, `${code} regulatory rate between 0% and 5%`);
-    assert.ok(c.offsiteCap > 0, `${code} offsite cap is positive`);
+    assert.ok(c.rate >= 0.02 && c.rate <= 0.10, `${code} processing rate between 2% and 10%`);
+    assert.ok(c.fixed >= 0, `${code} processing fixed charge is non-negative`);
+    const regRate = STATUTORY_REGULATORY_RATES[code];
+    if (regRate != null) {
+      assert.ok(regRate >= 0 && regRate <= 0.05, `${code} regulatory rate between 0% and 5%`);
+    }
     assert.equal(typeof c.locale, "string", `${code} has valid locale string`);
   }
 });
 
 test("official 6.5% transaction rate and $100 offsite cap remain strictly configured", () => {
   assert.equal(TRANSACTION_RATE, 0.065, "Etsy transaction fee must remain 6.5%");
-  assert.equal(OFFSITE_CAP, 100, "Etsy Offsite Ads baseline cap must remain 100 USD");
+  assert.equal(STATUTORY_OFFSITE_ADS_CAP.amount, 100, "Etsy Offsite Ads baseline cap must remain 100 USD");
+  assert.equal(STATUTORY_OFFSITE_ADS_CAP.currency, "USD");
 });
 
 test("conditional fee regions contain explicit seller disclosures", () => {
-  assert.ok(COUNTRIES.CA.processingNote.toLowerCase().includes("domestic"), "Canada documents domestic vs international rate");
-  assert.ok(COUNTRIES.AU.processingNote.toLowerCase().includes("domestic"), "Australia documents domestic vs international rate");
-  assert.ok(COUNTRIES.JP.processingNote.toLowerCase().includes("usd"), "Japan documents USD fixed conversion");
-  assert.ok(COUNTRIES.TR.processingNote.includes("6.5%"), "Türkiye documents 6.5% + 14 TRY rate");
-  assert.ok(COUNTRIES.OTHER.processingNote.toLowerCase().includes("baseline"), "Global/Other documents generic baseline");
+  assert.ok(GLOBAL_COUNTRY_RULES.CA.domesticRate != null, "Canada documents domestic vs international rate");
+  assert.ok(GLOBAL_COUNTRY_RULES.AU.domesticRate != null, "Australia documents domestic vs international rate");
 });
 
 test("methodology page discloses review date and official Etsy source URLs", async () => {

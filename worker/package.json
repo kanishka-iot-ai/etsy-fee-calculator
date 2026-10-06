@@ -1,0 +1,12 @@
+{
+  "name": "shopprofit-fee-intelligence",
+  "version": "1.0.0",
+  "description": "Global Etsy Fee Intelligence Worker & D1 API for ShopProfit",
+  "private": true,
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "test:d1:local": "wrangler d1 execute shopprofit-fees-db --local --command \"SELECT * FROM fee_versions;\""
+  }
+}

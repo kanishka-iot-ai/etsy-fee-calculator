@@ -75,7 +75,7 @@ if (changes.length > 0) {
     console.error(`   URL: ${change.url}`);
     console.error(`   Last Updated by Etsy: ${change.updatedAt}`);
   }
-  console.error("\nAction: Review the rate changes on help.etsy.com, update src/countries.js if needed, and run 'npm run check:etsy -- --update'.\n");
+  console.error("\nAction: Review the rate changes on help.etsy.com, publish updated release via Fee Intelligence API/worker, and run 'npm run check:etsy -- --update'.\n");
   process.exitCode = 1;
 } else {
   console.log("✅ All official Etsy fee policies are unchanged. ShopProfit fee database is 100% current.");

@@ -13,8 +13,11 @@ import {
   formatDate
 } from "../src/i18n.js";
 import { LANGUAGES, languageForRegion } from "../src/translations.js";
-import { COUNTRIES } from "../src/countries.js";
-import { calculateSale, calculateRequiredPrice } from "../src/calculator.js";
+import {
+  calculateOrderFees,
+  solveRequiredPrice,
+  resolveCountryFeeRule
+} from "../src/fee-engine.js";
 import { readFile } from "node:fs/promises";
 
 test("ALL_LANGUAGES registry contains worldwide languages across major scripts", () => {
@@ -152,13 +155,13 @@ test("formatNumber formats without mutating underlying numerical values", () => 
 });
 
 test("formatCurrency supports different country currencies and locales independently", () => {
-  const usd = formatCurrency(3500, COUNTRIES.US);
+  const usd = formatCurrency(3500, resolveCountryFeeRule("US"));
   assert.ok(usd.includes("35"));
 
-  const gbp = formatCurrency(3500, COUNTRIES.UK);
+  const gbp = formatCurrency(3500, resolveCountryFeeRule("UK"));
   assert.ok(gbp.includes("35"));
 
-  const inr = formatCurrency(3500, COUNTRIES.IN);
+  const inr = formatCurrency(3500, resolveCountryFeeRule("IN"));
   assert.ok(inr.includes("35"));
 });
 
@@ -170,15 +173,17 @@ test("CALCULATOR REGRESSION: math remains 100% identical regardless of UI langua
     shipping: 5,
     production: 7,
     packaging: 4,
-    country: COUNTRIES.US,
-    offsiteRate: 0.15,
-    plus: true,
+    country: "US",
+    offsiteAds: true,
+    shopOffsiteAdsTier: 0.15,
+    plusEnabled: true,
     salesPerMonth: 20
   };
 
-  const baseline = calculateSale(baseInput);
+  const baselineRes = calculateOrderFees(baseInput);
+  const baseline = baselineRes.legacy;
   const baselineBreakEven = baseline.breakEvenCents;
-  const baselineTarget = calculateRequiredPrice({ ...baseInput, targetProfit: 15 });
+  const baselineTarget = solveRequiredPrice(15, baseInput);
 
   // Baseline verification:
   // Gross: 3500 + 500 = 4000
@@ -205,9 +210,9 @@ test("CALCULATOR REGRESSION: math remains 100% identical regardless of UI langua
   // Now verify that changing language context NEVER mutates these numbers
   const testLanguages = ["en", "fr-FR", "de-DE", "es-ES", "hi-IN", "ja-JP", "zh-CN", "ar"];
   for (const lang of testLanguages) {
-    const saleResult = calculateSale(baseInput);
+    const saleResult = calculateOrderFees(baseInput).legacy;
     const breakEven = saleResult.breakEvenCents;
-    const targetPrice = calculateRequiredPrice({ ...baseInput, targetProfit: 15 });
+    const targetPrice = solveRequiredPrice(15, baseInput);
 
     assert.equal(saleResult.grossCents, baseline.grossCents, `${lang} grossCents must match`);
     assert.equal(saleResult.feesCents, baseline.feesCents, `${lang} feesCents must match`);

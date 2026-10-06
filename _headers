@@ -1,8 +1,20 @@
 /*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
   Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://shopprofit-fee-intelligence.kanishka-bmchak.workers.dev; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex, nofollow
+
+https://:version.:project.pages.dev/*
+  X-Robots-Tag: noindex, nofollow
+
+/sitemap.xml
+  Content-Type: application/xml
+  Cache-Control: public, max-age=3600
 
 /styles.css
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800

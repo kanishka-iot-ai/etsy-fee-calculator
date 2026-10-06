@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#F2F1EC">
-  <meta name="description" content="Estimate Etsy fees and profit for a digital download. Set physical production and packaging costs to zero and calculate your take-home.">
+  <meta name="description" content="Calculate Etsy seller fees, unit margins, and take-home profit for digital downloads. Accurate digital fee calculator modeling 6.5% transaction, payment processing, listing fees, and Offsite Ads.">
   <link rel="canonical" href="https://shopprofitcalculator.com/etsy-digital-download-fee-calculator">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="ShopProfit">
   <meta property="og:title" content="Etsy Digital Download Fee Calculator — ShopProfit">
-  <meta property="og:description" content="Estimate Etsy fees and profit for a digital download. Set physical production and packaging costs to zero and calculate your take-home.">
+  <meta property="og:description" content="Calculate Etsy seller fees, unit margins, and take-home profit for digital downloads. Accurate digital fee calculator modeling 6.5% transaction, payment processing, listing fees, and Offsite Ads.">
   <meta property="og:url" content="https://shopprofitcalculator.com/etsy-digital-download-fee-calculator">
   <meta property="og:image" content="https://shopprofitcalculator.com/social-preview.png">
   <meta property="og:image:type" content="image/png">
@@ -19,7 +19,7 @@
   <meta property="og:image:alt" content="ShopProfit Etsy profit calculator — Know what you keep">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Etsy Digital Download Fee Calculator — ShopProfit">
-  <meta name="twitter:description" content="Estimate Etsy fees and profit for a digital download. Set physical production and packaging costs to zero and calculate your take-home.">
+  <meta name="twitter:description" content="Calculate Etsy seller fees, unit margins, and take-home profit for digital downloads. Accurate digital fee calculator modeling 6.5% transaction, payment processing, listing fees, and Offsite Ads.">
   <meta name="twitter:image" content="https://shopprofitcalculator.com/social-preview.png">
   <title>Etsy Digital Download Fee Calculator — ShopProfit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,8 +27,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
   <link rel="modulepreload" href="/src/app.js">
-  <link rel="modulepreload" href="/src/calculator.js">
-  <link rel="modulepreload" href="/src/countries.js">
+  <link rel="modulepreload" href="/src/fee-intelligence-client.js">
+  <link rel="modulepreload" href="/src/compatibility.js">
+  <link rel="modulepreload" href="/src/fee-engine.js">
   <link rel="modulepreload" href="/src/translations.js">
   <link rel="modulepreload" href="/src/i18n.js">
   <script type="speculationrules">
@@ -58,10 +59,10 @@
   }
   </script>
   <script type="application/ld+json" id="structured-data">
-{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://shopprofitcalculator.com/#organization","name":"ShopProfit","url":"https://shopprofitcalculator.com/","logo":"https://shopprofitcalculator.com/logo-mark.svg"},{"@type":"WebSite","@id":"https://shopprofitcalculator.com/#website","name":"ShopProfit","alternateName":"ShopProfit Calculator","url":"https://shopprofitcalculator.com/","publisher":{"@id":"https://shopprofitcalculator.com/#organization"}},{"@type":"WebApplication","name":"Etsy Digital Download Fee Calculator","url":"https://shopprofitcalculator.com/etsy-digital-download-fee-calculator","applicationCategory":"FinanceApplication","operatingSystem":"Any","description":"Estimate Etsy fees and profit for a digital download. Set physical production and packaging costs to zero and calculate your take-home.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://shopprofitcalculator.com/"},{"@type":"ListItem","position":2,"name":"Etsy Digital Download Fee Calculator","item":"https://shopprofitcalculator.com/etsy-digital-download-fee-calculator"}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://shopprofitcalculator.com/#organization","name":"ShopProfit","url":"https://shopprofitcalculator.com/","logo":"https://shopprofitcalculator.com/logo-mark.svg"},{"@type":"WebSite","@id":"https://shopprofitcalculator.com/#website","name":"ShopProfit","alternateName":"ShopProfit Calculator","url":"https://shopprofitcalculator.com/","publisher":{"@id":"https://shopprofitcalculator.com/#organization"}},{"@type":"WebApplication","name":"Etsy Digital Download Fee Calculator","url":"https://shopprofitcalculator.com/etsy-digital-download-fee-calculator","applicationCategory":"FinanceApplication","operatingSystem":"Any","description":"Calculate Etsy seller fees, unit margins, and take-home profit for digital downloads. Accurate digital fee calculator modeling 6.5% transaction, payment processing, listing fees, and Offsite Ads.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://shopprofitcalculator.com/"},{"@type":"ListItem","position":2,"name":"Etsy Digital Download Fee Calculator","item":"https://shopprofitcalculator.com/etsy-digital-download-fee-calculator"}]}]}
   </script>
   <script type="application/ld+json" id="faq-structured-data">
-{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How do Etsy fees affect a digital download?","acceptedAnswer":{"@type":"Answer","text":"Digital products still incur Etsy listing, transaction, and payment-processing fees, and attributed Offsite Ads may add a fee. Use the digital preset to set production and packaging costs to zero, then add any other costs relevant to your product."}},{"@type":"Question","name":"Does Etsy charge fees on shipping?","acceptedAnswer":{"@type":"Answer","text":"Etsy's transaction and payment processing fees generally apply to the order total including shipping charged to the buyer."}},{"@type":"Question","name":"How does Etsy Offsite Ads affect profit?","acceptedAnswer":{"@type":"Answer","text":"An attributed order may incur a 15% Offsite Ads fee, or 12% for shops that meet Etsy's sales threshold. Etsy caps this fee per order."}},{"@type":"Question","name":"How is payment processing calculated?","acceptedAnswer":{"@type":"Answer","text":"It is a percentage of the sale plus a fixed fee per order. Rates depend on the seller's bank account country."}},{"@type":"Question","name":"Can I calculate digital product profit?","acceptedAnswer":{"@type":"Answer","text":"Yes. Set production and packaging costs to zero to estimate digital product profit."}},{"@type":"Question","name":"Does ShopProfit store my financial data?","acceptedAnswer":{"@type":"Answer","text":"No. Calculations run in your browser. ShopProfit does not send or store your prices, costs, or profit calculations."}},{"@type":"Question","name":"How do I calculate Etsy profit?","acceptedAnswer":{"@type":"Answer","text":"Net profit is item price plus buyer shipping, minus Etsy fees, production and material costs, and packaging and shipping costs. Include other business costs that apply to your sale."}},{"@type":"Question","name":"How do I calculate Etsy fees?","acceptedAnswer":{"@type":"Answer","text":"Add the listing fee, transaction fee on the order total, payment processing for the seller’s country, any regulatory operating fee, and any Offsite Ads fee attributed to the order."}},{"@type":"Question","name":"How much should I charge on Etsy?","acceptedAnswer":{"@type":"Answer","text":"Choose a price that covers your costs and Etsy fees while meeting your take-home target. Use break-even for the minimum price that avoids a loss, or target pricing for a chosen profit amount."}},{"@type":"Question","name":"What is Etsy profit margin?","acceptedAnswer":{"@type":"Answer","text":"Profit margin is net profit divided by gross revenue, then multiplied by 100. ShopProfit’s gross revenue includes item price and shipping charged to the buyer."}},{"@type":"Question","name":"What is an Etsy break-even price?","acceptedAnswer":{"@type":"Answer","text":"It is the minimum item price that covers estimated Etsy fees and costs at your chosen shipping amount, seller location, and Offsite Ads rate."}},{"@type":"Question","name":"What fees apply to Etsy digital products?","acceptedAnswer":{"@type":"Answer","text":"Digital products still incur Etsy listing, transaction, and payment-processing fees. Attributed Offsite Ads may add a fee; physical production and packaging costs are optional inputs."}}]}
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What fees does Etsy charge on digital downloads?","acceptedAnswer":{"@type":"Answer","text":"Etsy charges the same core platform fees on digital downloads as on physical items: a $0.20 USD listing fee (renewed every 4 months or upon each sale), a 6.5% transaction fee on the download price, and country-specific payment processing (such as 3% + $0.25 in the US). If attributed to an Offsite Ad, an additional 12% or 15% advertising fee applies. Digital downloads incur no shipping fees unless physical items are included."}},{"@type":"Question","name":"Does Etsy charge transaction fees on digital products?","acceptedAnswer":{"@type":"Answer","text":"Yes. Etsy charges its standard 6.5% transaction fee on the digital product's sale price. Because digital items typically have $0 shipping, the 6.5% applies solely to the item price."}},{"@type":"Question","name":"Do Etsy payment processing fees apply to digital downloads?","acceptedAnswer":{"@type":"Answer","text":"Yes. Etsy Payments processes buyer payments for all digital downloads, charging a percentage plus a fixed flat fee per transaction depending on your bank country (e.g., 3% + $0.25 in the US, 4% + £0.20 in the UK, 3% + $0.25 CAD in Canada, 3% + A$0.25 in Australia)."}},{"@type":"Question","name":"Do Offsite Ads fees apply to Etsy digital downloads?","acceptedAnswer":{"@type":"Answer","text":"Yes. If a buyer clicks an Etsy advertisement on external platforms (Google, Facebook, Instagram, Pinterest) and buys your digital download within 30 days, Etsy charges an Offsite Ads fee (15% for shops under $10k annual sales, 12% mandatory for shops at or above $10k). The fee is capped at $100 USD per order."}},{"@type":"Question","name":"How should I price a digital download after Etsy fees?","acceptedAnswer":{"@type":"Answer","text":"To price a digital download profitably, work backward from your desired take-home profit rather than guessing a price. Account for Etsy's fixed fees ($0.20 listing + $0.25 processing = $0.45 minimum in the US), 6.5% transaction fee, variable processing percentage, and any advertising. For low-ticket items under $5, consider bundling multiple designs to dilute the impact of fixed fees."}},{"@type":"Question","name":"Can I calculate the break-even price for an Etsy digital product?","acceptedAnswer":{"@type":"Answer","text":"Yes. Using ShopProfit's break-even mode, you can calculate the minimum selling price needed to cover all Etsy fees and per-unit digital creation or licensing expenses. With zero production and shipping costs, the break-even price represents the minimum price where revenue exactly covers Etsy platform fees."}}]}
   </script>
 </head>
 <body data-route-country="OTHER">
@@ -92,8 +93,8 @@
     <section class="hero page-width" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="hero-index">SHOPPROFIT / OTHER &nbsp;—&nbsp; FREE ETSY DIGITAL DOWNLOAD FEE CALCULATOR</p>
-        <h1 id="hero-title"><span class="hero-word">KNOW</span> <span class="hero-word">WHAT</span> <span class="hero-word">YOU</span> <span class="hero-word hero-keep">KEEP.</span></h1>
-        <p class="hero-description">Estimate what you keep from an Etsy digital download after transaction, listing, payment-processing, and applicable advertising fees. The preset removes production and packaging costs; enter any other costs that apply to your shop.</p>
+        <div class="hero-title" id="hero-title" aria-label="Know what you keep."><span class="hero-word">KNOW</span> <span class="hero-word">WHAT</span> <span class="hero-word">YOU</span> <span class="hero-word hero-keep">KEEP.</span></div>
+        <p class="hero-description">Calculate your exact Etsy seller fees, unit break-even price, and net profit for digital downloads, printables, templates, and SVGs. The calculator automatically zeroes shipping and production costs while accurately modeling Etsy’s 6.5% transaction fee, country-specific payment processing, listing fees, and optional Offsite Ads. Looking for multi-currency physical product calculations? Visit the main <a href="/">Etsy profit calculator</a> or browse the <a href="/fees/">Etsy fees guide</a>.</p>
         <ul class="trust-row" aria-label="Calculator benefits">
           <li>No signup</li><li>No ads</li><li>100% client-side</li><li>Global fee support</li>
         </ul>
@@ -103,7 +104,7 @@
 
     <section class="calculator-section page-width" id="calculator" aria-labelledby="calculator-heading">
       <div class="section-heading">
-        <div><h2 id="calculator-heading">Etsy Digital Download Fee Calculator</h2><p>Adjust your sale details to see your real profit.</p></div>
+        <div><h1 id="calculator-heading">Etsy Digital Download Fee Calculator</h1><p>Adjust your sale details to see your real profit.</p></div>
       </div>
       <div class="calculator-grid">
         <form class="panel input-panel spotlight" id="sale-form" novalidate>
@@ -185,7 +186,7 @@
     </section>
 
     <section class="content-section page-width" id="fees" aria-labelledby="fees-heading">
-      <div class="section-heading"><div><h2 id="fees-heading">How Etsy fees vary by country</h2><p>Published processing and regulatory rates. Fixed charges are shown in estimated local amounts. Explore our complete <a href="/fees/">Etsy Fees Guide</a>.</p></div><div class="fee-audit-badge"><span class="status-dot"></span><span>Verified October 2026</span></div></div>
+      <div class="section-heading"><div><h2 id="fees-heading">Etsy Digital Download Fees by Seller Country</h2><p>Published payment processing and statutory regulatory rates across major seller jurisdictions. Explore our complete 62-country <a href="/fees/">Etsy Fees Guide</a>.</p></div><div class="fee-audit-badge"><span class="status-dot"></span><span>Verified October 2026</span></div></div>
         <div class="panel fee-table-wrap table-scroll"><table class="fee-table"><thead><tr><th scope="col">Country</th><th scope="col">Currency</th><th scope="col">Listing fee*</th><th scope="col">Transaction fee</th><th scope="col">Payment processing</th><th scope="col">Regulatory fee</th><th scope="col">Notes</th></tr></thead><tbody id="fee-table-body">
           <tr><th scope="row">United States</th><td>USD</td><td>$0.20</td><td>6.5%</td><td>3% + $0.25</td><td>—</td><td>Domestic/default processing estimate; international order rates may differ.</td></tr>
           <tr><th scope="row">United Kingdom</th><td>GBP</td><td>£0.16</td><td>6.5%</td><td>4% + £0.20</td><td>0.48%</td><td>Domestic/default processing estimate; international order rates may differ.</td></tr>
@@ -200,28 +201,137 @@
           <tr><th scope="row">Türkiye</th><td>TRY</td><td>₺7,00</td><td>6.5%</td><td>6.5% + ₺14,00</td><td>1.67%</td><td>Türkiye rate per Etsy's published schedule: 6.5% + ₺14. Regulatory operating fee 1.67%. Fixed TRY amounts are subject to exchange-rate changes.</td></tr>
           <tr><th scope="row">Global / Other</th><td>USD</td><td>$0.20</td><td>6.5%</td><td>6.5% + $0.30</td><td>—</td><td>Generic USD baseline only; this is not a country-specific Etsy fee schedule.</td></tr>
       </tbody></table></div>
-      <p class="table-note">* Etsy publishes some fixed charges in USD; amounts shown in local currency are estimates, not live conversions. Canada and Australia use the domestic processing rate by default; international rates differ. Sales tax, VAT, refunds, currency-conversion charges, and seller-specific adjustments are not modeled. Currency follows the selected seller country.</p>
+      <p class="table-note">* Etsy publishes some fixed charges in USD; local currency equivalents are estimates. On digital downloads, transaction fees (6.5%) apply directly to the item price without shipping deductions. Canada and Australia use domestic processing rates by default. Sales tax/VAT (remitted by Etsy in most jurisdictions), currency-conversion charges (2.5% when listing currency differs from bank payout), and account subscriptions are not modeled. For other sovereign markets, see the <a href="/fees/">global fee table</a>.</p>
     </section>
 
-    <section class="answer-formula page-width" id="how-it-works" aria-label="Etsy fees and calculation method">
-      <article class="panel answer-panel"><p class="eyebrow">The short answer</p><h2>How much does Etsy take from a sale?</h2><p>Etsy charges a 6.5% transaction fee on the order total, plus a $0.20 USD listing fee and country-specific payment processing. Some sellers also pay a regulatory operating fee or an Offsite Ads fee of 12% or 15% when Etsy attributes the order to an ad.</p><p class="answer-footnote">Your exact total depends on seller location, order value, and ad attribution.</p></article>
-      <article class="panel formula-panel"><p class="eyebrow">Transparent methodology</p><h2>How ShopProfit calculates profit</h2><div class="formula-code" aria-label="Profit formulas"><code>gross revenue = item price + shipping</code><code>platform fees = listing + 6.5% + processing + other fees</code><code>net profit = revenue − fees − business costs</code></div><p class="formula-note">Fee information is based on Etsy's published fee schedules and may change. Check Etsy's current fee policy for the latest applicable fees. Sales tax, VAT on seller fees, refunds, currency-conversion charges, and account-specific adjustments are not modeled. Fixed local amounts are estimates; currency conversion is not modeled. <a href="/methodology/">Read our complete methodology and official fee sources</a>.</p></article>
+    <section class="answer-formula page-width" id="how-it-works" aria-label="Etsy digital download fees and calculation method">
+      <article class="panel answer-panel">
+        <p class="eyebrow">Digital download fee breakdown</p>
+        <h2>How much does Etsy take from a digital download sale?</h2>
+        <p>For Etsy digital downloads, Etsy charges a $0.20 USD listing fee (which renews upon every sale or every 4 months), a 6.5% transaction fee on the download price, and country-specific payment processing (such as 3% + $0.25 in the US, 4% + £0.20 in the UK, 3% + $0.25 CAD in Canada, or 3% + A$0.25 in Australia). If the sale is attributed to an Etsy Offsite Ad, an additional 12% or 15% fee applies (capped at the $100 USD equivalent). Any statutory regulatory operating fees (e.g., 0.48% UK, 0.50% Canada) also apply.</p>
+        <p class="answer-footnote">While digital downloads eliminate physical postage and material expenses, Etsy platform fees apply to every sale. Per-unit design software, mockups, or commercial licenses can be entered as production costs.</p>
+      </article>
+      <article class="panel formula-panel">
+        <p class="eyebrow">Transparent methodology</p>
+        <h2>How ShopProfit calculates digital download profit</h2>
+        <div class="formula-code" aria-label="Digital download profit formulas">
+          <code>gross revenue = digital download price (shipping = $0.00)</code>
+          <code>platform fees = $0.20 listing + 6.5% transaction + payment processing + ads</code>
+          <code>net profit = gross revenue − platform fees − digital creation &amp; software costs</code>
+        </div>
+        <p class="formula-note">Fee calculations are grounded in Etsy's official published fee schedules for digital products. The preset automatically sets physical production, packaging, and shipping costs to $0.00, while leaving input fields open for sellers who track per-unit software, mockup, or commercial license amortizations. Sales tax/VAT (which Etsy collects and remits directly in most jurisdictions), currency conversion (2.5% when listing currency differs from bank deposit currency), and shop-level overhead are not deducted per-item. <a href="/methodology/">Read our full methodology and calculation standards</a> or browse the <a href="/fees/">Etsy Fees Guide</a>.</p>
+      </article>
+    </section>
+
+    <section class="content-section page-width" id="seller-guides" aria-labelledby="guides-heading">
+      <div class="section-heading"><div><h2 id="guides-heading">Etsy Digital Download Fee &amp; Profit Strategy</h2><p>Essential frameworks for pricing digital printables, avoiding fixed-fee margin erosion, and modeling net take-home.</p></div></div>
+      <div class="calculator-grid" style="align-items: stretch; margin-bottom: 24px;">
+        <article class="panel input-panel">
+          <p class="eyebrow">Digital Pricing Strategy</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">How to Price Etsy Digital Downloads After Fees</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Many digital creators price files arbitrarily at $2 or $3 without factoring in how compounding Etsy deductions erode low-ticket sales. Target pricing reverses that formula: you define your desired net profit per download, and calculate backward through Etsy’s tiered deductions.</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Because Etsy's 6.5% transaction fee, country-specific payment processing percentage, and optional Offsite Ads (12% or 15%) scale with your retail price alongside flat fixed fees ($0.20 listing + $0.25 US processing), simple linear markups consistently fall short of your profit target. ShopProfit uses an exact binary search solver to calculate the precise listing price required to hit your target profit.</p>
+        </article>
+        <article class="panel input-panel">
+          <p class="eyebrow">Unit Margin Economics</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Etsy Digital Product Profit Margins: The Low-Ticket Trap</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Fixed platform charges create disproportionately high fee drag on low-priced digital downloads. In the US, every order incurs a $0.20 listing fee and a $0.25 fixed processing fee ($0.45 in combined fixed fees):</p>
+          <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; line-height: 1.6; margin: 8px 0;">
+            <li><strong>$2.00 SVG Cut File:</strong> The $0.45 in fixed fees alone consumes 22.5% of revenue. With 6.5% transaction ($0.13) and 3% processing ($0.06), total fees reach $0.64 (32.0% platform deduction), leaving only $1.36.</li>
+            <li><strong>$15.00 Planner Template:</strong> That same $0.45 fixed fee represents only 3.0% of revenue. Total fees are $1.88 (12.5% platform deduction), leaving $13.12 take-home profit.</li>
+          </ul>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">To maximize margins on Etsy, digital sellers should bundle low-cost assets into higher-value collections ($10 to $20) rather than selling single files at extreme micro-prices.</p>
+        </article>
+      </div>
+      <div class="calculator-grid" style="align-items: stretch; margin-bottom: 24px;">
+        <article class="panel input-panel">
+          <p class="eyebrow">Advertising Economics</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Etsy Offsite Ads on Digital Downloads (15% vs. 12% &amp; The $100 Cap)</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">When a shopper discovers your digital listing via an Etsy-placed advertisement on Google, Pinterest, or Facebook and purchases within 30 days, Etsy deducts an advertising fee:</p>
+          <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; line-height: 1.6; margin: 8px 0;">
+            <li><strong>15% Fee (Optional):</strong> For shops under $10,000 USD in trailing 12-month sales. Can be disabled in Shop Manager.</li>
+            <li><strong>12% Fee (Mandatory):</strong> For shops at or above $10,000 USD in trailing 12-month sales. Enrolled permanently.</li>
+            <li><strong>The $100 Order Cap:</strong> Etsy caps the Offsite Ads fee at $100 USD (or local equivalent) per order. For high-ticket commercial digital licenses or full template bundles, your ad fee never exceeds this ceiling.</li>
+          </ul>
+        </article>
+        <article class="panel input-panel">
+          <p class="eyebrow">Business Model Comparison</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Digital Downloads vs. Physical Etsy Products: The Economic Difference</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Selling digital products on Etsy offers distinct operational and margin advantages over physical commerce, but platform fee rules apply identically:</p>
+          <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; line-height: 1.6; margin: 8px 0;">
+            <li><strong>Zero Shipping &amp; Postage Deductions:</strong> On physical goods, Etsy levies 6.5% transaction and payment processing fees on buyer shipping revenue. Digital downloads have $0 shipping, eliminating postage fee drag entirely.</li>
+            <li><strong>Zero Marginal Production Costs:</strong> Physical products consume materials and labor on every unit sold. Once created, a digital file delivers infinitely at zero reproduction cost.</li>
+            <li><strong>Upfront Sunk Costs:</strong> Digital sellers must amortize software subscriptions (Adobe Creative Cloud, Canva Pro), font/asset commercial licenses, and creation time rather than per-order raw materials.</li>
+          </ul>
+        </article>
+      </div>
+      <div class="calculator-grid" style="align-items: stretch;">
+        <article class="panel input-panel" style="grid-column: 1 / -1;">
+          <p class="eyebrow">Real-World Benchmarks</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Realistic Digital Download Economics Across Product Types</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Here is how standard Etsy fees (listing, 6.5% transaction, and US 3% + $0.25 payment processing) affect typical digital product price tiers:</p>
+          <div class="table-scroll" style="margin-top: 12px;">
+            <table class="scenario-table" style="font-size: 12px;">
+              <thead>
+                <tr>
+                  <th scope="col">Product Example</th>
+                  <th scope="col">Sale Price</th>
+                  <th scope="col">Etsy Platform Fees</th>
+                  <th scope="col">Effective Fee %</th>
+                  <th scope="col">Net Take-Home</th>
+                  <th scope="col">Profit Margin</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">SVG Cut File / Clipart</th>
+                  <td>$3.00</td>
+                  <td>$0.74</td>
+                  <td>24.7%</td>
+                  <td>$2.26</td>
+                  <td>75.3%</td>
+                </tr>
+                <tr>
+                  <th scope="row">Digital Art Print / Printable</th>
+                  <td>$5.00</td>
+                  <td>$0.93</td>
+                  <td>18.6%</td>
+                  <td>$4.07</td>
+                  <td>81.4%</td>
+                </tr>
+                <tr>
+                  <th scope="row">Editable Invitation Template</th>
+                  <td>$8.00</td>
+                  <td>$1.21</td>
+                  <td>15.1%</td>
+                  <td>$6.79</td>
+                  <td>84.9%</td>
+                </tr>
+                <tr>
+                  <th scope="row">Digital Planner Bundle</th>
+                  <td>$15.00</td>
+                  <td>$1.88</td>
+                  <td>12.5%</td>
+                  <td>$13.12</td>
+                  <td>87.5%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color: var(--muted); font-size: 12px; margin-top: 8px;">Figures assume standard domestic US processing without Offsite Ads attribution. For international currency rates or physical goods, see our <a href="/etsy-fee-calculator-uk">UK fee calculator</a>, <a href="/etsy-fee-calculator-canada">Canada fee calculator</a>, or <a href="/etsy-fee-calculator-australia">Australia fee calculator</a>.</p>
+        </article>
+      </div>
     </section>
 
     <section class="faq-section page-width" id="faq" aria-labelledby="faq-heading">
-      <div class="section-heading"><div><h2 id="faq-heading">Frequently asked questions</h2><p>Clear answers about fees, shipping, and your data. Browse the full <a href="/faq/">Etsy Seller FAQ</a>.</p></div></div>
+      <div class="section-heading"><div><h2 id="faq-heading">Frequently asked questions about Etsy digital download fees</h2><p>Clear, verified answers for digital creators. Browse the full <a href="/faq/">Etsy Seller FAQ</a>.</p></div></div>
       <div class="panel faq-list" id="faq-list">
-        <details><summary>How do Etsy fees affect a digital download?</summary><p>Digital products still incur Etsy listing, transaction, and payment-processing fees, and attributed Offsite Ads may add a fee. Use the digital preset to set production and packaging costs to zero, then add any other costs relevant to your product.</p></details>
-        <details><summary>Does Etsy charge fees on shipping?</summary><p>Yes. Etsy’s transaction fee applies to the order total including shipping charged to the buyer. Payment processing generally also applies to the sale amount including shipping.</p></details>
-        <details><summary>How does Etsy Offsite Ads affect profit?</summary><p>When Etsy attributes an order to an Offsite Ad, the fee is typically 15%, or 12% for shops that have reached Etsy’s sales threshold. Etsy also applies a per-order cap. The calculator shows the selected rate as an estimate.</p></details>
-        <details><summary>How is payment processing calculated?</summary><p>It is a percentage of the payment plus a fixed amount per order. Both values depend on the seller’s bank account country; international orders may use a different rate in some regions.</p></details>
-        <details><summary>How do I calculate Etsy profit?</summary><p>Net profit = item price + buyer shipping − Etsy fees − production and material costs − packaging and shipping costs. Include other business costs that apply to your sale.</p></details>
-        <details><summary>How do I calculate Etsy fees?</summary><p>Add the listing fee, transaction fee on the order total, payment processing for the seller’s country, any regulatory operating fee, and any Offsite Ads fee attributed to the order.</p></details>
-        <details><summary>How much should I charge on Etsy?</summary><p>Choose a price that covers your costs and Etsy fees while meeting your take-home target. Use break-even for the minimum price that avoids a loss, or target pricing for a chosen profit amount.</p></details>
-        <details><summary>What is Etsy profit margin?</summary><p>Profit margin is net profit divided by gross revenue, then multiplied by 100. ShopProfit’s gross revenue includes item price and shipping charged to the buyer.</p></details>
-        <details><summary>What is an Etsy break-even price?</summary><p>It is the minimum item price that covers estimated Etsy fees and costs at your chosen shipping amount, seller location, and Offsite Ads rate.</p></details>
-        <details><summary>Can I calculate digital product profit?</summary><p>Yes. Choose the Digital product preset to set production and packaging costs to zero, then enter your item price and seller location.</p></details>
-        <details><summary>Does ShopProfit store my financial data?</summary><p>No. Your inputs and calculations stay in this browser. ShopProfit does not send them to a server or require an account. Sharing or downloading a report happens only when you choose it.</p></details>
+        <details><summary>What fees does Etsy charge on digital downloads?</summary><p>Etsy charges the same core platform fees on digital downloads as on physical items: a $0.20 USD listing fee (renewed every 4 months or upon each sale), a 6.5% transaction fee on the download price, and country-specific payment processing (such as 3% + $0.25 in the US). If attributed to an Offsite Ad, an additional 12% or 15% advertising fee applies. Digital downloads incur no shipping fees unless physical items are included.</p></details>
+        <details><summary>Does Etsy charge transaction fees on digital products?</summary><p>Yes. Etsy charges its standard 6.5% transaction fee on the digital product's sale price. Because digital items typically have $0 shipping, the 6.5% applies solely to the item price.</p></details>
+        <details><summary>Do Etsy payment processing fees apply to digital downloads?</summary><p>Yes. Etsy Payments processes buyer payments for all digital downloads, charging a percentage plus a fixed flat fee per transaction depending on your bank country (e.g., 3% + $0.25 in the US, 4% + £0.20 in the UK, 3% + $0.25 CAD in Canada, 3% + A$0.25 in Australia).</p></details>
+        <details><summary>Do Offsite Ads fees apply to Etsy digital downloads?</summary><p>Yes. If a buyer clicks an Etsy advertisement on external platforms (Google, Facebook, Instagram, Pinterest) and buys your digital download within 30 days, Etsy charges an Offsite Ads fee (15% for shops under $10k annual sales, 12% mandatory for shops at or above $10k). The fee is capped at $100 USD per order.</p></details>
+        <details><summary>How should I price a digital download after Etsy fees?</summary><p>To price a digital download profitably, work backward from your desired take-home profit rather than guessing a price. Account for Etsy's fixed fees ($0.20 listing + $0.25 processing = $0.45 minimum in the US), 6.5% transaction fee, variable processing percentage, and any advertising. For low-ticket items under $5, consider bundling multiple designs to dilute the impact of fixed fees.</p></details>
+        <details><summary>Can I calculate the break-even price for an Etsy digital product?</summary><p>Yes. Using ShopProfit's break-even mode, you can calculate the minimum selling price needed to cover all Etsy fees and per-unit digital creation or licensing expenses. With zero production and shipping costs, the break-even price represents the minimum price where revenue exactly covers Etsy platform fees.</p></details>
       </div>
     </section>
 

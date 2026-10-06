@@ -12,6 +12,14 @@ const pages = [
 ];
 const attr = (html, expression) => html.match(expression)?.[1] ?? "";
 
+const expectedH1s = {
+  "/": "Etsy Profit Calculator",
+  "/etsy-fee-calculator-uk": "Etsy Fee Calculator UK",
+  "/etsy-fee-calculator-canada": "Etsy Fee Calculator Canada",
+  "/etsy-fee-calculator-australia": "Etsy Fee Calculator Australia",
+  "/etsy-digital-download-fee-calculator": "Etsy Digital Download Fee Calculator",
+};
+
 test("all indexable pages have static unique titles, descriptions, canonicals, H1s, and JSON-LD", async () => {
   const titles = new Set();
   for (const [file, canonical] of pages) {
@@ -24,7 +32,10 @@ test("all indexable pages have static unique titles, descriptions, canonicals, H
     assert.ok(description.length >= 60, `${file} static description`);
     assert.equal(canonicalUrl, `https://shopprofitcalculator.com${canonical}`);
     assert.equal(h1s.length, 1, `${file} has one static H1`);
-    assert.ok(h1s[0][1].replace(/<[^>]+>/g, "").trim().length > 5, `${file} static H1 text`);
+    const h1Text = h1s[0][1].replace(/<[^>]+>/g, "").trim();
+    assert.equal(h1Text, expectedH1s[canonical], `${file} primary H1 matches page topic`);
+    assert.ok(!html.includes('<h1 class="hero-title"'), `${file} hero-title slogan is not an H1`);
+    assert.ok(html.includes('id="hero-title"'), `${file} preserves hero-title element`);
     assert.ok(html.includes("class=\"hero-description\">"), `${file} has static introduction`);
     assert.match(html, /id="fee-table-body">\s*<tr/, `${file} static fee rows`);
     assert.ok(html.includes("id=\"how-it-works\""), `${file} static methodology`);
@@ -43,10 +54,79 @@ test("all indexable pages have static unique titles, descriptions, canonicals, H
     assert.ok(graph["@graph"].some((node) => node["@type"] === "WebApplication"));
     assert.ok(graph["@graph"].some((node) => node["@type"] === "BreadcrumbList"));
     const faq = schemas.find((schema) => schema["@type"] === "FAQPage");
-    assert.ok(faq && faq.mainEntity.length >= 10);
-    for (const answerTitle of ["How do I calculate Etsy profit?", "How much should I charge on Etsy?", "What is an Etsy break-even price?"]) {
-      assert.ok(html.includes(`<summary>${answerTitle}</summary>`), `${file} shows AEO answer ${answerTitle}`);
-      assert.ok(faq.mainEntity.some((item) => item.name === answerTitle), `${file} schema includes ${answerTitle}`);
+    assert.ok(faq, `${file} has FAQPage schema`);
+    if (canonical === "/etsy-fee-calculator-uk") {
+      assert.ok(faq.mainEntity.length >= 6, `${file} UK FAQ schema has at least 6 questions`);
+      for (const answerTitle of [
+        "What Etsy fees do sellers pay in the United Kingdom?",
+        "What is the 0.48% UK regulatory operating fee on Etsy?",
+        "Does Etsy charge fees on shipping and postage in the UK?",
+        "How do Etsy Offsite Ads work for UK shops?",
+        "How do I calculate net profit for an Etsy sale in the UK?"
+      ]) {
+        assert.ok(html.includes(`<summary>${answerTitle}</summary>`), `${file} shows UK answer ${answerTitle}`);
+        assert.ok(faq.mainEntity.some((item) => item.name === answerTitle), `${file} schema includes ${answerTitle}`);
+      }
+      assert.ok(html.includes("Etsy UK Seller Fee &amp; Profit Strategy"), `${file} contains UK seller guides`);
+      assert.ok(html.includes("The UK Regulatory Operating Fee (0.48%): How It Adds Up"), `${file} contains UK regulatory guide`);
+      assert.ok(html.includes("Royal Mail &amp; Postage Economics"), `${file} contains Royal Mail guide`);
+      assert.ok(html.includes("gross revenue = item price + buyer postage (GBP)"), `${file} contains UK profit formula`);
+    } else if (canonical === "/etsy-fee-calculator-canada") {
+      assert.ok(faq.mainEntity.length >= 6, `${file} Canada FAQ schema has at least 6 questions`);
+      for (const answerTitle of [
+        "What fees does Etsy charge sellers in Canada?",
+        "What is the 0.50% Canadian regulatory operating fee on Etsy?",
+        "How does Etsy payment processing work for Canadian sellers?",
+        "Does Etsy charge fees on shipping in Canada?",
+        "How do Etsy Offsite Ads work for Canadian shops?"
+      ]) {
+        assert.ok(html.includes(`<summary>${answerTitle}</summary>`), `${file} shows Canada answer ${answerTitle}`);
+        assert.ok(faq.mainEntity.some((item) => item.name === answerTitle), `${file} schema includes ${answerTitle}`);
+      }
+      assert.ok(html.includes("Etsy Canada Seller Fee &amp; Profit Strategy"), `${file} contains Canada seller guides`);
+      assert.ok(html.includes("The Canadian Regulatory Operating Fee (0.50%): How It Adds Up"), `${file} contains Canada regulatory guide`);
+      assert.ok(html.includes("Canada Post &amp; Shipping Economics"), `${file} contains Canada Post guide`);
+      assert.ok(html.includes("gross revenue = item price + buyer shipping (CAD)"), `${file} contains Canada profit formula`);
+    } else if (canonical === "/etsy-fee-calculator-australia") {
+      assert.ok(faq.mainEntity.length >= 6, `${file} Australia FAQ schema has at least 6 questions`);
+      for (const answerTitle of [
+        "What fees does Etsy charge sellers in Australia?",
+        "Does Etsy charge a regulatory operating fee in Australia?",
+        "How does Etsy payment processing work for Australian sellers?",
+        "Does Etsy charge fees on shipping in Australia?",
+        "How do Etsy Offsite Ads work for Australian shops?"
+      ]) {
+        assert.ok(html.includes(`<summary>${answerTitle}</summary>`), `${file} shows Australia answer ${answerTitle}`);
+        assert.ok(faq.mainEntity.some((item) => item.name === answerTitle), `${file} schema includes ${answerTitle}`);
+      }
+      assert.ok(html.includes("Etsy Australia Seller Fee &amp; Profit Strategy"), `${file} contains Australia seller guides`);
+      assert.ok(html.includes("Regulatory Operating Fees: Why Australia Pays 0% on Etsy"), `${file} contains Australia regulatory guide`);
+      assert.ok(html.includes("Australia Post &amp; Shipping Economics"), `${file} contains Australia Post guide`);
+      assert.ok(html.includes("gross revenue = item price + buyer shipping (AUD)"), `${file} contains Australia profit formula`);
+    } else if (canonical === "/etsy-digital-download-fee-calculator") {
+      assert.ok(faq.mainEntity.length >= 6, `${file} Digital FAQ schema has at least 6 questions`);
+      for (const answerTitle of [
+        "What fees does Etsy charge on digital downloads?",
+        "Does Etsy charge transaction fees on digital products?",
+        "Do Etsy payment processing fees apply to digital downloads?",
+        "Do Offsite Ads fees apply to Etsy digital downloads?",
+        "How should I price a digital download after Etsy fees?",
+        "Can I calculate the break-even price for an Etsy digital product?"
+      ]) {
+        assert.ok(html.includes(`<summary>${answerTitle}</summary>`), `${file} shows Digital answer ${answerTitle}`);
+        assert.ok(faq.mainEntity.some((item) => item.name === answerTitle), `${file} schema includes ${answerTitle}`);
+      }
+      assert.ok(html.includes("Etsy Digital Download Fee &amp; Profit Strategy"), `${file} contains Digital seller guides`);
+      assert.ok(html.includes("How to Price Etsy Digital Downloads After Fees"), `${file} contains Digital pricing guide`);
+      assert.ok(html.includes("Etsy Digital Product Profit Margins: The Low-Ticket Trap"), `${file} contains Low-ticket trap guide`);
+      assert.ok(html.includes("Realistic Digital Download Economics Across Product Types"), `${file} contains Digital examples benchmark`);
+      assert.ok(html.includes("gross revenue = digital download price (shipping = $0.00)"), `${file} contains Digital profit formula`);
+    } else {
+      assert.ok(faq.mainEntity.length >= 10);
+      for (const answerTitle of ["How do I calculate Etsy profit?", "How much should I charge on Etsy?", "What is an Etsy break-even price?"]) {
+        assert.ok(html.includes(`<summary>${answerTitle}</summary>`), `${file} shows AEO answer ${answerTitle}`);
+        assert.ok(faq.mainEntity.some((item) => item.name === answerTitle), `${file} schema includes ${answerTitle}`);
+      }
     }
     if (canonical !== "/") assert.ok(!titles.has(title), `${file} title is unique`);
     titles.add(title);
@@ -118,7 +198,7 @@ test("fees, methodology and FAQ routes are indexable, crawlable resources with c
   const redirects = await read("../_redirects");
   const sitemap = await read("../sitemap.xml");
   for (const [file, route, expectedTitle] of [
-    ["../fees.html", "/fees/", "Etsy Fees Calculator &amp; Complete Seller Fees Guide | ShopProfit"],
+    ["../fees.html", "/fees/", "Etsy Fee Calculator — Calculate Etsy Seller Fees | ShopProfit"],
     ["../methodology.html", "/methodology/", "Etsy Profit Calculator Methodology | How ShopProfit Calculates Profit"],
     ["../faq.html", "/faq/", "Etsy Profit Calculator FAQ – Etsy Fees &amp; Profit Questions | ShopProfit"],
   ]) {
@@ -216,8 +296,22 @@ test("primary result exposes separate total platform fees and business costs", a
 
 test("Cloudflare Pages security headers are configured without blocking app resources", async () => {
   const headers = await read("../_headers");
-  for (const header of ["X-Content-Type-Options: nosniff", "Referrer-Policy: strict-origin-when-cross-origin", "X-Frame-Options: DENY", "Permissions-Policy: camera=(), microphone=(), geolocation=()"])
+  for (const header of [
+    "Strict-Transport-Security: max-age=31536000; includeSubDomains",
+    "X-Content-Type-Options: nosniff",
+    "Referrer-Policy: strict-origin-when-cross-origin",
+    "X-Frame-Options: DENY",
+    "Permissions-Policy: camera=(), microphone=(), geolocation=()",
+    "Content-Security-Policy: default-src 'self'"
+  ])
     assert.ok(headers.includes(header));
+});
+
+test("pages.dev deployments receive X-Robots-Tag: noindex, nofollow while apex domain remains indexable", async () => {
+  const headers = await read("../_headers");
+  assert.match(headers, /https:\/\/:\w*\.?pages\.dev\/\*[\s\S]*?X-Robots-Tag: noindex, nofollow/);
+  const globalBlock = headers.split("https://")[0];
+  assert.ok(!globalBlock.includes("X-Robots-Tag"), "Global /* rule must NOT include X-Robots-Tag");
 });
 
 test("contact information is configured through SUPPORT_EMAIL and missing configuration blocks launch check", async () => {
@@ -253,7 +347,10 @@ test("dedicated /fees/ route satisfies all AEO, GEO, schema, and internal linkin
     read("../fees.html"), read("../fees/index.html"), read("../index.html"), read("../sitemap.xml"),
   ]);
   assert.equal(attr(fees, /<link rel="canonical" href="([^"]+)"/), "https://shopprofitcalculator.com/fees/");
-  assert.match(fees, /<h1>Etsy Fees Calculator &amp; Complete Etsy Seller Fees Guide<\/h1>/);
+  assert.match(fees, /<h1\b[^>]*>Etsy Fee Calculator<\/h1>/);
+  assert.equal((fees.match(/<h1\b/g) || []).length, 1, "fees.html has exactly one H1");
+  assert.ok(fees.includes('id="sale-form"'), "fees.html contains interactive fee calculator");
+  assert.ok(fees.includes('id="result-heading"'), "fees.html contains fee breakdown ledger");
   assert.ok(fees.includes("Direct Answer:"), "contains direct answer block for AEO");
   assert.ok(fees.includes("fee-stat-grid"), "contains key rate visual callouts");
   assert.ok(fees.includes("Scenario 1: $10 Digital Download"), "contains worked example 1");
@@ -274,5 +371,56 @@ test("dedicated /fees/ route satisfies all AEO, GEO, schema, and internal linkin
   for (const q of faqSchema.mainEntity) {
     assert.ok(q.name && q.acceptedAnswer?.text);
   }
+});
+
+test("sitemap.xml is valid XML with exactly 11 canonical URLs and explicit application/xml header rule", async () => {
+  const [sitemap, headers, redirects] = await Promise.all([
+    read("../sitemap.xml"),
+    read("../_headers"),
+    read("../_redirects"),
+  ]);
+
+  assert.ok(sitemap.startsWith('<?xml version="1.0" encoding="UTF-8"?>'), "starts with XML declaration");
+  assert.ok(sitemap.includes('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'), "valid urlset namespace");
+  assert.ok(sitemap.trim().endsWith("</urlset>"), "valid closing urlset tag");
+
+  const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+  assert.equal(locs.length, 11, "contains exactly 11 URLs");
+
+  const expectedUrls = [
+    "https://shopprofitcalculator.com/",
+    "https://shopprofitcalculator.com/etsy-fee-calculator-uk",
+    "https://shopprofitcalculator.com/etsy-fee-calculator-canada",
+    "https://shopprofitcalculator.com/etsy-fee-calculator-australia",
+    "https://shopprofitcalculator.com/etsy-digital-download-fee-calculator",
+    "https://shopprofitcalculator.com/fees/",
+    "https://shopprofitcalculator.com/methodology/",
+    "https://shopprofitcalculator.com/faq/",
+    "https://shopprofitcalculator.com/privacy",
+    "https://shopprofitcalculator.com/terms",
+    "https://shopprofitcalculator.com/contact",
+  ];
+  assert.deepEqual(locs, expectedUrls, "contains exactly the 11 production URLs in order");
+
+  assert.ok(!sitemap.includes("pages.dev"), "no pages.dev URLs in sitemap");
+
+  const uniqueLocs = new Set(locs);
+  assert.equal(uniqueLocs.size, 11, "no duplicate URLs");
+
+  const redirectSources = redirects
+    .split("\n")
+    .map((l) => l.trim().split(/\s+/)[0])
+    .filter(Boolean);
+  for (const url of locs) {
+    const path = new URL(url).pathname;
+    assert.ok(!redirectSources.includes(path), `sitemap URL ${url} is not a redirect source`);
+  }
+
+  assert.match(
+    headers,
+    /\/sitemap\.xml\s*\n\s*Content-Type:\s*application\/xml\s*\n\s*Cache-Control:\s*public,\s*max-age=3600/,
+    "_headers configures Content-Type application/xml and Cache-Control for /sitemap.xml"
+  );
+  assert.ok(!headers.includes("/sitemap.xml\n  X-Robots-Tag"), "sitemap rule has no noindex");
 });
 

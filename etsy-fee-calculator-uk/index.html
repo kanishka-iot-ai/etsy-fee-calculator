@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#F2F1EC">
-  <meta name="description" content="Estimate Etsy fees and take-home profit in GBP for UK sellers, including payment processing and the UK regulatory operating fee.">
+  <meta name="description" content="Calculate Etsy seller fees and take-home profit in GBP. Accurate UK fee calculator modeling 6.5% transaction, 4% + £0.20 processing, and 0.48% regulatory fees.">
   <link rel="canonical" href="https://shopprofitcalculator.com/etsy-fee-calculator-uk">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="ShopProfit">
   <meta property="og:title" content="Etsy Fee Calculator UK — ShopProfit">
-  <meta property="og:description" content="Estimate Etsy fees and take-home profit in GBP for UK sellers, including payment processing and the UK regulatory operating fee.">
+  <meta property="og:description" content="Calculate Etsy seller fees and take-home profit in GBP. Accurate UK fee calculator modeling 6.5% transaction, 4% + £0.20 processing, and 0.48% regulatory fees.">
   <meta property="og:url" content="https://shopprofitcalculator.com/etsy-fee-calculator-uk">
   <meta property="og:image" content="https://shopprofitcalculator.com/social-preview.png">
   <meta property="og:image:type" content="image/png">
@@ -19,7 +19,7 @@
   <meta property="og:image:alt" content="ShopProfit Etsy profit calculator — Know what you keep">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Etsy Fee Calculator UK — ShopProfit">
-  <meta name="twitter:description" content="Estimate Etsy fees and take-home profit in GBP for UK sellers, including payment processing and the UK regulatory operating fee.">
+  <meta name="twitter:description" content="Calculate Etsy seller fees and take-home profit in GBP. Accurate UK fee calculator modeling 6.5% transaction, 4% + £0.20 processing, and 0.48% regulatory fees.">
   <meta name="twitter:image" content="https://shopprofitcalculator.com/social-preview.png">
   <title>Etsy Fee Calculator UK — ShopProfit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,8 +27,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
   <link rel="modulepreload" href="/src/app.js">
-  <link rel="modulepreload" href="/src/calculator.js">
-  <link rel="modulepreload" href="/src/countries.js">
+  <link rel="modulepreload" href="/src/fee-intelligence-client.js">
+  <link rel="modulepreload" href="/src/compatibility.js">
+  <link rel="modulepreload" href="/src/fee-engine.js">
   <link rel="modulepreload" href="/src/translations.js">
   <link rel="modulepreload" href="/src/i18n.js">
   <script type="speculationrules">
@@ -58,10 +59,10 @@
   }
   </script>
   <script type="application/ld+json" id="structured-data">
-{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://shopprofitcalculator.com/#organization","name":"ShopProfit","url":"https://shopprofitcalculator.com/","logo":"https://shopprofitcalculator.com/logo-mark.svg"},{"@type":"WebSite","@id":"https://shopprofitcalculator.com/#website","name":"ShopProfit","alternateName":"ShopProfit Calculator","url":"https://shopprofitcalculator.com/","publisher":{"@id":"https://shopprofitcalculator.com/#organization"}},{"@type":"WebApplication","name":"Etsy Fee Calculator UK","url":"https://shopprofitcalculator.com/etsy-fee-calculator-uk","applicationCategory":"FinanceApplication","operatingSystem":"Any","description":"Estimate Etsy fees and take-home profit in GBP for UK sellers, including payment processing and the UK regulatory operating fee.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://shopprofitcalculator.com/"},{"@type":"ListItem","position":2,"name":"Etsy Fee Calculator UK","item":"https://shopprofitcalculator.com/etsy-fee-calculator-uk"}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://shopprofitcalculator.com/#organization","name":"ShopProfit","url":"https://shopprofitcalculator.com/","logo":"https://shopprofitcalculator.com/logo-mark.svg"},{"@type":"WebSite","@id":"https://shopprofitcalculator.com/#website","name":"ShopProfit","alternateName":"ShopProfit Calculator","url":"https://shopprofitcalculator.com/","publisher":{"@id":"https://shopprofitcalculator.com/#organization"}},{"@type":"WebApplication","name":"Etsy Fee Calculator UK","url":"https://shopprofitcalculator.com/etsy-fee-calculator-uk","applicationCategory":"FinanceApplication","operatingSystem":"Any","description":"Calculate Etsy seller fees and take-home profit in GBP. Accurate UK fee calculator modeling 6.5% transaction, 4% + £0.20 processing, and 0.48% regulatory fees.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://shopprofitcalculator.com/"},{"@type":"ListItem","position":2,"name":"Etsy Fee Calculator UK","item":"https://shopprofitcalculator.com/etsy-fee-calculator-uk"}]}]}
   </script>
   <script type="application/ld+json" id="faq-structured-data">
-{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What Etsy fees do sellers pay in the United Kingdom?","acceptedAnswer":{"@type":"Answer","text":"UK sellers should account for Etsy's listing fee, 6.5% transaction fee, UK payment-processing fees, and a 0.48% regulatory operating fee. This calculator uses estimated local fixed amounts; check Etsy's current schedule and your order-specific rate."}},{"@type":"Question","name":"Does Etsy charge fees on shipping?","acceptedAnswer":{"@type":"Answer","text":"Etsy's transaction and payment processing fees generally apply to the order total including shipping charged to the buyer."}},{"@type":"Question","name":"How does Etsy Offsite Ads affect profit?","acceptedAnswer":{"@type":"Answer","text":"An attributed order may incur a 15% Offsite Ads fee, or 12% for shops that meet Etsy's sales threshold. Etsy caps this fee per order."}},{"@type":"Question","name":"How is payment processing calculated?","acceptedAnswer":{"@type":"Answer","text":"It is a percentage of the sale plus a fixed fee per order. Rates depend on the seller's bank account country."}},{"@type":"Question","name":"Can I calculate digital product profit?","acceptedAnswer":{"@type":"Answer","text":"Yes. Set production and packaging costs to zero to estimate digital product profit."}},{"@type":"Question","name":"Does ShopProfit store my financial data?","acceptedAnswer":{"@type":"Answer","text":"No. Calculations run in your browser. ShopProfit does not send or store your prices, costs, or profit calculations."}},{"@type":"Question","name":"How do I calculate Etsy profit?","acceptedAnswer":{"@type":"Answer","text":"Net profit is item price plus buyer shipping, minus Etsy fees, production and material costs, and packaging and shipping costs. Include other business costs that apply to your sale."}},{"@type":"Question","name":"How do I calculate Etsy fees?","acceptedAnswer":{"@type":"Answer","text":"Add the listing fee, transaction fee on the order total, payment processing for the seller’s country, any regulatory operating fee, and any Offsite Ads fee attributed to the order."}},{"@type":"Question","name":"How much should I charge on Etsy?","acceptedAnswer":{"@type":"Answer","text":"Choose a price that covers your costs and Etsy fees while meeting your take-home target. Use break-even for the minimum price that avoids a loss, or target pricing for a chosen profit amount."}},{"@type":"Question","name":"What is Etsy profit margin?","acceptedAnswer":{"@type":"Answer","text":"Profit margin is net profit divided by gross revenue, then multiplied by 100. ShopProfit’s gross revenue includes item price and shipping charged to the buyer."}},{"@type":"Question","name":"What is an Etsy break-even price?","acceptedAnswer":{"@type":"Answer","text":"It is the minimum item price that covers estimated Etsy fees and costs at your chosen shipping amount, seller location, and Offsite Ads rate."}},{"@type":"Question","name":"What fees apply to Etsy digital products?","acceptedAnswer":{"@type":"Answer","text":"Digital products still incur Etsy listing, transaction, and payment-processing fees. Attributed Offsite Ads may add a fee; physical production and packaging costs are optional inputs."}}]}
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What Etsy fees do sellers pay in the United Kingdom?","acceptedAnswer":{"@type":"Answer","text":"UK sellers pay four core platform fees on standard domestic sales: an estimated £0.16 listing fee ($0.20 USD converted), a 6.5% transaction fee on the full order amount (item price + buyer postage), UK payment processing of 4% + £0.20 per order, and a 0.48% UK regulatory operating fee. Attributed Offsite Ads may add an optional 15% or mandatory 12% fee."}},{"@type":"Question","name":"What is the 0.48% UK regulatory operating fee on Etsy?","acceptedAnswer":{"@type":"Answer","text":"The UK regulatory operating fee is a 0.48% charge applied to the total order value (item price plus buyer postage). Etsy introduced this fee to cover the operating costs of the UK Digital Services Tax. It is deducted automatically alongside standard transaction and processing fees."}},{"@type":"Question","name":"Does Etsy charge fees on shipping and postage in the UK?","acceptedAnswer":{"@type":"Answer","text":"Yes. Etsy applies the 6.5% transaction fee, 4% payment processing, and 0.48% regulatory operating fee to the entire postage amount charged to the buyer. For example, on a £3.50 shipping charge, Etsy deducts approximately £0.38 in fees."}},{"@type":"Question","name":"How do Etsy Offsite Ads work for UK shops?","acceptedAnswer":{"@type":"Answer","text":"If a buyer clicks an Etsy advertisement on search engines or partner networks and purchases from your shop within 30 days, Etsy charges an Offsite Ads fee on the total order value. The rate is 15% for shops with under $10,000 USD in trailing 12-month sales (which can be opted out), or 12% for shops at or above $10,000 USD (mandatory). Etsy caps this fee at $100 USD (or equivalent in GBP) per order."}},{"@type":"Question","name":"How do I calculate net profit for an Etsy sale in the UK?","acceptedAnswer":{"@type":"Answer","text":"Net profit is gross revenue (item price + buyer postage in GBP) minus total Etsy platform fees (listing fee, 6.5% transaction fee, 4% + £0.20 payment processing, 0.48% regulatory fee, and any ad fees), minus item production and materials costs, minus actual packaging and postage costs."}},{"@type":"Question","name":"Can I calculate Etsy fees for digital downloads sold in the UK?","acceptedAnswer":{"@type":"Answer","text":"Yes. Select the Digital product preset in this calculator to automatically set physical production and postage costs to £0.00. For sellers exclusively offering digital products, explore our dedicated Etsy digital download fee calculator."}}]}
   </script>
 </head>
 <body data-route-country="UK">
@@ -92,8 +93,8 @@
     <section class="hero page-width" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="hero-index">SHOPPROFIT / UK &nbsp;—&nbsp; FREE ETSY FEE CALCULATOR UK</p>
-        <h1 id="hero-title"><span class="hero-word">KNOW</span> <span class="hero-word">WHAT</span> <span class="hero-word">YOU</span> <span class="hero-word hero-keep">KEEP.</span></h1>
-        <p class="hero-description">Estimate your Etsy take-home in pounds. This UK calculator includes the 6.5% transaction fee, UK payment-processing assumptions, and the published 0.48% regulatory operating fee; fixed local amounts are estimates.</p>
+        <div class="hero-title" id="hero-title" aria-label="Know what you keep."><span class="hero-word">KNOW</span> <span class="hero-word">WHAT</span> <span class="hero-word">YOU</span> <span class="hero-word hero-keep">KEEP.</span></div>
+        <p class="hero-description">Calculate your exact Etsy seller fees, unit break-even price, and net profit in British Pounds (£ GBP). Models Etsy’s 6.5% transaction fee, UK payment processing (4% + £0.20), the 0.48% UK regulatory operating fee, and optional Offsite Ads. Looking for multi-currency calculations? Visit the main <a href="/">Etsy profit calculator</a> or browse the <a href="/fees/">Etsy fees guide</a>.</p>
         <ul class="trust-row" aria-label="Calculator benefits">
           <li>No signup</li><li>No ads</li><li>100% client-side</li><li>Global fee support</li>
         </ul>
@@ -103,7 +104,7 @@
 
     <section class="calculator-section page-width" id="calculator" aria-labelledby="calculator-heading">
       <div class="section-heading">
-        <div><h2 id="calculator-heading">Etsy Fee Calculator for UK Sellers</h2><p>Adjust your sale details to see your real profit.</p></div>
+        <div><h1 id="calculator-heading">Etsy Fee Calculator UK</h1><p>Adjust your sale details to see your real profit.</p></div>
       </div>
       <div class="calculator-grid">
         <form class="panel input-panel spotlight" id="sale-form" novalidate>
@@ -185,7 +186,7 @@
     </section>
 
     <section class="content-section page-width" id="fees" aria-labelledby="fees-heading">
-      <div class="section-heading"><div><h2 id="fees-heading">How Etsy fees vary by country</h2><p>Published processing and regulatory rates. Fixed charges are shown in estimated local amounts. Explore our complete <a href="/fees/">Etsy Fees Guide</a>.</p></div><div class="fee-audit-badge"><span class="status-dot"></span><span>Verified October 2026</span></div></div>
+      <div class="section-heading"><div><h2 id="fees-heading">Etsy UK Fee Schedule &amp; International Processing Rates</h2><p>Published payment processing and statutory regulatory rates for UK shops and international destinations. Explore the full 62-country <a href="/fees/">Etsy Fees Guide</a>.</p></div><div class="fee-audit-badge"><span class="status-dot"></span><span>Verified October 2026</span></div></div>
         <div class="panel fee-table-wrap table-scroll"><table class="fee-table"><thead><tr><th scope="col">Country</th><th scope="col">Currency</th><th scope="col">Listing fee*</th><th scope="col">Transaction fee</th><th scope="col">Payment processing</th><th scope="col">Regulatory fee</th><th scope="col">Notes</th></tr></thead><tbody id="fee-table-body">
           <tr><th scope="row">United States</th><td>USD</td><td>$0.20</td><td>6.5%</td><td>3% + $0.25</td><td>—</td><td>Domestic/default processing estimate; international order rates may differ.</td></tr>
           <tr><th scope="row">United Kingdom</th><td>GBP</td><td>£0.16</td><td>6.5%</td><td>4% + £0.20</td><td>0.48%</td><td>Domestic/default processing estimate; international order rates may differ.</td></tr>
@@ -200,28 +201,73 @@
           <tr><th scope="row">Türkiye</th><td>TRY</td><td>₺7,00</td><td>6.5%</td><td>6.5% + ₺14,00</td><td>1.67%</td><td>Türkiye rate per Etsy's published schedule: 6.5% + ₺14. Regulatory operating fee 1.67%. Fixed TRY amounts are subject to exchange-rate changes.</td></tr>
           <tr><th scope="row">Global / Other</th><td>USD</td><td>$0.20</td><td>6.5%</td><td>6.5% + $0.30</td><td>—</td><td>Generic USD baseline only; this is not a country-specific Etsy fee schedule.</td></tr>
       </tbody></table></div>
-      <p class="table-note">* Etsy publishes some fixed charges in USD; amounts shown in local currency are estimates, not live conversions. Canada and Australia use the domestic processing rate by default; international rates differ. Sales tax, VAT, refunds, currency-conversion charges, and seller-specific adjustments are not modeled. Currency follows the selected seller country.</p>
+      <p class="table-note">* Etsy publishes some fixed charges in USD; UK listing fee is estimated at £0.16. UK domestic payment processing is 4% + £0.20 per order; the statutory UK regulatory operating fee is 0.48%. International sales may use differing processing rates. Fixed local amounts are estimates. Sales tax, VAT on seller fees, refunds, and currency-conversion charges are not modeled. For other sovereign markets, see the <a href="/fees/">global fee table</a>.</p>
     </section>
 
-    <section class="answer-formula page-width" id="how-it-works" aria-label="Etsy fees and calculation method">
-      <article class="panel answer-panel"><p class="eyebrow">The short answer</p><h2>How much does Etsy take from a sale?</h2><p>Etsy charges a 6.5% transaction fee on the order total, plus a $0.20 USD listing fee and country-specific payment processing. Some sellers also pay a regulatory operating fee or an Offsite Ads fee of 12% or 15% when Etsy attributes the order to an ad.</p><p class="answer-footnote">Your exact total depends on seller location, order value, and ad attribution.</p></article>
-      <article class="panel formula-panel"><p class="eyebrow">Transparent methodology</p><h2>How ShopProfit calculates profit</h2><div class="formula-code" aria-label="Profit formulas"><code>gross revenue = item price + shipping</code><code>platform fees = listing + 6.5% + processing + other fees</code><code>net profit = revenue − fees − business costs</code></div><p class="formula-note">Fee information is based on Etsy's published fee schedules and may change. Check Etsy's current fee policy for the latest applicable fees. Sales tax, VAT on seller fees, refunds, currency-conversion charges, and account-specific adjustments are not modeled. Fixed local amounts are estimates; currency conversion is not modeled. <a href="/methodology/">Read our complete methodology and official fee sources</a>.</p></article>
+    <section class="answer-formula page-width" id="how-it-works" aria-label="Etsy UK fees and calculation method">
+      <article class="panel answer-panel">
+        <p class="eyebrow">UK fee breakdown</p>
+        <h2>How much does Etsy take from a UK sale?</h2>
+        <p>For UK sellers, Etsy takes an estimated £0.16 listing fee, a 6.5% transaction fee on the full order amount (item price + buyer postage), 4% + £0.20 UK payment processing, and a 0.48% regulatory operating fee. If the order is attributed to an Offsite Ad, an additional 12% or 15% ad fee applies (capped at the $100 USD equivalent).</p>
+        <p class="answer-footnote">Your exact deduction depends on sale price, postage charged to the buyer, and advertising attribution.</p>
+      </article>
+      <article class="panel formula-panel">
+        <p class="eyebrow">Transparent methodology</p>
+        <h2>How ShopProfit calculates UK profit</h2>
+        <div class="formula-code" aria-label="UK Profit formulas">
+          <code>gross revenue = item price + buyer postage (GBP)</code>
+          <code>UK platform fees = £0.16 listing + 6.5% transaction + (4% + £0.20) processing + 0.48% regulatory + ads</code>
+          <code>net profit = gross revenue − platform fees − production − postage &amp; packaging</code>
+        </div>
+        <p class="formula-note">Fee calculations are based on Etsy's official published fee schedule for United Kingdom sellers. UK domestic processing is modeled at 4% + £0.20; the statutory regulatory operating fee is 0.48%. VAT on seller fees, international card processing differences, and account-level adjustments are not modeled. <a href="/methodology/">Read our full methodology and calculation standards</a> or browse the <a href="/fees/">Etsy Fees Guide</a>.</p>
+      </article>
+    </section>
+
+    <section class="content-section page-width" id="seller-guides" aria-labelledby="guides-heading">
+      <div class="section-heading"><div><h2 id="guides-heading">Etsy UK Seller Fee &amp; Profit Strategy</h2><p>Essential frameworks for pricing backward in GBP, absorbing UK-specific fees, and protecting take-home margins.</p></div></div>
+      <div class="calculator-grid" style="align-items: stretch; margin-bottom: 24px;">
+        <article class="panel input-panel">
+          <p class="eyebrow">UK Pricing Strategy</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Target Pricing in GBP: How to Price Backward in the UK</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Most UK sellers guess a retail price in pounds and hope a margin remains after Etsy takes its cut. Target pricing reverses that formula: you specify the exact take-home profit you want in GBP, and calculate backward through Etsy’s tiered deductions.</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Because Etsy's 6.5% transaction fee, UK payment processing (4% + £0.20), the 0.48% regulatory operating fee, and optional Offsite Ads (12% or 15%) scale with your final order total, simple linear markups consistently fall short of your profit target. ShopProfit uses an exact binary search solver to calculate the precise listing price required to hit your desired profit in pounds.</p>
+        </article>
+        <article class="panel input-panel">
+          <p class="eyebrow">Statutory Operating Fees</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">The UK Regulatory Operating Fee (0.48%): How It Adds Up</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Etsy levies a 0.48% regulatory operating fee on every sale made by a UK seller. This statutory fee was introduced to offset the operating costs of the UK Digital Services Tax.</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Crucially, this 0.48% charge applies to the entire order total (item price + buyer postage). Combined with the 6.5% transaction fee and 4% payment processing, UK sellers pay a baseline variable deduction of 10.98% on every pound collected before fixed charges (£0.36 combined listing and processing) are applied.</p>
+        </article>
+      </div>
+      <div class="calculator-grid" style="align-items: stretch;">
+        <article class="panel input-panel">
+          <p class="eyebrow">Advertising Economics</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Offsite Ads for UK Shops: 15% vs 12% &amp; The $100 USD Cap</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">When a shopper clicks an Etsy-funded ad on Google, Facebook, or Instagram and orders from your UK shop within 30 days, Etsy deducts an advertising fee on the full order amount (item price + buyer postage):</p>
+          <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; line-height: 1.6; margin: 8px 0;">
+            <li><strong>15% Fee (Optional):</strong> For UK shops with under $10,000 USD in trailing 12-month sales. Can be toggled on or off in Shop Manager.</li>
+            <li><strong>12% Fee (Mandatory):</strong> For UK shops that have generated $10,000 USD or more in trailing 12-month sales. Enrolled permanently.</li>
+            <li><strong>The Statutory $100 USD Cap:</strong> Etsy caps the Offsite Ads fee at $100 USD (or equivalent in GBP) per order, preventing runaway advertising costs on high-ticket UK sales.</li>
+          </ul>
+        </article>
+        <article class="panel input-panel">
+          <p class="eyebrow">Postage Profitability</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Royal Mail &amp; Postage Economics: Fees Deducted from Shipping</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">A frequent surprise for new UK sellers is discovering that Etsy fees apply to postage. Etsy charges the 6.5% transaction fee, 4% processing fee, and 0.48% regulatory fee on the postage amount paid by the buyer.</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">If you charge a buyer £3.85 for Royal Mail Tracked 48, Etsy deducts approximately £0.42 (10.98%) in fees from that postage. If your actual postage label costs £3.85 and packaging costs £0.65, you lose money on fulfillment unless your item price absorbs that shortfall. Always enter your true packaging and shipping costs into ShopProfit.</p>
+        </article>
+      </div>
     </section>
 
     <section class="faq-section page-width" id="faq" aria-labelledby="faq-heading">
-      <div class="section-heading"><div><h2 id="faq-heading">Frequently asked questions</h2><p>Clear answers about fees, shipping, and your data. Browse the full <a href="/faq/">Etsy Seller FAQ</a>.</p></div></div>
+      <div class="section-heading"><div><h2 id="faq-heading">Frequently asked questions about Etsy UK fees</h2><p>Clear, verified answers for United Kingdom sellers. Browse the full <a href="/faq/">Etsy Seller FAQ</a>.</p></div></div>
       <div class="panel faq-list" id="faq-list">
-        <details><summary>What Etsy fees do sellers pay in the United Kingdom?</summary><p>UK sellers should account for Etsy's listing fee, 6.5% transaction fee, UK payment-processing fees, and a 0.48% regulatory operating fee. This calculator uses estimated local fixed amounts; check Etsy's current schedule and your order-specific rate.</p></details>
-        <details><summary>Does Etsy charge fees on shipping?</summary><p>Yes. Etsy’s transaction fee applies to the order total including shipping charged to the buyer. Payment processing generally also applies to the sale amount including shipping.</p></details>
-        <details><summary>How does Etsy Offsite Ads affect profit?</summary><p>When Etsy attributes an order to an Offsite Ad, the fee is typically 15%, or 12% for shops that have reached Etsy’s sales threshold. Etsy also applies a per-order cap. The calculator shows the selected rate as an estimate.</p></details>
-        <details><summary>How is payment processing calculated?</summary><p>It is a percentage of the payment plus a fixed amount per order. Both values depend on the seller’s bank account country; international orders may use a different rate in some regions.</p></details>
-        <details><summary>How do I calculate Etsy profit?</summary><p>Net profit = item price + buyer shipping − Etsy fees − production and material costs − packaging and shipping costs. Include other business costs that apply to your sale.</p></details>
-        <details><summary>How do I calculate Etsy fees?</summary><p>Add the listing fee, transaction fee on the order total, payment processing for the seller’s country, any regulatory operating fee, and any Offsite Ads fee attributed to the order.</p></details>
-        <details><summary>How much should I charge on Etsy?</summary><p>Choose a price that covers your costs and Etsy fees while meeting your take-home target. Use break-even for the minimum price that avoids a loss, or target pricing for a chosen profit amount.</p></details>
-        <details><summary>What is Etsy profit margin?</summary><p>Profit margin is net profit divided by gross revenue, then multiplied by 100. ShopProfit’s gross revenue includes item price and shipping charged to the buyer.</p></details>
-        <details><summary>What is an Etsy break-even price?</summary><p>It is the minimum item price that covers estimated Etsy fees and costs at your chosen shipping amount, seller location, and Offsite Ads rate.</p></details>
-        <details><summary>Can I calculate digital product profit?</summary><p>Yes. Choose the Digital product preset to set production and packaging costs to zero, then enter your item price and seller location.</p></details>
-        <details><summary>Does ShopProfit store my financial data?</summary><p>No. Your inputs and calculations stay in this browser. ShopProfit does not send them to a server or require an account. Sharing or downloading a report happens only when you choose it.</p></details>
+        <details><summary>What Etsy fees do sellers pay in the United Kingdom?</summary><p>UK sellers pay four core platform fees on standard domestic sales: an estimated £0.16 listing fee ($0.20 USD converted), a 6.5% transaction fee on the full order amount (item price + buyer postage), UK payment processing of 4% + £0.20 per order, and a 0.48% UK regulatory operating fee. Attributed Offsite Ads may add an optional 15% or mandatory 12% fee.</p></details>
+        <details><summary>What is the 0.48% UK regulatory operating fee on Etsy?</summary><p>The UK regulatory operating fee is a 0.48% charge applied to the total order value (item price plus buyer postage). Etsy introduced this fee to cover the operating costs of the UK Digital Services Tax. It is deducted automatically alongside standard transaction and processing fees.</p></details>
+        <details><summary>Does Etsy charge fees on shipping and postage in the UK?</summary><p>Yes. Etsy applies the 6.5% transaction fee, 4% payment processing, and 0.48% regulatory operating fee to the entire postage amount charged to the buyer. For example, on a £3.50 shipping charge, Etsy deducts approximately £0.38 in fees.</p></details>
+        <details><summary>How do Etsy Offsite Ads work for UK shops?</summary><p>If a buyer clicks an Etsy advertisement on search engines or partner networks and purchases from your shop within 30 days, Etsy charges an Offsite Ads fee on the total order value. The rate is 15% for shops with under $10,000 USD in trailing 12-month sales (which can be opted out), or 12% for shops at or above $10,000 USD (mandatory). Etsy caps this fee at $100 USD (or equivalent in GBP) per order.</p></details>
+        <details><summary>How do I calculate net profit for an Etsy sale in the UK?</summary><p>Net profit is gross revenue (item price + buyer postage in GBP) minus total Etsy platform fees (listing fee, 6.5% transaction fee, 4% + £0.20 payment processing, 0.48% regulatory fee, and any ad fees), minus item production and materials costs, minus actual packaging and postage costs.</p></details>
+        <details><summary>Can I calculate Etsy fees for digital downloads sold in the UK?</summary><p>Yes. Select the Digital product preset in this calculator to automatically set physical production and postage costs to £0.00. For sellers exclusively offering digital products, explore our dedicated <a href="/etsy-digital-download-fee-calculator">Etsy digital download fee calculator</a>.</p></details>
       </div>
     </section>
 

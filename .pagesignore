@@ -1,0 +1,15 @@
+node_modules
+worker
+backups
+tests
+scripts
+docs
+config
+.git
+.github
+*.mjs
+*.test.js
+package.json
+package-lock.json
+.wrangler
+scratch

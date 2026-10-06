@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { COUNTRIES, COUNTRY_ORDER, countryFromTimeZone } from "../src/countries.js";
-import { asCents, calculateGrossRevenue, calculateRequiredPrice, calculateSale, formatMoney } from "../src/calculator.js";
-import { languageForRegion } from "../src/translations.js";
+import { COUNTRIES, COUNTRY_ORDER, countryFromTimeZone } from "./countries.js";
+import { asCents, calculateGrossRevenue, calculateRequiredPrice, calculateSale, formatMoney } from "./calculator.js";
+import { languageForRegion } from "../../src/translations.js";
 
 const sale = (overrides = {}) => calculateSale({ itemPrice: 35, shipping: 5, production: 7, packaging: 4, country: COUNTRIES.US, ...overrides });
 

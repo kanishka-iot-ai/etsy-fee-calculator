@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#F2F1EC">
-  <meta name="description" content="Estimate Etsy fees and take-home profit in AUD for Australian sellers, with Australian payment-processing assumptions and local fee estimates.">
+  <meta name="description" content="Calculate Etsy seller fees and take-home profit in AUD. Accurate Australian fee calculator modeling 6.5% transaction, domestic 3% + A$0.25 processing, and export rates.">
   <link rel="canonical" href="https://shopprofitcalculator.com/etsy-fee-calculator-australia">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="ShopProfit">
   <meta property="og:title" content="Etsy Fee Calculator Australia — ShopProfit">
-  <meta property="og:description" content="Estimate Etsy fees and take-home profit in AUD for Australian sellers, with Australian payment-processing assumptions and local fee estimates.">
+  <meta property="og:description" content="Calculate Etsy seller fees and take-home profit in AUD. Accurate Australian fee calculator modeling 6.5% transaction, domestic 3% + A$0.25 processing, and export rates.">
   <meta property="og:url" content="https://shopprofitcalculator.com/etsy-fee-calculator-australia">
   <meta property="og:image" content="https://shopprofitcalculator.com/social-preview.png">
   <meta property="og:image:type" content="image/png">
@@ -19,7 +19,7 @@
   <meta property="og:image:alt" content="ShopProfit Etsy profit calculator — Know what you keep">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Etsy Fee Calculator Australia — ShopProfit">
-  <meta name="twitter:description" content="Estimate Etsy fees and take-home profit in AUD for Australian sellers, with Australian payment-processing assumptions and local fee estimates.">
+  <meta name="twitter:description" content="Calculate Etsy seller fees and take-home profit in AUD. Accurate Australian fee calculator modeling 6.5% transaction, domestic 3% + A$0.25 processing, and export rates.">
   <meta name="twitter:image" content="https://shopprofitcalculator.com/social-preview.png">
   <title>Etsy Fee Calculator Australia — ShopProfit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,8 +27,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
   <link rel="modulepreload" href="/src/app.js">
-  <link rel="modulepreload" href="/src/calculator.js">
-  <link rel="modulepreload" href="/src/countries.js">
+  <link rel="modulepreload" href="/src/fee-intelligence-client.js">
+  <link rel="modulepreload" href="/src/compatibility.js">
+  <link rel="modulepreload" href="/src/fee-engine.js">
   <link rel="modulepreload" href="/src/translations.js">
   <link rel="modulepreload" href="/src/i18n.js">
   <script type="speculationrules">
@@ -58,10 +59,10 @@
   }
   </script>
   <script type="application/ld+json" id="structured-data">
-{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://shopprofitcalculator.com/#organization","name":"ShopProfit","url":"https://shopprofitcalculator.com/","logo":"https://shopprofitcalculator.com/logo-mark.svg"},{"@type":"WebSite","@id":"https://shopprofitcalculator.com/#website","name":"ShopProfit","alternateName":"ShopProfit Calculator","url":"https://shopprofitcalculator.com/","publisher":{"@id":"https://shopprofitcalculator.com/#organization"}},{"@type":"WebApplication","name":"Etsy Fee Calculator Australia","url":"https://shopprofitcalculator.com/etsy-fee-calculator-australia","applicationCategory":"FinanceApplication","operatingSystem":"Any","description":"Estimate Etsy fees and take-home profit in AUD for Australian sellers, with Australian payment-processing assumptions and local fee estimates.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://shopprofitcalculator.com/"},{"@type":"ListItem","position":2,"name":"Etsy Fee Calculator Australia","item":"https://shopprofitcalculator.com/etsy-fee-calculator-australia"}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://shopprofitcalculator.com/#organization","name":"ShopProfit","url":"https://shopprofitcalculator.com/","logo":"https://shopprofitcalculator.com/logo-mark.svg"},{"@type":"WebSite","@id":"https://shopprofitcalculator.com/#website","name":"ShopProfit","alternateName":"ShopProfit Calculator","url":"https://shopprofitcalculator.com/","publisher":{"@id":"https://shopprofitcalculator.com/#organization"}},{"@type":"WebApplication","name":"Etsy Fee Calculator Australia","url":"https://shopprofitcalculator.com/etsy-fee-calculator-australia","applicationCategory":"FinanceApplication","operatingSystem":"Any","description":"Calculate Etsy seller fees and take-home profit in AUD. Accurate Australian fee calculator modeling 6.5% transaction, domestic 3% + A$0.25 processing, and export rates.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://shopprofitcalculator.com/"},{"@type":"ListItem","position":2,"name":"Etsy Fee Calculator Australia","item":"https://shopprofitcalculator.com/etsy-fee-calculator-australia"}]}]}
   </script>
   <script type="application/ld+json" id="faq-structured-data">
-{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What Etsy fees do sellers pay in Australia?","acceptedAnswer":{"@type":"Answer","text":"Australian sellers generally account for Etsy's listing fee, 6.5% transaction fee, and Australia-specific payment processing. Processing rates can differ for international orders; local fixed amounts shown here are estimates."}},{"@type":"Question","name":"Does Etsy charge fees on shipping?","acceptedAnswer":{"@type":"Answer","text":"Etsy's transaction and payment processing fees generally apply to the order total including shipping charged to the buyer."}},{"@type":"Question","name":"How does Etsy Offsite Ads affect profit?","acceptedAnswer":{"@type":"Answer","text":"An attributed order may incur a 15% Offsite Ads fee, or 12% for shops that meet Etsy's sales threshold. Etsy caps this fee per order."}},{"@type":"Question","name":"How is payment processing calculated?","acceptedAnswer":{"@type":"Answer","text":"It is a percentage of the sale plus a fixed fee per order. Rates depend on the seller's bank account country."}},{"@type":"Question","name":"Can I calculate digital product profit?","acceptedAnswer":{"@type":"Answer","text":"Yes. Set production and packaging costs to zero to estimate digital product profit."}},{"@type":"Question","name":"Does ShopProfit store my financial data?","acceptedAnswer":{"@type":"Answer","text":"No. Calculations run in your browser. ShopProfit does not send or store your prices, costs, or profit calculations."}},{"@type":"Question","name":"How do I calculate Etsy profit?","acceptedAnswer":{"@type":"Answer","text":"Net profit is item price plus buyer shipping, minus Etsy fees, production and material costs, and packaging and shipping costs. Include other business costs that apply to your sale."}},{"@type":"Question","name":"How do I calculate Etsy fees?","acceptedAnswer":{"@type":"Answer","text":"Add the listing fee, transaction fee on the order total, payment processing for the seller’s country, any regulatory operating fee, and any Offsite Ads fee attributed to the order."}},{"@type":"Question","name":"How much should I charge on Etsy?","acceptedAnswer":{"@type":"Answer","text":"Choose a price that covers your costs and Etsy fees while meeting your take-home target. Use break-even for the minimum price that avoids a loss, or target pricing for a chosen profit amount."}},{"@type":"Question","name":"What is Etsy profit margin?","acceptedAnswer":{"@type":"Answer","text":"Profit margin is net profit divided by gross revenue, then multiplied by 100. ShopProfit’s gross revenue includes item price and shipping charged to the buyer."}},{"@type":"Question","name":"What is an Etsy break-even price?","acceptedAnswer":{"@type":"Answer","text":"It is the minimum item price that covers estimated Etsy fees and costs at your chosen shipping amount, seller location, and Offsite Ads rate."}},{"@type":"Question","name":"What fees apply to Etsy digital products?","acceptedAnswer":{"@type":"Answer","text":"Digital products still incur Etsy listing, transaction, and payment-processing fees. Attributed Offsite Ads may add a fee; physical production and packaging costs are optional inputs."}}]}
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What fees does Etsy charge sellers in Australia?","acceptedAnswer":{"@type":"Answer","text":"Australian sellers pay three core platform fees on domestic sales: an estimated $0.28 AUD listing fee ($0.20 USD converted), a 6.5% transaction fee on the order total (item price + buyer shipping), and Australian payment processing of 3% + A$0.25 (for domestic Australian buyers) or 4% + A$0.25 (for international buyers). Australia has no separate regulatory operating fee. Attributed Offsite Ads may add an optional 15% or mandatory 12% advertising fee."}},{"@type":"Question","name":"Does Etsy charge a regulatory operating fee in Australia?","acceptedAnswer":{"@type":"Answer","text":"No. Etsy does not charge a regulatory operating fee in Australia. While sellers in countries like the UK (0.48%) and Canada (0.50%) pay statutory operating fees to cover local digital regulations, Australia is not subject to this fee (0.00%)."}},{"@type":"Question","name":"How does Etsy payment processing work for Australian sellers?","acceptedAnswer":{"@type":"Answer","text":"Etsy charges Australian sellers 3% + A$0.25 for orders from buyers within Australia. For orders from buyers outside Australia, the processing rate is 4% + A$0.25. If you list items in a currency different from your Australian bank account's currency (AUD), Etsy also assesses a 2.5% currency conversion fee."}},{"@type":"Question","name":"Does Etsy charge fees on shipping in Australia?","acceptedAnswer":{"@type":"Answer","text":"Yes. Etsy applies the 6.5% transaction fee and payment processing (3% domestic or 4% international) to the entire shipping amount paid by the buyer. For instance, on a $15 AUD Australia Post shipping fee, Etsy deducts approximately $1.43 in platform fees."}},{"@type":"Question","name":"How do Etsy Offsite Ads work for Australian shops?","acceptedAnswer":{"@type":"Answer","text":"If a shopper clicks an Etsy-placed advertisement on Google, Facebook, or partner networks and purchases from your shop within 30 days, Etsy charges an Offsite Ads fee on the order total. The fee is 15% for shops with under $10,000 USD in trailing 12-month sales (optional, can be disabled), or 12% for shops earning $10,000 USD or more (mandatory). Etsy caps this fee at $100 USD (equivalent in AUD) per attributed order."}},{"@type":"Question","name":"Can I calculate Etsy fees for digital downloads in Australia?","acceptedAnswer":{"@type":"Answer","text":"Yes. Select the Digital product preset in this calculator to automatically set physical production and shipping costs to $0.00 AUD. If you sell digital printables, templates, or planners, check out our dedicated Etsy digital download fee calculator."}}]}
   </script>
 </head>
 <body data-route-country="AU">
@@ -92,8 +93,8 @@
     <section class="hero page-width" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="hero-index">SHOPPROFIT / AU &nbsp;—&nbsp; FREE ETSY FEE CALCULATOR AUSTRALIA</p>
-        <h1 id="hero-title"><span class="hero-word">KNOW</span> <span class="hero-word">WHAT</span> <span class="hero-word">YOU</span> <span class="hero-word hero-keep">KEEP.</span></h1>
-        <p class="hero-description">Estimate your Etsy take-home in Australian dollars. This model includes the 6.5% transaction fee and Australian payment-processing assumptions; international orders and currency conversion may change your actual fees.</p>
+        <div class="hero-title" id="hero-title" aria-label="Know what you keep."><span class="hero-word">KNOW</span> <span class="hero-word">WHAT</span> <span class="hero-word">YOU</span> <span class="hero-word hero-keep">KEEP.</span></div>
+        <p class="hero-description">Calculate your exact Etsy seller fees, unit break-even price, and net profit in Australian Dollars ($ AUD). Models Etsy’s 6.5% transaction fee, Australian payment processing (3% + A$0.25 domestic or 4% + A$0.25 international), zero regulatory operating fees, and optional Offsite Ads. Looking for multi-currency calculations? Visit the main <a href="/">Etsy profit calculator</a> or browse the <a href="/fees/">Etsy fees guide</a>.</p>
         <ul class="trust-row" aria-label="Calculator benefits">
           <li>No signup</li><li>No ads</li><li>100% client-side</li><li>Global fee support</li>
         </ul>
@@ -103,7 +104,7 @@
 
     <section class="calculator-section page-width" id="calculator" aria-labelledby="calculator-heading">
       <div class="section-heading">
-        <div><h2 id="calculator-heading">Etsy Fee Calculator for Australian Sellers</h2><p>Adjust your sale details to see your real profit.</p></div>
+        <div><h1 id="calculator-heading">Etsy Fee Calculator Australia</h1><p>Adjust your sale details to see your real profit.</p></div>
       </div>
       <div class="calculator-grid">
         <form class="panel input-panel spotlight" id="sale-form" novalidate>
@@ -185,7 +186,7 @@
     </section>
 
     <section class="content-section page-width" id="fees" aria-labelledby="fees-heading">
-      <div class="section-heading"><div><h2 id="fees-heading">How Etsy fees vary by country</h2><p>Published processing and regulatory rates. Fixed charges are shown in estimated local amounts. Explore our complete <a href="/fees/">Etsy Fees Guide</a>.</p></div><div class="fee-audit-badge"><span class="status-dot"></span><span>Verified October 2026</span></div></div>
+      <div class="section-heading"><div><h2 id="fees-heading">Etsy Australia Fee Schedule &amp; International Processing Rates</h2><p>Published payment processing and fee rates for Australian shops and export markets. Explore the full 62-country <a href="/fees/">Etsy Fees Guide</a>.</p></div><div class="fee-audit-badge"><span class="status-dot"></span><span>Verified October 2026</span></div></div>
         <div class="panel fee-table-wrap table-scroll"><table class="fee-table"><thead><tr><th scope="col">Country</th><th scope="col">Currency</th><th scope="col">Listing fee*</th><th scope="col">Transaction fee</th><th scope="col">Payment processing</th><th scope="col">Regulatory fee</th><th scope="col">Notes</th></tr></thead><tbody id="fee-table-body">
           <tr><th scope="row">United States</th><td>USD</td><td>$0.20</td><td>6.5%</td><td>3% + $0.25</td><td>—</td><td>Domestic/default processing estimate; international order rates may differ.</td></tr>
           <tr><th scope="row">United Kingdom</th><td>GBP</td><td>£0.16</td><td>6.5%</td><td>4% + £0.20</td><td>0.48%</td><td>Domestic/default processing estimate; international order rates may differ.</td></tr>
@@ -200,28 +201,73 @@
           <tr><th scope="row">Türkiye</th><td>TRY</td><td>₺7,00</td><td>6.5%</td><td>6.5% + ₺14,00</td><td>1.67%</td><td>Türkiye rate per Etsy's published schedule: 6.5% + ₺14. Regulatory operating fee 1.67%. Fixed TRY amounts are subject to exchange-rate changes.</td></tr>
           <tr><th scope="row">Global / Other</th><td>USD</td><td>$0.20</td><td>6.5%</td><td>6.5% + $0.30</td><td>—</td><td>Generic USD baseline only; this is not a country-specific Etsy fee schedule.</td></tr>
       </tbody></table></div>
-      <p class="table-note">* Etsy publishes some fixed charges in USD; amounts shown in local currency are estimates, not live conversions. Canada and Australia use the domestic processing rate by default; international rates differ. Sales tax, VAT, refunds, currency-conversion charges, and seller-specific adjustments are not modeled. Currency follows the selected seller country.</p>
+      <p class="table-note">* Etsy publishes some fixed charges in USD; Australian listing fee is estimated at $0.28 AUD. Australian domestic payment processing is 3% + A$0.25 for domestic orders, or 4% + A$0.25 for international orders. Australia has no separate regulatory operating fee (0.00%). Goods and Services Tax (GST), refunds, and currency-conversion charges (2.5% when listing currency differs from bank payout currency) are not modeled. For other sovereign markets, see the <a href="/fees/">global fee table</a>.</p>
     </section>
 
-    <section class="answer-formula page-width" id="how-it-works" aria-label="Etsy fees and calculation method">
-      <article class="panel answer-panel"><p class="eyebrow">The short answer</p><h2>How much does Etsy take from a sale?</h2><p>Etsy charges a 6.5% transaction fee on the order total, plus a $0.20 USD listing fee and country-specific payment processing. Some sellers also pay a regulatory operating fee or an Offsite Ads fee of 12% or 15% when Etsy attributes the order to an ad.</p><p class="answer-footnote">Your exact total depends on seller location, order value, and ad attribution.</p></article>
-      <article class="panel formula-panel"><p class="eyebrow">Transparent methodology</p><h2>How ShopProfit calculates profit</h2><div class="formula-code" aria-label="Profit formulas"><code>gross revenue = item price + shipping</code><code>platform fees = listing + 6.5% + processing + other fees</code><code>net profit = revenue − fees − business costs</code></div><p class="formula-note">Fee information is based on Etsy's published fee schedules and may change. Check Etsy's current fee policy for the latest applicable fees. Sales tax, VAT on seller fees, refunds, currency-conversion charges, and account-specific adjustments are not modeled. Fixed local amounts are estimates; currency conversion is not modeled. <a href="/methodology/">Read our complete methodology and official fee sources</a>.</p></article>
+    <section class="answer-formula page-width" id="how-it-works" aria-label="Etsy Australia fees and calculation method">
+      <article class="panel answer-panel">
+        <p class="eyebrow">Australian fee breakdown</p>
+        <h2>How much does Etsy take from an Australian sale?</h2>
+        <p>For Australian sellers, Etsy takes an estimated $0.28 AUD listing fee, a 6.5% transaction fee on the full order amount (item price + buyer shipping), and Australian payment processing (3% + A$0.25 for domestic Australian buyers, or 4% + A$0.25 for international buyers). Australia has no separate regulatory operating fee. If the order is attributed to an Offsite Ad, an additional 12% or 15% ad fee applies (capped at the $100 USD equivalent).</p>
+        <p class="answer-footnote">Your exact deduction depends on item price, shipping charged to the buyer, buyer location (domestic vs international), and advertising attribution.</p>
+      </article>
+      <article class="panel formula-panel">
+        <p class="eyebrow">Transparent methodology</p>
+        <h2>How ShopProfit calculates Australian profit</h2>
+        <div class="formula-code" aria-label="Australian Profit formulas">
+          <code>gross revenue = item price + buyer shipping (AUD)</code>
+          <code>Australian platform fees = $0.28 listing + 6.5% transaction + processing (3% or 4% + A$0.25) + ads</code>
+          <code>net profit = gross revenue − platform fees − production − packaging &amp; shipping</code>
+        </div>
+        <p class="formula-note">Fee calculations are grounded in Etsy's official published fee schedules for Australian shops. Domestic Australian buyer orders use the 3% + A$0.25 processing rate; international orders use 4% + A$0.25. Australia does not have a statutory regulatory operating fee (0.00%). Goods and Services Tax (GST), currency conversion (2.5% when listing currency differs from bank deposit currency), and account-level fees are not modeled. <a href="/methodology/">Read our full methodology and calculation standards</a> or browse the <a href="/fees/">Etsy Fees Guide</a>.</p>
+      </article>
+    </section>
+
+    <section class="content-section page-width" id="seller-guides" aria-labelledby="guides-heading">
+      <div class="section-heading"><div><h2 id="guides-heading">Etsy Australia Seller Fee &amp; Profit Strategy</h2><p>Essential frameworks for pricing backward in AUD, understanding domestic vs international rates, and protecting take-home margins.</p></div></div>
+      <div class="calculator-grid" style="align-items: stretch; margin-bottom: 24px;">
+        <article class="panel input-panel">
+          <p class="eyebrow">Australian Pricing Strategy</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Target Pricing in AUD: How to Price Backward in Australia</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Most Australian sellers pick an arbitrary retail price in AUD and discover too late that their profit has eroded. Target pricing reverses that formula: you specify the exact take-home profit you need in Australian Dollars, and calculate backward through Etsy’s tiered deductions.</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Because Etsy's 6.5% transaction fee, Australian payment processing (3% + A$0.25 domestic or 4% + A$0.25 intl), and optional Offsite Ads (12% or 15%) scale with your final order total, simple linear markups consistently fall short of your profit target. ShopProfit uses an exact binary search solver to calculate the precise listing price required to hit your desired profit in Australian Dollars.</p>
+        </article>
+        <article class="panel input-panel">
+          <p class="eyebrow">Statutory Fee Clarity</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Regulatory Operating Fees: Why Australia Pays 0% on Etsy</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Unlike sellers in the United Kingdom (0.48%), Canada (0.50%), France (0.40%), or Spain (0.40%), Etsy does not charge a separate regulatory operating fee to shops in Australia. Australia is not subject to Etsy's statutory regulatory operating fee surcharge.</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">This means your baseline variable platform cost on domestic Australian orders remains 9.5% (6.5% transaction + 3% domestic processing), rather than the higher blended rates seen in Europe and the UK. Knowing your true baseline rate prevents unnecessary over-padding or confusing deductions in your unit economics.</p>
+        </article>
+      </div>
+      <div class="calculator-grid" style="align-items: stretch;">
+        <article class="panel input-panel">
+          <p class="eyebrow">Cross-Border Economics</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Domestic vs. International Payment Processing (3% vs 4%)</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Etsy distinguishes payment processing fees for Australian sellers depending on whether the buyer is located within Australia or overseas:</p>
+          <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; line-height: 1.6; margin: 8px 0;">
+            <li><strong>Domestic Australian Orders:</strong> 3% + A$0.25 for sales to buyers within Australia.</li>
+            <li><strong>International Orders:</strong> 4% + A$0.25 for orders shipped to overseas buyers (e.g., US, UK, Canada, New Zealand, Europe).</li>
+            <li><strong>Currency Conversion (2.5%):</strong> If you list items in USD or EUR while having an Australian bank account (AUD payouts), Etsy charges a 2.5% currency conversion fee on the converted payout amount. Keep your listing currency in AUD to avoid FX charges.</li>
+          </ul>
+        </article>
+        <article class="panel input-panel">
+          <p class="eyebrow">Fulfillment Economics</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Australia Post &amp; Shipping Economics: Fees Deducted from Shipping</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Australian distances and high international export postage make shipping economics crucial on Etsy. Etsy levies its 6.5% transaction fee and payment processing (3% domestic or 4% international) on the total postage amount paid by the buyer.</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">If you charge a domestic buyer $12 AUD for Australia Post Parcel Post, Etsy deducts approximately $1.14 in platform fees from that postage. If shipping internationally to the US at $30 AUD postage, Etsy deducts over $3.15 from the shipping charge. If you don't factor these deductions into your pricing, fulfillment will eat directly into your product margin.</p>
+        </article>
+      </div>
     </section>
 
     <section class="faq-section page-width" id="faq" aria-labelledby="faq-heading">
-      <div class="section-heading"><div><h2 id="faq-heading">Frequently asked questions</h2><p>Clear answers about fees, shipping, and your data. Browse the full <a href="/faq/">Etsy Seller FAQ</a>.</p></div></div>
+      <div class="section-heading"><div><h2 id="faq-heading">Frequently asked questions about Etsy Australia fees</h2><p>Clear, verified answers for Australian sellers. Browse the full <a href="/faq/">Etsy Seller FAQ</a>.</p></div></div>
       <div class="panel faq-list" id="faq-list">
-        <details><summary>What Etsy fees do sellers pay in Australia?</summary><p>Australian sellers generally account for Etsy's listing fee, 6.5% transaction fee, and Australia-specific payment processing. Processing rates can differ for international orders; local fixed amounts shown here are estimates.</p></details>
-        <details><summary>Does Etsy charge fees on shipping?</summary><p>Yes. Etsy’s transaction fee applies to the order total including shipping charged to the buyer. Payment processing generally also applies to the sale amount including shipping.</p></details>
-        <details><summary>How does Etsy Offsite Ads affect profit?</summary><p>When Etsy attributes an order to an Offsite Ad, the fee is typically 15%, or 12% for shops that have reached Etsy’s sales threshold. Etsy also applies a per-order cap. The calculator shows the selected rate as an estimate.</p></details>
-        <details><summary>How is payment processing calculated?</summary><p>It is a percentage of the payment plus a fixed amount per order. Both values depend on the seller’s bank account country; international orders may use a different rate in some regions.</p></details>
-        <details><summary>How do I calculate Etsy profit?</summary><p>Net profit = item price + buyer shipping − Etsy fees − production and material costs − packaging and shipping costs. Include other business costs that apply to your sale.</p></details>
-        <details><summary>How do I calculate Etsy fees?</summary><p>Add the listing fee, transaction fee on the order total, payment processing for the seller’s country, any regulatory operating fee, and any Offsite Ads fee attributed to the order.</p></details>
-        <details><summary>How much should I charge on Etsy?</summary><p>Choose a price that covers your costs and Etsy fees while meeting your take-home target. Use break-even for the minimum price that avoids a loss, or target pricing for a chosen profit amount.</p></details>
-        <details><summary>What is Etsy profit margin?</summary><p>Profit margin is net profit divided by gross revenue, then multiplied by 100. ShopProfit’s gross revenue includes item price and shipping charged to the buyer.</p></details>
-        <details><summary>What is an Etsy break-even price?</summary><p>It is the minimum item price that covers estimated Etsy fees and costs at your chosen shipping amount, seller location, and Offsite Ads rate.</p></details>
-        <details><summary>Can I calculate digital product profit?</summary><p>Yes. Choose the Digital product preset to set production and packaging costs to zero, then enter your item price and seller location.</p></details>
-        <details><summary>Does ShopProfit store my financial data?</summary><p>No. Your inputs and calculations stay in this browser. ShopProfit does not send them to a server or require an account. Sharing or downloading a report happens only when you choose it.</p></details>
+        <details><summary>What fees does Etsy charge sellers in Australia?</summary><p>Australian sellers pay three core platform fees on domestic sales: an estimated $0.28 AUD listing fee ($0.20 USD converted), a 6.5% transaction fee on the order total (item price + buyer shipping), and Australian payment processing of 3% + A$0.25 (for domestic Australian buyers) or 4% + A$0.25 (for international buyers). Australia has no separate regulatory operating fee. Attributed Offsite Ads may add an optional 15% or mandatory 12% advertising fee.</p></details>
+        <details><summary>Does Etsy charge a regulatory operating fee in Australia?</summary><p>No. Etsy does not charge a regulatory operating fee in Australia. While sellers in countries like the UK (0.48%) and Canada (0.50%) pay statutory operating fees to cover local digital regulations, Australia is not subject to this fee (0.00%).</p></details>
+        <details><summary>How does Etsy payment processing work for Australian sellers?</summary><p>Etsy charges Australian sellers 3% + A$0.25 for orders from buyers within Australia. For orders from buyers outside Australia, the processing rate is 4% + A$0.25. If you list items in a currency different from your Australian bank account's currency (AUD), Etsy also assesses a 2.5% currency conversion fee.</p></details>
+        <details><summary>Does Etsy charge fees on shipping in Australia?</summary><p>Yes. Etsy applies the 6.5% transaction fee and payment processing (3% domestic or 4% international) to the entire shipping amount paid by the buyer. For instance, on a $15 AUD Australia Post shipping fee, Etsy deducts approximately $1.43 in platform fees.</p></details>
+        <details><summary>How do Etsy Offsite Ads work for Australian shops?</summary><p>If a shopper clicks an Etsy-placed advertisement on Google, Facebook, or partner networks and purchases from your shop within 30 days, Etsy charges an Offsite Ads fee on the order total. The fee is 15% for shops with under $10,000 USD in trailing 12-month sales (optional, can be disabled), or 12% for shops earning $10,000 USD or more (mandatory). Etsy caps this fee at $100 USD (equivalent in AUD) per attributed order.</p></details>
+        <details><summary>Can I calculate Etsy fees for digital downloads in Australia?</summary><p>Yes. Select the Digital product preset in this calculator to automatically set physical production and shipping costs to $0.00 AUD. If you sell digital printables, templates, or planners, check out our dedicated <a href="/etsy-digital-download-fee-calculator">Etsy digital download fee calculator</a>.</p></details>
       </div>
     </section>
 

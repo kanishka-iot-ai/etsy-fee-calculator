@@ -1,0 +1,26 @@
+name: Production Synthetic Canary
+
+on:
+  schedule:
+    # Run every hour on the hour
+    - cron: '0 * * * *'
+  workflow_dispatch: # Allows manual verification anytime
+
+permissions:
+  contents: read
+
+jobs:
+  canary:
+    name: Verify Live Production API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run Production Synthetic Canary
+        run: node scripts/production-canary.mjs

@@ -1,35 +1,64 @@
-import { COUNTRIES, COUNTRY_ORDER, countryFromTimeZone } from "./countries.js";
-import { asCents, calculateRequiredPrice, calculateSale, formatMoney, TRANSACTION_RATE } from "./calculator.js";
 import {
   LANGUAGES,
   detectPreferredLanguage,
   getLanguageDirection,
   isLanguageSupported
 } from "./translations.js";
+import {
+  FeeIntelligenceClient,
+  EXPECTED_VERSION_ID,
+  getCachedFees,
+  setCachedFees,
+  clearCachedFees
+} from "./fee-intelligence-client.js";
+import { normalizeFeeSchedule } from "./compatibility.js";
+import {
+  calculateOrderFees,
+  solveRequiredPrice,
+  resolveCountryFeeRule,
+  countryFromTimeZone,
+  formatMoney,
+  asCents,
+  OFFICIAL_TRANSACTION_RATE as TRANSACTION_RATE
+} from "./fee-engine.js";
 
-const $ = (selector, root = document) => root.querySelector(selector);
-const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+const DEFAULT_BASELINE_ORDER = Object.freeze([
+  "US", "UK", "CA", "AU", "DE", "FR", "IT", "ES", "IN", "JP", "TR", "OTHER"
+]);
+
+const $ = (selector, root = (typeof document !== "undefined" ? document : null)) => root?.querySelector?.(selector) ?? null;
+const $$ = (selector, root = (typeof document !== "undefined" ? document : null)) => (root?.querySelectorAll ? [...root.querySelectorAll(selector)] : []);
 const getCountryRoute = () => {
+  if (typeof location === "undefined") return null;
   const path = location.pathname.toLowerCase();
   if (path.includes("etsy-fee-calculator-uk")) return "UK";
   if (path.includes("etsy-fee-calculator-canada")) return "CA";
   if (path.includes("etsy-fee-calculator-australia")) return "AU";
   if (path.includes("etsy-digital-download-fee-calculator")) return "OTHER";
   // Fallback: read data-route-country injected by the build into each regional page's <body>
-  const bodyAttr = document.body?.dataset?.routeCountry;
+  const bodyAttr = typeof document !== "undefined" ? document.body?.dataset?.routeCountry : null;
   if (bodyAttr && ["UK", "CA", "AU", "OTHER"].includes(bodyAttr)) return bodyAttr;
   return null;
 };
 
 const routeCountry = getCountryRoute();
 const store = {
-  get(key) { try { return localStorage.getItem(key); } catch { return null; } },
-  set(key, value) { try { localStorage.setItem(key, value); } catch { /* Private browsing can disable storage. */ } },
+  get(key) { try { return typeof localStorage !== "undefined" ? localStorage.getItem(key) : null; } catch { return null; } },
+  set(key, value) { try { if (typeof localStorage !== "undefined") localStorage.setItem(key, value); } catch { /* Private browsing can disable storage. */ } },
+  remove(key) { try { if (typeof localStorage !== "undefined") localStorage.removeItem(key); } catch {} }
 };
-const countrySelects = [$("#country"), $("#country-nav")];
-let activeCountryCode = routeCountry || store.get("shopprofit-country") || countryFromTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
-if (!COUNTRIES[activeCountryCode]) activeCountryCode = "US";
-const languageSelect = $("#language-nav");
+const countrySelects = typeof document !== "undefined" ? [$("#country"), $("#country-nav")].filter(Boolean) : [];
+
+// Authoritative global fee schedules populated from v1.1.1 API / local client cache
+const activeFeeSchedules = new Map();
+let activeCountryOrder = [...DEFAULT_BASELINE_ORDER];
+let isFeeDataLoaded = false;
+let feeDataError = null;
+const feeClient = new FeeIntelligenceClient();
+
+let activeCountryCode = routeCountry || store.get("shopprofit-country") || (typeof Intl !== "undefined" && Intl.DateTimeFormat ? countryFromTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone) : "US");
+if (!resolveCountryFeeRule(activeCountryCode) && activeCountryCode !== "OTHER") activeCountryCode = "US";
+const languageSelect = typeof document !== "undefined" ? $("#language-nav") : null;
 let languagePreference = store.get("shopprofit.language") || store.get("shopprofit-language") || "auto";
 if (languagePreference !== "auto" && !isLanguageSupported(languagePreference)) languagePreference = "auto";
 let activeLanguage = detectPreferredLanguage({
@@ -145,14 +174,107 @@ function applyLanguage() {
   }
   translatePage();
 }
-function formatCents(value) { return formatMoney(value, COUNTRIES[activeCountryCode]); }
-function fillCountryOptions() {
-  const options = COUNTRY_ORDER.map((code) => {
-    const c = COUNTRIES[code];
-    return `<option value="${code}">${c.name}</option>`;
-  }).join("");
-  countrySelects.forEach((select) => { select.innerHTML = options; select.value = activeCountryCode; });
+function getStatusBanner() {
+  let banner = $("#fee-status-banner");
+  if (!banner) {
+    banner = document.createElement("div");
+    banner.id = "fee-status-banner";
+    banner.className = "fee-status-banner";
+    const calculatorSection = $("#calculator");
+    if (calculatorSection) {
+      calculatorSection.prepend(banner);
+    }
+  }
+  return banner;
 }
+
+function setControlsEnabled(enabled) {
+  const form = $("#sale-form");
+  if (form) {
+    form.setAttribute("aria-busy", String(!enabled));
+    form.querySelectorAll("input, button:not(#retry-fees-btn), select").forEach((el) => {
+      el.disabled = !enabled;
+    });
+  }
+  const adv = $("#advanced-options");
+  if (adv) {
+    adv.querySelectorAll("input, button").forEach((el) => {
+      el.disabled = !enabled;
+    });
+  }
+}
+
+function setOutputsLoading(loading) {
+  if (!loading) return;
+  const selectors = [
+    "#net-profit", "#mobile-profit", "#net-profit-ledger", "#profit-margin",
+    "#gross-revenue", "#listing-fee", "#transaction-fee", "#processing-fee",
+    "#regulatory-fee", "#offsite-fee", "#total-deductions", "#total-fees",
+    "#total-costs", "#break-even-price", "#summary-break-even",
+    "#required-price", "#summary-required-price", "#insight-break-even",
+    "#insight-target", "#platform-rate", "#cost-rate"
+  ];
+  selectors.forEach((sel) => {
+    const el = $(sel);
+    if (el) el.textContent = "—";
+  });
+}
+
+function showLoadingState() {
+  const banner = getStatusBanner();
+  if (banner) {
+    banner.hidden = false;
+    banner.className = "fee-status-banner is-loading";
+    banner.innerHTML = `<span class="fee-spinner" aria-hidden="true"></span> <span>${translate("Loading verified Etsy fee data...")}</span>`;
+  }
+  setControlsEnabled(false);
+  setOutputsLoading(true);
+}
+
+function hideStatusBanner() {
+  const banner = getStatusBanner();
+  if (banner) banner.hidden = true;
+}
+
+function showErrorState(message) {
+  const banner = getStatusBanner();
+  if (banner) {
+    banner.hidden = false;
+    banner.className = "fee-status-banner is-error";
+    banner.setAttribute("role", "alert");
+    banner.innerHTML = `<span>${translate(message || "Fee data is temporarily unavailable. Please try again.")}</span> <button type="button" class="button button-quiet" id="retry-fees-btn">${translate("Retry")}</button>`;
+    $("#retry-fees-btn")?.addEventListener("click", () => loadFeeData());
+  }
+  setControlsEnabled(false);
+  setOutputsLoading(true);
+}
+
+function getActiveCountry() {
+  const norm = activeFeeSchedules.get(activeCountryCode);
+  if (norm && norm.country) return norm.country;
+  return resolveCountryFeeRule(activeCountryCode) || { currency: "USD", symbol: "$", locale: "en-US", name: "United States" };
+}
+
+function formatCents(value) {
+  return formatMoney(value, getActiveCountry());
+}
+
+function fillCountryOptions() {
+  const order = activeCountryOrder.length > 0 ? activeCountryOrder : DEFAULT_BASELINE_ORDER;
+  const options = order.map((code) => {
+    const norm = activeFeeSchedules.get(code);
+    const c = norm ? norm.country : resolveCountryFeeRule(code);
+    const name = c ? c.name : code;
+    return `<option value="${code}">${name}</option>`;
+  }).join("");
+  countrySelects.forEach((select) => {
+    if (select) {
+      select.innerHTML = options;
+      select.value = activeCountryCode;
+    }
+  });
+}
+
 function getNumber(id) {
   const input = $(id);
   const raw = input.value.trim();
@@ -175,16 +297,21 @@ function getNumber(id) {
   }
   return invalid ? Math.min(99_999_999, Math.max(0, Number.isFinite(value) ? value : 0)) : value;
 }
+
 function getState() {
+  const norm = activeFeeSchedules.get(activeCountryCode);
   return {
-    itemPrice: getNumber("#item-price"), shipping: getNumber("#shipping"),
-    production: getNumber("#production"), packaging: getNumber("#packaging"),
-    country: COUNTRIES[activeCountryCode],
+    itemPrice: getNumber("#item-price"),
+    shipping: getNumber("#shipping"),
+    production: getNumber("#production"),
+    packaging: getNumber("#packaging"),
+    country: norm || resolveCountryFeeRule(activeCountryCode),
     offsiteRate: Number($("input[name=offsite]:checked")?.value || 0),
     plus: $("#etsy-plus").checked,
     salesPerMonth: Math.max(1, Math.min(10_000, Number($("#sales-per-month").value) || 30)),
   };
 }
+
 function setOutput(selector, value) {
   const output = $(selector);
   const changed = output.textContent !== value;
@@ -200,16 +327,54 @@ function setOutput(selector, value) {
     output.classList.remove("pixel-refresh");
   }
 }
-function render() {
-  const state = getState();
-  const data = calculateSale(state);
-  const targetProfit = getNumber("#target-profit");
-  const required = calculateRequiredPrice({ ...state, targetProfit });
-  lastCalculation = { state, data, targetProfit, required };
 
-  $("#currency-display").innerHTML = `${state.country.currency} <span>·</span> ${state.country.symbol}`;
-  $$(".currency-prefix").forEach((el) => { el.textContent = state.country.symbol; });
-  $$(".input-suffix").forEach((el) => { el.textContent = state.country.currency; });
+function render() {
+  if (!isFeeDataLoaded) {
+    return;
+  }
+  const state = getState();
+  const schedule = activeFeeSchedules.get(activeCountryCode) || resolveCountryFeeRule(activeCountryCode);
+  const activeCurrency = schedule.country ? schedule.country.currency : (schedule.currency || "USD");
+  const orderType = (routeCountry === "CA" || routeCountry === "AU") ? "domestic" : "domestic";
+
+  // Pure fee engine calculation
+  const orderFees = calculateOrderFees({
+    country: schedule,
+    itemPrice: state.itemPrice,
+    shipping: state.shipping,
+    production: state.production,
+    packaging: state.packaging,
+    offsiteAds: state.offsiteRate > 0,
+    shopOffsiteAdsTier: state.offsiteRate,
+    plusEnabled: state.plus,
+    salesPerMonth: state.salesPerMonth,
+    orderType,
+    listingCurrency: activeCurrency,
+    paymentAccountCurrency: activeCurrency
+  });
+
+  const data = orderFees.legacy;
+  const targetProfit = getNumber("#target-profit");
+  const required = solveRequiredPrice(targetProfit, {
+    country: schedule,
+    shipping: state.shipping,
+    production: state.production,
+    packaging: state.packaging,
+    offsiteAds: state.offsiteRate > 0,
+    shopOffsiteAdsTier: state.offsiteRate,
+    plusEnabled: state.plus,
+    salesPerMonth: state.salesPerMonth,
+    orderType,
+    listingCurrency: activeCurrency,
+    paymentAccountCurrency: activeCurrency
+  });
+
+  lastCalculation = { state, data, targetProfit, required, orderFees };
+
+  const countryData = getActiveCountry();
+  $("#currency-display").innerHTML = `${countryData.currency} <span>·</span> ${countryData.symbol}`;
+  $$(".currency-prefix").forEach((el) => { el.textContent = countryData.symbol; });
+  $$(".input-suffix").forEach((el) => { el.textContent = countryData.currency; });
 
   setOutput("#net-profit", formatCents(data.netCents));
   setOutput("#mobile-profit", formatCents(data.netCents));
@@ -259,6 +424,7 @@ function render() {
   renderScenarios(state);
   translatePage();
 }
+
 function renderScenarios(state) {
   const entries = [
     { name: "Current sale", rate: state.offsiteRate, current: true },
@@ -266,16 +432,59 @@ function renderScenarios(state) {
     { name: "15% Offsite Ads", rate: 0.15 },
     { name: "12% Offsite Ads", rate: 0.12 },
   ];
+  const schedule = activeFeeSchedules.get(activeCountryCode) || resolveCountryFeeRule(activeCountryCode);
+  const activeCurrency = schedule.country ? schedule.country.currency : (schedule.currency || "USD");
+
   $("#scenario-body").innerHTML = entries.map((entry) => {
-    const result = calculateSale({ ...state, offsiteRate: entry.rate });
+    const calc = calculateOrderFees({
+      country: schedule,
+      itemPrice: state.itemPrice,
+      shipping: state.shipping,
+      production: state.production,
+      packaging: state.packaging,
+      offsiteAds: entry.rate > 0,
+      shopOffsiteAdsTier: entry.rate,
+      plusEnabled: state.plus,
+      salesPerMonth: state.salesPerMonth,
+      listingCurrency: activeCurrency,
+      paymentAccountCurrency: activeCurrency
+    });
+    const result = calc.legacy;
     const costs = result.costsCents;
     const price = formatCents(asCents(state.itemPrice));
     return `<tr class="${entry.current ? "current-row" : ""}"><td>${entry.name}</td><td>${price}</td><td>${formatCents(result.feesCents)}</td><td>${formatCents(costs)}</td><td>${formatCents(result.netCents)}</td><td>${(result.margin * 100).toFixed(1)}%</td></tr>`;
   }).join("");
 }
+
 function renderFeeTable() {
-  $("#fee-table-body").innerHTML = COUNTRY_ORDER.map((code) => {
-    const c = COUNTRIES[code];
+  const tableBody = $("#fee-table-body");
+  if (!tableBody) return;
+  const list = activeCountryOrder.length > 0 ? activeCountryOrder : DEFAULT_BASELINE_ORDER;
+  tableBody.innerHTML = list.map((code) => {
+    const norm = activeFeeSchedules.get(code);
+    const fallbackRule = resolveCountryFeeRule(code);
+    const c = norm ? {
+      name: norm.country.name,
+      currency: norm.country.currency,
+      symbol: norm.country.symbol,
+      locale: norm.country.locale,
+      listingFee: norm.fees.listing.amount,
+      processingRate: norm.fees.processing.rate,
+      processingFixed: norm.fees.processing.fixedAmount,
+      regulatoryRate: norm.fees.regulatory.rate,
+      processingNote: norm.metadata?.specialRules
+    } : {
+      name: fallbackRule.name,
+      currency: fallbackRule.currency,
+      symbol: fallbackRule.symbol,
+      locale: fallbackRule.locale,
+      listingFee: fallbackRule.listingFee,
+      processingRate: fallbackRule.rate,
+      processingFixed: fallbackRule.fixed,
+      regulatoryRate: fallbackRule.regulatoryRate || 0,
+      processingNote: fallbackRule.domesticRate != null ? "Domestic order rate; international orders differ." : (code === "TR" ? "Türkiye rate per published schedule." : "")
+    };
+    if (!c) return "";
     const regulatory = c.regulatoryRate ? `${(c.regulatoryRate * 100).toFixed(2)}%` : "—";
     const processingRate = c.processingRate * 100;
     const rateDigits = Number.isInteger(processingRate) ? 0 : 1;
@@ -283,10 +492,12 @@ function renderFeeTable() {
     return `<tr class="${code === activeCountryCode ? "is-selected" : ""}"><th scope="row">${c.name}${code === activeCountryCode ? ' <span class="selected-country">Selected</span>' : ""}</th><td>${c.currency}</td><td>${formatMoney(Math.round(c.listingFee * 100), c)}</td><td>${(TRANSACTION_RATE * 100).toFixed(1)}%</td><td>${processingRate.toFixed(rateDigits)}% + ${formatMoney(Math.round(c.processingFixed * 100), c)}</td><td>${regulatory}</td><td>${note}</td></tr>`;
   }).join("");
 }
+
 function syncCountry(code, persist = true) {
-  if (!COUNTRIES[code]) return;
+  const norm = activeFeeSchedules.get(code);
+  if (!norm && !resolveCountryFeeRule(code)) return;
   activeCountryCode = code;
-  countrySelects.forEach((select) => { select.value = code; });
+  countrySelects.forEach((select) => { if (select) select.value = code; });
   if (persist && !routeCountry) store.set("shopprofit-country", code);
   renderFeeTable();
   render();
@@ -435,9 +646,10 @@ function setItemPriceFromCents(value, input) {
 }
 function applyRouteContent() {
   if (!routeCountry) return;
+  const cName = (resolveCountryFeeRule(routeCountry) || {}).name || routeCountry;
   $(".answer-panel h2").textContent = routeCountry === "OTHER"
     ? "How do Etsy fees affect a digital download?"
-    : `How much does Etsy take from a sale in ${COUNTRIES[routeCountry].name}?`;
+    : `How much does Etsy take from a sale in ${cName}?`;
   // The build generates route-specific metadata and structured data in the HTML.
   // Keep those crawlable values intact after hydration instead of replacing them
   // with generic client-side metadata.
@@ -512,24 +724,24 @@ function setupMenu() {
   });
 }
 
-fillCountryOptions();
-applyRouteContent();
-applyLanguage();
-renderFeeTable();
-countrySelects.forEach((select) => select.addEventListener("change", () => syncCountry(select.value)));
-languageSelect.addEventListener("change", () => {
-  languagePreference = languageSelect.value;
-  store.set("shopprofit.language", languagePreference);
-  store.set("shopprofit-language", languagePreference);
-  activeLanguage = detectPreferredLanguage({
-    savedLanguage: languagePreference === "auto" ? null : languagePreference,
-    languages: typeof navigator !== "undefined" ? (navigator.languages || (navigator.language ? [navigator.language] : [])) : [],
-  });
+if (typeof document !== "undefined" && typeof window !== "undefined") {
+  fillCountryOptions();
+  applyRouteContent();
   applyLanguage();
-  render();
-});
+  renderFeeTable();
+  countrySelects.forEach((select) => select?.addEventListener("change", () => syncCountry(select.value)));
+  languageSelect?.addEventListener("change", () => {
+    languagePreference = languageSelect.value;
+    store.set("shopprofit.language", languagePreference);
+    store.set("shopprofit-language", languagePreference);
+    activeLanguage = detectPreferredLanguage({
+      savedLanguage: languagePreference === "auto" ? null : languagePreference,
+      languages: typeof navigator !== "undefined" ? (navigator.languages || (navigator.language ? [navigator.language] : [])) : [],
+    });
+    applyLanguage();
+    render();
+  });
 
-if (typeof window !== "undefined") {
   window.addEventListener("languagechange", () => {
     if (languagePreference === "auto") {
       activeLanguage = detectPreferredLanguage({
@@ -540,118 +752,228 @@ if (typeof window !== "undefined") {
       render();
     }
   });
-}
-$("#sale-form").addEventListener("submit", (event) => event.preventDefault());
-$("#sale-form").addEventListener("input", (event) => { if (event.target.matches("input")) render(); });
-$("#target-profit").addEventListener("input", render);
-$("#sales-per-month").addEventListener("input", render);
-$("#etsy-plus").addEventListener("change", render);
-$$('input[name="offsite"]').forEach((input) => input.addEventListener("change", render));
-$$('[data-price]').forEach((button) => button.addEventListener("click", () => { $("#item-price").value = button.dataset.price; render(); }));
-$("#digital-preset").addEventListener("click", () => {
-  if (!digitalMode) {
-    physicalSnapshot = { itemPrice: $("#item-price").value, shipping: $("#shipping").value, production: $("#production").value, packaging: $("#packaging").value };
-    digitalMode = true;
-    $("#item-price").value = "25"; $("#shipping").value = "0"; $("#production").value = "0"; $("#packaging").value = "0";
-    $("#digital-preset").setAttribute("aria-pressed", "true");
-    $("#digital-mode-note").hidden = false;
-    render(); showToast("Digital product preset applied");
-  } else {
-    const restored = physicalSnapshot || { itemPrice: "35", shipping: "5", production: "7", packaging: "4" };
-    $("#item-price").value = restored.itemPrice; $("#shipping").value = restored.shipping;
-    $("#production").value = restored.production; $("#packaging").value = restored.packaging;
-    digitalMode = false; physicalSnapshot = null;
-    $("#digital-preset").setAttribute("aria-pressed", "false");
-    $("#digital-mode-note").hidden = true;
-    render(); showToast("Physical product settings restored");
-  }
-});
-$("#use-break-even").addEventListener("click", () => setItemPriceFromCents(lastCalculation.data.breakEvenCents, $("#item-price")));
-$("#use-target").addEventListener("click", () => setItemPriceFromCents(lastCalculation.required, $("#item-price")));
-$("#copy-breakdown").addEventListener("click", (event) => copyBreakdown(event.currentTarget));
-$("#mobile-copy").addEventListener("click", (event) => copyBreakdown(event.currentTarget));
-$("#download-report").addEventListener("click", downloadReport);
-$("#share-email").addEventListener("click", shareByEmail);
-$("#share-whatsapp").addEventListener("click", shareByWhatsApp);
-const analysisPanel = $(".scenarios-panel"), analysisButton = $("#show-analysis");
-analysisButton.addEventListener("click", toggleDetailedAnalysis);
-analysisPanel.addEventListener("toggle", () => { analysisButton.textContent = translate(analysisPanel.open ? "Hide Detailed Analysis" : "Show Detailed Analysis"); });
-function resetCalculator() {
-  digitalMode = routeCountry === "OTHER";
-  physicalSnapshot = digitalMode ? { itemPrice: "35", shipping: "5", production: "7", packaging: "4" } : null;
-  $("#item-price").value = "35"; $("#shipping").value = digitalMode ? "0" : "5";
-  $("#production").value = digitalMode ? "0" : "7"; $("#packaging").value = digitalMode ? "0" : "4";
-  $("#digital-preset").setAttribute("aria-pressed", String(digitalMode));
-  $("#digital-mode-note").hidden = !digitalMode;
-  $("#target-profit").value = "25"; $("#etsy-plus").checked = false; $("#sales-per-month").value = "30";
-  $('input[name="offsite"][value="0"]').checked = true;
-  $$("input[aria-invalid]").forEach((input) => { input.removeAttribute("aria-invalid"); input.setCustomValidity(""); input.closest(".field")?.classList.remove("has-error"); input.closest(".field")?.querySelector(".field-error-text")?.remove(); });
-  syncCountry(routeCountry || "US"); showToast("Calculator reset");
-}
-$("#reset").addEventListener("click", resetCalculator);
-$("#mobile-reset").addEventListener("click", resetCalculator);
-$("#theme-toggle").addEventListener("click", () => {
-  const next = document.body.classList.contains("dark") ? "light" : "dark";
-  setTheme(next); store.set("shopprofit-theme", next);
-});
-$("#copyright-year").textContent = new Date().getFullYear();
-function setupInstantNavigation() {
-  const prefetched = new Set();
-  const prefetch = (href) => {
-    if (!href || prefetched.has(href)) return;
-    try {
-      const url = new URL(href, location.origin);
-      if (url.origin !== location.origin || url.pathname === location.pathname || url.hash) return;
-      prefetched.add(href);
-      const link = document.createElement("link");
-      link.rel = "prefetch";
-      link.href = url.pathname;
-      document.head.appendChild(link);
-    } catch { /* ignore */ }
-  };
 
-  document.addEventListener("pointerover", (event) => {
-    const link = event.target.closest("a");
-    if (link) prefetch(link.getAttribute("href"));
-  }, { passive: true });
-
-  document.addEventListener("touchstart", (event) => {
-    const link = event.target.closest("a");
-    if (link) prefetch(link.getAttribute("href"));
-  }, { passive: true });
-
-  document.addEventListener("click", (event) => {
-    const link = event.target.closest('a[href^="/#"]');
-    if (!link) return;
-    const isHome = location.pathname === "/" || location.pathname === "" || location.pathname === "/index.html";
-    if (isHome) {
-      const hash = link.getAttribute("href").slice(1);
-      const target = $(hash);
-      if (target) {
-        event.preventDefault();
-        target.scrollIntoView({ behavior: "smooth" });
-        history.pushState(null, "", hash);
-      }
+  $("#sale-form")?.addEventListener("submit", (event) => event.preventDefault());
+  $("#sale-form")?.addEventListener("input", (event) => { if (event.target.matches("input")) render(); });
+  $("#target-profit")?.addEventListener("input", render);
+  $("#sales-per-month")?.addEventListener("input", render);
+  $("#etsy-plus")?.addEventListener("change", render);
+  $$('input[name="offsite"]').forEach((input) => input.addEventListener("change", render));
+  $$('[data-price]').forEach((button) => button.addEventListener("click", () => {
+    const ip = $("#item-price");
+    if (ip) ip.value = button.dataset.price;
+    render();
+  }));
+  $("#digital-preset")?.addEventListener("click", () => {
+    if (!digitalMode) {
+      physicalSnapshot = { itemPrice: $("#item-price")?.value, shipping: $("#shipping")?.value, production: $("#production")?.value, packaging: $("#packaging")?.value };
+      digitalMode = true;
+      if ($("#item-price")) $("#item-price").value = "25";
+      if ($("#shipping")) $("#shipping").value = "0";
+      if ($("#production")) $("#production").value = "0";
+      if ($("#packaging")) $("#packaging").value = "0";
+      $("#digital-preset")?.setAttribute("aria-pressed", "true");
+      if ($("#digital-mode-note")) $("#digital-mode-note").hidden = false;
+      render(); showToast("Digital product preset applied");
+    } else {
+      const restored = physicalSnapshot || { itemPrice: "35", shipping: "5", production: "7", packaging: "4" };
+      if ($("#item-price")) $("#item-price").value = restored.itemPrice;
+      if ($("#shipping")) $("#shipping").value = restored.shipping;
+      if ($("#production")) $("#production").value = restored.production;
+      if ($("#packaging")) $("#packaging").value = restored.packaging;
+      digitalMode = false; physicalSnapshot = null;
+      $("#digital-preset")?.setAttribute("aria-pressed", "false");
+      if ($("#digital-mode-note")) $("#digital-mode-note").hidden = true;
+      render(); showToast("Physical product settings restored");
     }
   });
+  $("#use-break-even")?.addEventListener("click", () => {
+    const ip = $("#item-price");
+    if (ip && lastCalculation) setItemPriceFromCents(lastCalculation.data.breakEvenCents, ip);
+  });
+  $("#use-target")?.addEventListener("click", () => {
+    const ip = $("#item-price");
+    if (ip && lastCalculation) setItemPriceFromCents(lastCalculation.required, ip);
+  });
+  $("#copy-breakdown")?.addEventListener("click", (event) => copyBreakdown(event.currentTarget));
+  $("#mobile-copy")?.addEventListener("click", (event) => copyBreakdown(event.currentTarget));
+  $("#download-report")?.addEventListener("click", downloadReport);
+  $("#share-email")?.addEventListener("click", shareByEmail);
+  $("#share-whatsapp")?.addEventListener("click", shareByWhatsApp);
+  const analysisPanel = $(".scenarios-panel"), analysisButton = $("#show-analysis");
+  analysisButton?.addEventListener("click", toggleDetailedAnalysis);
+  analysisPanel?.addEventListener("toggle", () => {
+    if (analysisButton) analysisButton.textContent = translate(analysisPanel.open ? "Hide Detailed Analysis" : "Show Detailed Analysis");
+  });
+  function resetCalculator() {
+    digitalMode = routeCountry === "OTHER";
+    physicalSnapshot = digitalMode ? { itemPrice: "35", shipping: "5", production: "7", packaging: "4" } : null;
+    const itemPriceEl = $("#item-price");
+    if (itemPriceEl) itemPriceEl.value = "35";
+    const shippingEl = $("#shipping");
+    if (shippingEl) shippingEl.value = digitalMode ? "0" : "5";
+    const productionEl = $("#production");
+    if (productionEl) productionEl.value = digitalMode ? "0" : "7";
+    const packagingEl = $("#packaging");
+    if (packagingEl) packagingEl.value = digitalMode ? "0" : "4";
+    $("#digital-preset")?.setAttribute("aria-pressed", String(digitalMode));
+    const note = $("#digital-mode-note");
+    if (note) note.hidden = !digitalMode;
+    const targetProfitEl = $("#target-profit");
+    if (targetProfitEl) targetProfitEl.value = "25";
+    const etsyPlusEl = $("#etsy-plus");
+    if (etsyPlusEl) etsyPlusEl.checked = false;
+    const salesEl = $("#sales-per-month");
+    if (salesEl) salesEl.value = "30";
+    const offsiteZero = $('input[name="offsite"][value="0"]');
+    if (offsiteZero) offsiteZero.checked = true;
+    $$("input[aria-invalid]").forEach((input) => {
+      input.removeAttribute("aria-invalid");
+      input.setCustomValidity("");
+      input.closest(".field")?.classList.remove("has-error");
+      input.closest(".field")?.querySelector(".field-error-text")?.remove();
+    });
+    syncCountry(routeCountry || "US");
+    showToast("Calculator reset");
+  }
+
+  $("#reset")?.addEventListener("click", resetCalculator);
+  $("#mobile-reset")?.addEventListener("click", resetCalculator);
+  $("#theme-toggle")?.addEventListener("click", () => {
+    const next = document.body.classList.contains("dark") ? "light" : "dark";
+    setTheme(next); store.set("shopprofit-theme", next);
+  });
+  const copyYear = $("#copyright-year");
+  if (copyYear) copyYear.textContent = new Date().getFullYear();
+
+  function setupInstantNavigation() {
+    const prefetched = new Set();
+    const prefetch = (href) => {
+      if (!href || prefetched.has(href)) return;
+      try {
+        const url = new URL(href, location.origin);
+        if (url.origin !== location.origin || url.pathname === location.pathname || url.hash) return;
+        prefetched.add(href);
+        const link = document.createElement("link");
+        link.rel = "prefetch";
+        link.href = url.pathname;
+        document.head?.appendChild(link);
+      } catch { /* ignore */ }
+    };
+
+    document.addEventListener("pointerover", (event) => {
+      const link = event.target?.closest?.("a");
+      if (link) prefetch(link.getAttribute("href"));
+    }, { passive: true });
+
+    document.addEventListener("touchstart", (event) => {
+      const link = event.target?.closest?.("a");
+      if (link) prefetch(link.getAttribute("href"));
+    }, { passive: true });
+
+    document.addEventListener("click", (event) => {
+      const link = event.target?.closest?.('a[href^="/#"]');
+      if (!link) return;
+      const isHome = location.pathname === "/" || location.pathname === "" || location.pathname === "/index.html";
+      if (isHome) {
+        const hash = link.getAttribute("href").slice(1);
+        const target = $(hash);
+        if (target) {
+          event.preventDefault();
+          target.scrollIntoView?.({ behavior: "smooth" });
+          history.pushState?.(null, "", hash);
+        }
+      }
+    });
+  }
+
+  setupMenu(); setupPointerEffects(); setupInstantNavigation();
+  window.addEventListener("scroll", () => $(".site-header")?.classList.toggle("scrolled", window.scrollY > 10), { passive: true });
+  window.addEventListener("resize", () => {
+    if (headingResizeFrame) return;
+    headingResizeFrame = requestAnimationFrame(() => { fitHeroHeading(); headingResizeFrame = 0; });
+  }, { passive: true });
+  document.addEventListener("keydown", (event) => {
+    const typing = event.target.matches("input, textarea, select, [contenteditable=true]");
+    if (typing || event.metaKey || event.ctrlKey || event.altKey) return;
+    if (event.key.toLowerCase() === "r") $("#reset")?.click();
+    if (event.key.toLowerCase() === "c") $("#copy-breakdown")?.click();
+  });
+
+  const preferredTheme = store.get("shopprofit-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  setTheme(preferredTheme);
+  if ($("#country")) $("#country").value = activeCountryCode;
+  if ($("#country-nav")) $("#country-nav").value = activeCountryCode;
+
+  loadFeeData();
 }
 
-setupMenu(); setupPointerEffects(); setupInstantNavigation();
-window.addEventListener("scroll", () => $(".site-header").classList.toggle("scrolled", window.scrollY > 10), { passive: true });
-let headingResizeFrame = 0;
-window.addEventListener("resize", () => {
-  if (headingResizeFrame) return;
-  headingResizeFrame = requestAnimationFrame(() => { fitHeroHeading(); headingResizeFrame = 0; });
-}, { passive: true });
-document.addEventListener("keydown", (event) => {
-  const typing = event.target.matches("input, textarea, select, [contenteditable=true]");
-  if (typing || event.metaKey || event.ctrlKey || event.altKey) return;
-  if (event.key.toLowerCase() === "r") $("#reset").click();
-  if (event.key.toLowerCase() === "c") $("#copy-breakdown").click();
-});
+/**
+ * Asynchronously loads authoritative v1.1.1 fee intelligence.
+ */
+export async function loadFeeData(customOptions = {}) {
+  showLoadingState();
+  const client = customOptions.client || feeClient;
+  const storage = customOptions.storage !== undefined ? customOptions.storage : store;
 
-const preferredTheme = store.get("shopprofit-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-setTheme(preferredTheme);
-$("#country").value = activeCountryCode;
-$("#country-nav").value = activeCountryCode;
-render();
+  try {
+    const result = await client.loadAllNormalizedFeeSchedules({
+      storage,
+      expectedVersion: customOptions.expectedVersion || EXPECTED_VERSION_ID,
+      bypassCache: customOptions.bypassCache || false
+    });
+
+    activeFeeSchedules.clear();
+    for (const [code, schedule] of result.schedules.entries()) {
+      activeFeeSchedules.set(code, schedule);
+    }
+    activeCountryOrder = result.countryOrder;
+    isFeeDataLoaded = true;
+    feeDataError = null;
+    hideStatusBanner();
+
+    const preferredCountry = routeCountry || store.get("shopprofit-country") || countryFromTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
+    if (activeFeeSchedules.has(preferredCountry)) {
+      activeCountryCode = preferredCountry;
+    } else if (activeFeeSchedules.has("US")) {
+      activeCountryCode = "US";
+    }
+
+    fillCountryOptions();
+    setControlsEnabled(true);
+    renderFeeTable();
+    render();
+    return true;
+  } catch (err) {
+    console.error("Fee data load failed:", err);
+    isFeeDataLoaded = false;
+    feeDataError = err;
+    showErrorState("Fee data is temporarily unavailable. Please try again.");
+    return false;
+  }
+}
+
+export function getFeeDataState() {
+  return {
+    isLoaded: isFeeDataLoaded,
+    error: feeDataError,
+    activeCountryCode,
+    activeCountryOrder: [...activeCountryOrder],
+    scheduleCount: activeFeeSchedules.size
+  };
+}
+
+export {
+  activeFeeSchedules,
+  activeCountryOrder,
+  solveRequiredPrice,
+  formatCents,
+  render,
+  getState
+};
+
+// Initiate startup loading in browser environment
+if (typeof window !== "undefined") {
+  loadFeeData();
+}
+

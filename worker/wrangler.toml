@@ -1,0 +1,18 @@
+name = "shopprofit-fee-intelligence"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+# Cloudflare D1 Database Binding
+# For local testing and development, Wrangler uses an internal SQLite database automatically.
+# BEFORE remote deployment in future phases, replace the placeholder below with the real D1 Database ID
+# obtained from your Cloudflare Dashboard (Workers & Pages > D1 > shopprofit-fees-db)
+# or via command: npx wrangler d1 info shopprofit-fees-db
+[[d1_databases]]
+binding = "DB"
+database_name = "shopprofit-fees-db"
+database_id = "758e36ac-4d94-45a7-9c0d-d6a18d32780e"
+
+# Scheduled Policy Monitor Cron Trigger (Daily at 08:00 UTC)
+[triggers]
+crons = ["0 8 * * *"]
+
