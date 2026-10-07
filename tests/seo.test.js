@@ -603,6 +603,21 @@ test("/fees/ route satisfies all Phase 2 Step 2 search-intent, authority, and fe
   assert.ok(faqMatch, "FAQPage schema present");
   const parsedFaq = JSON.parse(faqMatch[1]);
   assert.ok(parsedFaq.mainEntity.length >= 6, "at least 6 FAQs");
+
+  // 10. Phase 2 Step 2.1 verified Etsy fee documentation regression assertions
+  assert.match(html, /4\.0% \+ £0\.20 GBP/, "UK processing documented as 4.0% + £0.20 GBP");
+  assert.ok(!html.includes("£0.25 GBP"), "No £0.25 GBP in UK processing documentation");
+  assert.match(html, /6\.5% of the total order amount in your designated listing currency/, "official transaction fee phrasing");
+  assert.match(html, /Transaction fee basis/, "transaction fee basis explicitly documented");
+  assert.match(html, /Payment processing basis/, "payment processing basis explicitly documented");
+  assert.match(html, /Regulatory operating fee basis/, "regulatory fee basis explicitly documented");
+  assert.match(html, /not listed by Etsy/, "unlisted regulatory jurisdictions distinguished from synthetic zeroes");
+  assert.match(html, /apply per bank payout event, not per individual sale/, "deposit fees explicitly clarified as disbursement costs");
+  assert.match(html, /15% if the shop has always remained below \$10,000 USD in any consecutive 365-day period/, "offsite ads 15% tier eligibility");
+  assert.match(html, /12% once the shop has reached \$10,000 USD or more in a consecutive 365-day period/, "offsite ads 12% tier eligibility");
+  assert.match(html, /Scenario 1: \$10 Digital Download[\s\S]*?\$8\.60 \(86\.0% Margin\)/, "Scenario 1 matches engine");
+  assert.match(html, /Scenario 2: \$35 Handmade Ceramic Mug[\s\S]*?\$24\.75 \(61\.88% Margin\)/, "Scenario 2 matches engine");
+  assert.match(html, /Scenario 3: £28 Handmade Item with 0\.48% Regulatory Fee[\s\S]*?£18\.63 \(58\.22% Margin\)/, "Scenario 3 matches engine");
 });
 
 

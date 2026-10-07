@@ -96,7 +96,7 @@
         "name": "How much does Etsy charge sellers per sale?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Etsy charges a $0.20 USD listing fee, a 6.5% transaction fee on the gross order total (item price + shipping + gift wrap), and country-specific Etsy Payments processing fees (typically 3% to 6.5% plus a small fixed charge). Sellers in 9 countries also pay a regulatory operating fee (0.05% to 1.97%), and attributed Offsite Ads add 12% or 15%."
+          "text": "Etsy charges a $0.20 USD listing fee, a 6.5% transaction fee on the total order amount in the designated listing currency (item price + shipping + gift wrap), and country-specific Etsy Payments processing fees (typically 3% to 6.5% plus a small fixed charge). Sellers in 9 countries also pay a regulatory operating fee (0.05% to 1.97%), and attributed Offsite Ads add 12% or 15%."
         }
       },
       {
@@ -120,7 +120,7 @@
         "name": "What is Etsy's regulatory operating fee?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "A regulatory operating fee is a small surcharge (between 0.05% and 1.97%) charged to sellers in countries with local digital services tax legislation, including the UK (0.48%), France (1.14%), Italy (0.80%), Spain (0.88%), Canada (0.50%), Turkey (1.67%), Vietnam (1.24%), and Hungary (1.97%)."
+          "text": "A regulatory operating fee is a surcharge (between 0.05% and 1.97%) charged to sellers in countries with local digital services tax legislation, including the UK (0.48%), France (1.14%), Italy (0.80%), Spain (0.88%), Canada (0.50%), Türkiye (1.67%), Vietnam (1.24%), and Hungary (1.97%). Jurisdictions not listed by Etsy are not assessed for this fee, rather than carrying a statutory 0% rate."
         }
       },
       {
@@ -128,7 +128,7 @@
         "name": "How much do Etsy Offsite Ads cost?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Offsite Ads cost 15% for shops with less than $10,000 USD in annual sales (optional), or 12% for shops earning $10,000 or more (mandatory). The fee is charged only when a shopper clicks an external ad and purchases from your shop within 30 days, capped at $100 USD per order."
+          "text": "Offsite Ads cost 15% if the shop has always remained below $10,000 USD in any consecutive 365-day period (optional), or 12% once the shop has reached $10,000 USD or more in a consecutive 365-day period (mandatory for the lifetime of the shop). Attributed when a buyer clicks an Offsite Ad and purchases within 30 days, strictly capped at $100 USD per attributed order."
         }
       },
       {
@@ -305,7 +305,7 @@
       <h2>How Etsy Fees Work: 2026 Direct Answer</h2>
 
       <div class="direct-answer" role="region" aria-label="Quick Answer Summary">
-        <strong>Direct Answer:</strong> In 2026, Etsy charges sellers three core platform fees on every completed sale: a <strong>$0.20 USD listing fee</strong> per item (renewed every 4 months or upon sale), a flat <strong>6.5% transaction fee</strong> calculated on gross order revenue (item price + buyer shipping + gift wrap), and country-specific <strong>Etsy Payments processing fees</strong> (typically 3% to 6.5% + a fixed charge). In addition, sellers in 9 countries pay a <strong>regulatory operating fee</strong> (0.05% to 1.97%), and sellers whose orders originate from Etsy's external marketing pay a <strong>12% or 15% Offsite Ads fee</strong> (capped at $100 per order).
+        <strong>Direct Answer:</strong> In 2026, Etsy charges sellers three core platform fees on every completed sale: a <strong>$0.20 USD listing fee</strong> per item (renewed every 4 months or upon sale), a <strong>6.5% transaction fee</strong> on the total order amount in the designated listing currency (item price + buyer shipping + gift wrap), and country-specific <strong>Etsy Payments processing fees</strong> (typically 3% to 6.5% + a fixed charge). In addition, sellers in 9 statutory countries pay a <strong>regulatory operating fee</strong> (0.05% to 1.97%), and sellers whose orders originate from Etsy's external marketing pay a <strong>12% or 15% Offsite Ads fee</strong> (strictly capped at $100 USD per order).
       </div>
 
       <div class="fee-stat-grid" aria-label="Key fee rates">
@@ -417,9 +417,15 @@
       </ul>
 
       <h3>B. Etsy Transaction Fee (6.5%)</h3>
-      <p>Etsy takes a flat <strong>6.5% transaction fee</strong> on every sale. Crucially, the 6.5% is charged on the <strong>total order value</strong> charged to the customer:</p>
-      <div class="formula-box">transaction fee = 6.5% × (item price + buyer shipping + gift wrapping)</div>
-      <p>Etsy charges the transaction fee on shipping specifically to discourage sellers from listing an item for $1 and charging $30 in shipping to evade platform fees. Sales tax collected directly by Etsy from the buyer is excluded from the transaction fee.</p>
+      <p>When you make a sale on Etsy, you are charged a transaction fee of <strong>6.5% of the total order amount in your designated listing currency</strong>. This fee applies to the total cost of the item, along with shipping and gift wrap (if you charge your customers for these):</p>
+      <div class="formula-box">transaction fee = 6.5% × (item price + shipping charged + gift wrap)</div>
+      <p>Etsy charges the transaction fee on shipping specifically to discourage sellers from listing an item for a low price and inflating shipping charges to evade platform fees.</p>
+      <p><strong>Distinguishing the three statutory fee bases:</strong></p>
+      <ul>
+        <li><strong>Transaction fee basis:</strong> 6.5% of the total order amount in your designated listing currency, applying to item price, shipping charged, and gift wrap.</li>
+        <li><strong>Payment processing basis:</strong> Assessed on the total payment amount received from the buyer, which may include applicable sales tax or VAT collected by Etsy where applicable.</li>
+        <li><strong>Regulatory operating fee basis:</strong> Assessed on item price plus shipping charged and gift wrap, and explicitly excludes any sales tax collected by Etsy.</li>
+      </ul>
 
       <h3>C. Etsy Payments Processing Fee</h3>
       <p>Most transactions are processed through <strong>Etsy Payments</strong>. Unlike the transaction fee, the payment processing fee varies by the seller's registered bank account country and consists of a percentage plus a fixed flat fee:</p>
@@ -437,7 +443,7 @@
       <p><strong>Basis note:</strong> Payment processing is assessed on the entire gross transaction amount collected, which includes item price, shipping charged, and any buyer sales tax or VAT collected by Etsy where applicable.</p>
 
       <h3>D. Regulatory Operating Fees (9 Statutory Jurisdictions)</h3>
-      <p>To offset Digital Services Taxes (DST) imposed by individual national governments on digital platforms, Etsy passes along a <strong>regulatory operating fee</strong> in specific countries. This fee is calculated as a percentage of the item price plus buyer shipping:</p>
+      <p>To offset Digital Services Taxes (DST) imposed by individual national governments on digital platforms, Etsy passes along a <strong>regulatory operating fee</strong> in specific countries. This fee is calculated as a percentage of the item price plus buyer shipping and gift wrap (if applicable), and explicitly excludes any sales tax collected by Etsy:</p>
       <ul>
         <li><strong>United Kingdom:</strong> 0.48%</li>
         <li><strong>France:</strong> 1.14%</li>
@@ -449,14 +455,15 @@
         <li><strong>Canada:</strong> 0.50%</li>
         <li><strong>Vietnam:</strong> 1.24%</li>
       </ul>
-      <p><em>Statutory coverage note:</em> Jurisdictions not listed by Etsy (such as the United States, Australia, and Germany) are not assessed for a regulatory operating fee. ShopProfit's v1.1.1 fee intelligence engine supports all 62 sovereign Etsy Payments markets, incorporating verified statutory regulatory rates where applicable.</p>
+      <p><em>Statutory coverage note:</em> Jurisdictions not listed by Etsy (such as the United States, Australia, and Germany) are not assessed for a regulatory operating fee. In our fee intelligence engine and documentation, these jurisdictions are explicitly recorded as <strong>not listed by Etsy</strong>, rather than carrying an explicit 0% rate. ShopProfit's v1.1.1 fee intelligence engine supports all 62 sovereign Etsy Payments markets, incorporating verified statutory regulatory rates where applicable.</p>
 
       <h3>E. Etsy Offsite Ads (12% or 15% with Statutory Cap)</h3>
-      <p>Etsy markets products across external advertising platforms including Google Shopping, Facebook, Instagram, Pinterest, and Bing. You do not pay for impressions or clicks—you only pay an advertising fee if a customer clicks an external ad and purchases from your shop within a 30-day attribution window:</p>
+      <p>Etsy markets products across external advertising channels including Google Shopping, Facebook, Instagram, Pinterest, and Bing. You do not pay for impressions or clicks—you only pay an advertising fee if a buyer clicks an external ad and purchases from your shop within a 30-day attribution window:</p>
       <ul>
-        <li><strong>15% Fee (Optional):</strong> If your shop made less than $10,000 USD in gross revenue over the trailing 365 days, Offsite Ads is optional. You can opt out at any time in your shop dashboard.</li>
-        <li><strong>12% Fee (Mandatory):</strong> Once your shop exceeds $10,000 USD in sales over any 365-day window, participation is mandatory for the lifetime of your shop, and the rate drops to 12%.</li>
-        <li><strong>$100 Fee Cap:</strong> Regardless of the order size, Etsy strictly caps the maximum Offsite Ads fee at <strong>$100.00 USD</strong> (or local currency equivalent converted by Etsy at settlement) per attributed order.</li>
+        <li><strong>15% Fee (Under $10,000 Threshold):</strong> 15% if the shop has always remained below $10,000 USD in any consecutive 365-day period. Offsite Ads is optional for these shops, and you may choose to opt out in your shop settings.</li>
+        <li><strong>12% Fee (At or Above $10,000 Threshold):</strong> 12% once the shop has reached $10,000 USD or more in a consecutive 365-day period. Once this milestone is reached, participation is mandatory for the lifetime of the shop even if sales subsequently drop.</li>
+        <li><strong>30-Day Attribution Window:</strong> An Offsite Ads fee is attributed when a buyer clicks an Offsite Ad and purchases from your shop within 30 days of that click.</li>
+        <li><strong>$100 USD Fee Cap:</strong> Regardless of the order size, Etsy strictly caps the maximum Offsite Ads fee at <strong>$100.00 USD</strong> (or local currency equivalent converted by Etsy at settlement) per attributed order.</li>
       </ul>
       <p>Need to model advertising profitability? Simulate your shop's ad performance and fee caps using our dedicated <a href="/etsy-offsite-ads-calculator/">Etsy Offsite Ads Calculator</a>.</p>
 
@@ -504,17 +511,18 @@
             <tr><th scope="row">United Kingdom</th><td>GBP</td><td>£0.16</td><td>6.5%</td><td>4% + £0.20</td><td>0.48%</td><td>Domestic/default processing estimate; 0.48% UK regulatory operating fee.</td></tr>
             <tr><th scope="row">Canada</th><td>CAD</td><td>$0.27</td><td>6.5%</td><td>3% + $0.25</td><td>0.50%</td><td>Domestic/US order rate; international orders are 4% + CA$0.25. 0.50% regulatory fee.</td></tr>
             <tr><th scope="row">Australia</th><td>AUD</td><td>$0.28</td><td>6.5%</td><td>3% + $0.25</td><td>—</td><td>Domestic order rate; international orders are 4% + A$0.25.</td></tr>
-            <tr><th scope="row">Germany / Eurozone</th><td>EUR</td><td>0,18 €</td><td>6.5%</td><td>4% + 0,30 €</td><td>—</td><td>Eurozone standard rate; no regulatory operating fee.</td></tr>
+            <tr><th scope="row">Germany / Eurozone</th><td>EUR</td><td>0,18 €</td><td>6.5%</td><td>4% + 0,30 €</td><td>—</td><td>Eurozone standard rate; regulatory fee not listed by Etsy.</td></tr>
             <tr><th scope="row">France</th><td>EUR</td><td>0,18 €</td><td>6.5%</td><td>4% + 0,30 €</td><td>1.14%</td><td>Domestic/default processing estimate; 1.14% France regulatory operating fee.</td></tr>
             <tr><th scope="row">Italy</th><td>EUR</td><td>0,18 €</td><td>6.5%</td><td>4% + 0,30 €</td><td>0.80%</td><td>Domestic/default processing estimate; 0.80% Italy regulatory operating fee.</td></tr>
             <tr><th scope="row">Spain</th><td>EUR</td><td>0,18 €</td><td>6.5%</td><td>4% + 0,30 €</td><td>0.88%</td><td>Domestic/default processing estimate; 0.88% Spain regulatory operating fee.</td></tr>
             <tr><th scope="row">India</th><td>INR</td><td>₹16.50</td><td>6.5%</td><td>5% + ₹25.00</td><td>0.05%</td><td>Domestic/default processing estimate; 0.05% India regulatory fee.</td></tr>
-            <tr><th scope="row">Japan</th><td>JPY</td><td>￥30</td><td>6.5%</td><td>6% + ￥45</td><td>—</td><td>Etsy publishes fixed charge in USD; JPY amount is local equivalent.</td></tr>
+            <tr><th scope="row">Japan</th><td>JPY</td><td>￥30</td><td>6.5%</td><td>6% + ￥45</td><td>—</td><td>Etsy publishes fixed charge in USD; JPY amount is local equivalent; regulatory fee not listed by Etsy.</td></tr>
             <tr><th scope="row">Türkiye</th><td>TRY</td><td>₺7,00</td><td>6.5%</td><td>6.5% + ₺14,00</td><td>1.67%</td><td>6.5% + ₺14 processing; 1.67% regulatory operating fee.</td></tr>
-            <tr><th scope="row">Global / Other</th><td>USD</td><td>$0.20</td><td>6.5%</td><td>6.5% + $0.30</td><td>—</td><td>Baseline USD schedule; not a specific local schedule.</td></tr>
+            <tr><th scope="row">Global / Other</th><td>USD</td><td>$0.20</td><td>6.5%</td><td>6.5% + $0.30</td><td>—</td><td>Baseline USD schedule; not a specific local schedule; regulatory fee not listed by Etsy.</td></tr>
           </tbody>
         </table>
       </div>
+      <p class="table-note">* Note: Markets marked with "—" in the Regulatory Fee column are not listed by Etsy under statutory regulatory operating fees (rather than carrying an explicit 0% rate).</p>
 
       <h2>5. Real-World Worked Fee Examples</h2>
       <p>To see how Etsy deductions work together in real life, here are three transparent worked calculations across common seller scenarios.</p>
@@ -616,7 +624,7 @@ profit margin % = (net profit ÷ gross revenue) × 100
       <div class="faq-block">
         <details open>
           <summary>How much does Etsy charge sellers per sale?</summary>
-          <p>Etsy charges a $0.20 USD listing fee, a 6.5% transaction fee on the gross order total (item price + shipping + gift wrap), and country-specific Etsy Payments processing fees (typically 3% to 6.5% plus a small fixed charge). Sellers in 9 countries also pay a regulatory operating fee (0.05% to 1.97%), and attributed Offsite Ads add 12% or 15%.</p>
+          <p>Etsy charges a $0.20 USD listing fee, a 6.5% transaction fee on the total order amount in the designated listing currency (item price + shipping + gift wrap), and country-specific Etsy Payments processing fees (typically 3% to 6.5% plus a small fixed charge). Sellers in 9 countries also pay a regulatory operating fee (0.05% to 1.97%), and attributed Offsite Ads add 12% or 15%.</p>
         </details>
         <details>
           <summary>Does Etsy take a transaction fee on shipping?</summary>
@@ -628,11 +636,11 @@ profit margin % = (net profit ÷ gross revenue) × 100
         </details>
         <details>
           <summary>What is Etsy's regulatory operating fee?</summary>
-          <p>A regulatory operating fee is a small surcharge (between 0.05% and 1.97%) charged to sellers in countries with local digital services tax legislation, including the UK (0.48%), France (1.14%), Italy (0.80%), Spain (0.88%), Canada (0.50%), Turkey (1.67%), Vietnam (1.24%), and Hungary (1.97%).</p>
+          <p>A regulatory operating fee is a surcharge (between 0.05% and 1.97%) charged to sellers in countries with local digital services tax legislation, including the UK (0.48%), France (1.14%), Italy (0.80%), Spain (0.88%), Canada (0.50%), Türkiye (1.67%), Vietnam (1.24%), and Hungary (1.97%). Jurisdictions not listed by Etsy are not assessed for this fee, rather than carrying a statutory 0% rate.</p>
         </details>
         <details>
           <summary>How much do Etsy Offsite Ads cost?</summary>
-          <p>Offsite Ads cost 15% for shops with less than $10,000 USD in annual sales (optional), or 12% for shops earning $10,000 or more (mandatory). The fee is charged only when a shopper clicks an external ad and purchases from your shop within 30 days, capped at $100 USD per order.</p>
+          <p>Offsite Ads cost 15% if the shop has always remained below $10,000 USD in any consecutive 365-day period (optional), or 12% once the shop has reached $10,000 USD or more in a consecutive 365-day period (mandatory for the lifetime of the shop). Attributed when a buyer clicks an Offsite Ad and purchases within 30 days, strictly capped at $100 USD per attributed order.</p>
         </details>
         <details>
           <summary>What are Etsy fees for digital downloads?</summary>
