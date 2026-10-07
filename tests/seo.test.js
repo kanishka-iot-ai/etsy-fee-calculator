@@ -9,6 +9,10 @@ const pages = [
   ["../etsy-fee-calculator-canada.html", "/etsy-fee-calculator-canada"],
   ["../etsy-fee-calculator-australia.html", "/etsy-fee-calculator-australia"],
   ["../etsy-digital-download-fee-calculator.html", "/etsy-digital-download-fee-calculator"],
+  ["../etsy-pricing-calculator.html", "/etsy-pricing-calculator/"],
+  ["../etsy-break-even-calculator.html", "/etsy-break-even-calculator/"],
+  ["../etsy-offsite-ads-calculator.html", "/etsy-offsite-ads-calculator/"],
+  ["../etsy-print-on-demand-calculator.html", "/etsy-print-on-demand-calculator/"],
 ];
 const attr = (html, expression) => html.match(expression)?.[1] ?? "";
 
@@ -18,6 +22,10 @@ const expectedH1s = {
   "/etsy-fee-calculator-canada": "Etsy Fee Calculator Canada",
   "/etsy-fee-calculator-australia": "Etsy Fee Calculator Australia",
   "/etsy-digital-download-fee-calculator": "Etsy Digital Download Fee Calculator",
+  "/etsy-pricing-calculator/": "Etsy Pricing Calculator",
+  "/etsy-break-even-calculator/": "Etsy Break-Even Calculator",
+  "/etsy-offsite-ads-calculator/": "Etsy Offsite Ads Calculator",
+  "/etsy-print-on-demand-calculator/": "Etsy Print on Demand Calculator",
 };
 
 test("all indexable pages have static unique titles, descriptions, canonicals, H1s, and JSON-LD", async () => {
@@ -121,6 +129,74 @@ test("all indexable pages have static unique titles, descriptions, canonicals, H
       assert.ok(html.includes("Etsy Digital Product Profit Margins: The Low-Ticket Trap"), `${file} contains Low-ticket trap guide`);
       assert.ok(html.includes("Realistic Digital Download Economics Across Product Types"), `${file} contains Digital examples benchmark`);
       assert.ok(html.includes("gross revenue = digital download price (shipping = $0.00)"), `${file} contains Digital profit formula`);
+    } else if (canonical === "/etsy-pricing-calculator/") {
+      assert.ok(faq.mainEntity.length >= 6, `${file} Pricing FAQ schema has at least 6 questions`);
+      for (const answerTitle of [
+        "How do I calculate what price to charge on Etsy?",
+        "Why does simple cost markup result in lower profit on Etsy?",
+        "What is the difference between markup and profit margin on Etsy?",
+        "How do Etsy fees affect my pricing strategy?",
+        "How should I price items when offering free shipping on Etsy?",
+        "How does the Etsy target profit solver work?"
+      ]) {
+        assert.ok(html.includes(`<summary>${answerTitle}</summary>`), `${file} shows Pricing answer ${answerTitle}`);
+        assert.ok(faq.mainEntity.some((item) => item.name === answerTitle), `${file} schema includes ${answerTitle}`);
+      }
+      assert.ok(html.includes("Etsy Pricing Strategy &amp; Margin Protection"), `${file} contains Pricing seller guides`);
+      assert.ok(html.includes("Why Simple Percentage Markups Fail on Etsy"), `${file} contains markup failure guide`);
+      assert.ok(html.includes("Target Pricing: Solving Backward Through Platform Fees"), `${file} contains reverse math guide`);
+      assert.ok(html.includes("required price = solver(target profit, materials, packaging, buyer shipping, platform fees)"), `${file} contains pricing formula`);
+    } else if (canonical === "/etsy-break-even-calculator/") {
+      assert.ok(faq.mainEntity.length >= 6, `${file} Break-Even FAQ schema has at least 6 questions`);
+      for (const answerTitle of [
+        "What is an Etsy break-even price?",
+        "How do I calculate my break-even price on Etsy?",
+        "What happens if I sell below my Etsy break-even price?",
+        "How do fixed fees impact the break-even price of cheap items?",
+        "How does Offsite Ads affect my break-even price?",
+        "What is monthly volume break-even on Etsy?"
+      ]) {
+        assert.ok(html.includes(`<summary>${answerTitle}</summary>`), `${file} shows Break-Even answer ${answerTitle}`);
+        assert.ok(faq.mainEntity.some((item) => item.name === answerTitle), `${file} schema includes ${answerTitle}`);
+      }
+      assert.ok(html.includes("Etsy Break-Even Analysis &amp; Floor Price Strategy"), `${file} contains Break-Even seller guides`);
+      assert.ok(html.includes("Per-Unit Floor vs. Monthly Volume Break-Even"), `${file} contains floor vs volume guide`);
+      assert.ok(html.includes("The Fixed Fee Penalty: How $0.45 Minimums Impact Cheap Items"), `${file} contains fixed fee penalty guide`);
+      assert.ok(html.includes("break-even price = minimum retail price where Net Profit = $0.00"), `${file} contains break-even formula`);
+    } else if (canonical === "/etsy-offsite-ads-calculator/") {
+      assert.ok(faq.mainEntity.length >= 6, `${file} Offsite Ads FAQ schema has at least 6 questions`);
+      for (const answerTitle of [
+        "How much does Etsy charge for Offsite Ads?",
+        "Can I opt out of Etsy Offsite Ads?",
+        "How does the $10,000 threshold for Etsy Offsite Ads work?",
+        "Is there a maximum limit or cap on Etsy Offsite Ads fees?",
+        "Does Etsy charge the Offsite Ads fee on shipping?",
+        "How long does Etsy's Offsite Ads attribution window last?"
+      ]) {
+        assert.ok(html.includes(`<summary>${answerTitle}</summary>`), `${file} shows Offsite Ads answer ${answerTitle}`);
+        assert.ok(faq.mainEntity.some((item) => item.name === answerTitle), `${file} schema includes ${answerTitle}`);
+      }
+      assert.ok(html.includes("Etsy Offsite Ads Fee &amp; Margin Strategy"), `${file} contains Offsite Ads seller guides`);
+      assert.ok(html.includes("15% Optional vs. 12% Mandatory: The $10,000 Threshold"), `${file} contains tier guide`);
+      assert.ok(html.includes("The Statutory $100 Per-Order Cap: High-Ticket Protection"), `${file} contains $100 cap guide`);
+      assert.ok(html.includes("ad fee = min(order total × selected ad rate, $100 USD equivalent cap)"), `${file} contains ad fee formula`);
+    } else if (canonical === "/etsy-print-on-demand-calculator/") {
+      assert.ok(faq.mainEntity.length >= 6, `${file} POD FAQ schema has at least 6 questions`);
+      for (const answerTitle of [
+        "How do I calculate profit for Etsy print on demand?",
+        "What fees does Etsy charge on print on demand products?",
+        "What is a realistic profit margin for print on demand on Etsy?",
+        "Does Etsy charge fees on print-on-demand shipping?",
+        "How do Printify and Printful production costs interact with Etsy fees?",
+        "How should I price a POD t-shirt or hoodie on Etsy?"
+      ]) {
+        assert.ok(html.includes(`<summary>${answerTitle}</summary>`), `${file} shows POD answer ${answerTitle}`);
+        assert.ok(faq.mainEntity.some((item) => item.name === answerTitle), `${file} schema includes ${answerTitle}`);
+      }
+      assert.ok(html.includes("Etsy Print on Demand Profit &amp; Margin Strategy"), `${file} contains POD seller guides`);
+      assert.ok(html.includes("The 2-Leg Shipping Trap in Print on Demand"), `${file} contains 2-leg shipping guide`);
+      assert.ok(html.includes("Realistic Profit Margin Benchmarks for Etsy POD"), `${file} contains POD margin benchmarks`);
+      assert.ok(html.includes("fulfillment costs = print provider item cost + print provider shipping cost"), `${file} contains POD formula`);
     } else {
       assert.ok(faq.mainEntity.length >= 10);
       for (const answerTitle of ["How do I calculate Etsy profit?", "How much should I charge on Etsy?", "What is an Etsy break-even price?"]) {
@@ -224,8 +300,9 @@ test("fees, methodology and FAQ routes are indexable, crawlable resources with c
   assert.match(methodology, /net profit = gross revenue − platform fees − production cost − packaging\/shipping cost − Etsy Plus allocation/);
   for (const [path, target] of [
     ["/etsy-profit-calculator", "/ 301"], ["/etsy-fee-calculator", "/fees/ 301"],
-    ["/etsy-pricing-calculator", "/#target-pricing 301"], ["/etsy-break-even-calculator", "/#break-even-tool 301"],
-    ["/etsy-offsite-ads-calculator", "/#offsite-ads 301"],
+    ["/etsy-pricing-calculator", "/etsy-pricing-calculator/ 301"], ["/etsy-break-even-calculator", "/etsy-break-even-calculator/ 301"],
+    ["/etsy-offsite-ads-calculator", "/etsy-offsite-ads-calculator/ 301"],
+    ["/etsy-pod-calculator", "/etsy-print-on-demand-calculator/ 301"],
     ["/etsy-digital-product-calculator", "/etsy-digital-download-fee-calculator 301"],
   ]) assert.ok(redirects.includes(`${path} ${target}`), `${path} resolves to the corresponding existing tool`);
 });
@@ -373,7 +450,7 @@ test("dedicated /fees/ route satisfies all AEO, GEO, schema, and internal linkin
   }
 });
 
-test("sitemap.xml is valid XML with exactly 11 canonical URLs and explicit application/xml header rule", async () => {
+test("sitemap.xml is valid XML with exactly 15 canonical URLs and explicit application/xml header rule", async () => {
   const [sitemap, headers, redirects] = await Promise.all([
     read("../sitemap.xml"),
     read("../_headers"),
@@ -385,7 +462,7 @@ test("sitemap.xml is valid XML with exactly 11 canonical URLs and explicit appli
   assert.ok(sitemap.trim().endsWith("</urlset>"), "valid closing urlset tag");
 
   const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-  assert.equal(locs.length, 11, "contains exactly 11 URLs");
+  assert.equal(locs.length, 15, "contains exactly 15 URLs");
 
   const expectedUrls = [
     "https://shopprofitcalculator.com/",
@@ -393,6 +470,10 @@ test("sitemap.xml is valid XML with exactly 11 canonical URLs and explicit appli
     "https://shopprofitcalculator.com/etsy-fee-calculator-canada",
     "https://shopprofitcalculator.com/etsy-fee-calculator-australia",
     "https://shopprofitcalculator.com/etsy-digital-download-fee-calculator",
+    "https://shopprofitcalculator.com/etsy-pricing-calculator/",
+    "https://shopprofitcalculator.com/etsy-break-even-calculator/",
+    "https://shopprofitcalculator.com/etsy-offsite-ads-calculator/",
+    "https://shopprofitcalculator.com/etsy-print-on-demand-calculator/",
     "https://shopprofitcalculator.com/fees/",
     "https://shopprofitcalculator.com/methodology/",
     "https://shopprofitcalculator.com/faq/",
@@ -400,12 +481,12 @@ test("sitemap.xml is valid XML with exactly 11 canonical URLs and explicit appli
     "https://shopprofitcalculator.com/terms",
     "https://shopprofitcalculator.com/contact",
   ];
-  assert.deepEqual(locs, expectedUrls, "contains exactly the 11 production URLs in order");
+  assert.deepEqual(locs, expectedUrls, "contains exactly the 15 production URLs in order");
 
   assert.ok(!sitemap.includes("pages.dev"), "no pages.dev URLs in sitemap");
 
   const uniqueLocs = new Set(locs);
-  assert.equal(uniqueLocs.size, 11, "no duplicate URLs");
+  assert.equal(uniqueLocs.size, 15, "no duplicate URLs");
 
   const redirectSources = redirects
     .split("\n")

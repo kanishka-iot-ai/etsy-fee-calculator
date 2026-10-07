@@ -22,42 +22,15 @@
   <meta name="twitter:description" content="Calculate Etsy seller fees, unit margins, and take-home profit for digital downloads. Accurate digital fee calculator modeling 6.5% transaction, payment processing, listing fees, and Offsite Ads.">
   <meta name="twitter:image" content="https://shopprofitcalculator.com/social-preview.png">
   <title>Etsy Digital Download Fee Calculator — ShopProfit</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="/fonts/silkscreen-700-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
+  <noscript><p class="noscript-note">The fee guide, methodology, country table, and FAQs are available below. Entering and calculating a sale requires JavaScript; your entries are not submitted.</p></noscript>
   <link rel="modulepreload" href="/src/app.js">
   <link rel="modulepreload" href="/src/fee-intelligence-client.js">
   <link rel="modulepreload" href="/src/compatibility.js">
   <link rel="modulepreload" href="/src/fee-engine.js">
   <link rel="modulepreload" href="/src/translations.js">
   <link rel="modulepreload" href="/src/i18n.js">
-  <script type="speculationrules">
-  {
-    "prerender": [
-      {
-        "source": "list",
-        "urls": [
-          "/",
-          "/fees/",
-          "/fees",
-          "/etsy-fee-calculator-uk",
-          "/etsy-fee-calculator-canada",
-          "/etsy-fee-calculator-australia",
-          "/etsy-digital-download-fee-calculator",
-          "/methodology/",
-          "/methodology",
-          "/faq/",
-          "/faq",
-          "/privacy",
-          "/terms",
-          "/contact"
-        ],
-        "eagerness": "moderate"
-      }
-    ]
-  }
-  </script>
   <script type="application/ld+json" id="structured-data">
 {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://shopprofitcalculator.com/#organization","name":"ShopProfit","url":"https://shopprofitcalculator.com/","logo":"https://shopprofitcalculator.com/logo-mark.svg"},{"@type":"WebSite","@id":"https://shopprofitcalculator.com/#website","name":"ShopProfit","alternateName":"ShopProfit Calculator","url":"https://shopprofitcalculator.com/","publisher":{"@id":"https://shopprofitcalculator.com/#organization"}},{"@type":"WebApplication","name":"Etsy Digital Download Fee Calculator","url":"https://shopprofitcalculator.com/etsy-digital-download-fee-calculator","applicationCategory":"FinanceApplication","operatingSystem":"Any","description":"Calculate Etsy seller fees, unit margins, and take-home profit for digital downloads. Accurate digital fee calculator modeling 6.5% transaction, payment processing, listing fees, and Offsite Ads.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://shopprofitcalculator.com/"},{"@type":"ListItem","position":2,"name":"Etsy Digital Download Fee Calculator","item":"https://shopprofitcalculator.com/etsy-digital-download-fee-calculator"}]}]}
   </script>
@@ -103,12 +76,13 @@
     </section>
 
     <section class="calculator-section page-width" id="calculator" aria-labelledby="calculator-heading">
+      <div class="fee-status-banner" id="fee-status-banner" hidden></div>
       <div class="section-heading">
         <div><h1 id="calculator-heading">Etsy Digital Download Fee Calculator</h1><p>Adjust your sale details to see your real profit.</p></div>
       </div>
       <div class="calculator-grid">
         <form class="panel input-panel spotlight" id="sale-form" novalidate>
-          <div class="panel-heading"><div><h3>Sale Details</h3><p>All amounts update your take-home instantly.</p></div><span class="panel-step">01</span></div>
+          <div class="panel-heading"><div><h2>Sale Details</h2><p>All amounts update your take-home instantly.</p></div><span class="panel-step">01</span></div>
           <div class="input-grid">
             <div class="field"><label for="item-price">Item selling price</label><div class="money-input"><span class="currency-prefix" aria-hidden="true">$</span><input id="item-price" name="itemPrice" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="35" aria-describedby="item-price-help"><span class="input-suffix">USD</span></div><small id="item-price-help" class="field-help">Your item price before shipping.</small></div>
             <div class="field"><label for="shipping">Shipping charged to buyer</label><div class="money-input"><span class="currency-prefix" aria-hidden="true">$</span><input id="shipping" name="shipping" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="0"><span class="input-suffix">USD</span></div></div>
@@ -140,7 +114,7 @@
         </form>
 
         <aside class="panel result-panel spotlight" aria-labelledby="result-heading">
-          <div class="panel-heading result-heading"><h3 id="result-heading">Your Profit</h3><span class="profit-status" id="profit-status">Profitable sale</span></div>
+          <div class="panel-heading result-heading"><h2 id="result-heading">Your Profit</h2><span class="profit-status" id="profit-status">Profitable sale</span></div>
           <div class="net-block" aria-live="polite" aria-atomic="true"><span class="overline">Net take-home</span><output id="net-profit" class="net-number">$24.75</output><span class="net-meta"><span id="profit-margin">61.88%</span> profit margin</span></div>
           <div class="ledger">
             <div class="ledger-label">Revenue</div>
@@ -174,11 +148,11 @@
         <div class="advanced-content">
       <div class="secondary-grid">
         <article class="panel breakeven-panel" id="break-even-tool"><div><span class="row-label">Break-even price</span><output id="break-even-price" class="secondary-number">$7.65</output><p>Minimum item price needed to avoid a loss.</p></div><button class="button button-secondary use-break-even" id="use-break-even" type="button">Use price</button></article>
-        <article class="panel target-panel" id="target-pricing"><div class="target-copy"><h3>Target profit</h3><p>Choose the take-home amount you want from this sale.</p></div><div class="target-input field"><label for="target-profit">Desired profit</label><div class="money-input"><span class="currency-prefix" aria-hidden="true">$</span><input id="target-profit" type="number" inputmode="decimal" min="0" step="0.01" value="25"><span class="input-suffix">USD</span></div></div><div class="required-price"><span>To keep <output id="goal-display">$25.00</output>, charge about</span><output id="required-price" class="secondary-number">$35.28</output></div><button class="button button-primary use-target" id="use-target" type="button">Use required price</button></article>
+        <article class="panel target-panel" id="target-pricing"><div class="target-copy"><h2>Target profit</h2><p>Choose the take-home amount you want from this sale.</p></div><div class="target-input field"><label for="target-profit">Desired profit</label><div class="money-input"><span class="currency-prefix" aria-hidden="true">$</span><input id="target-profit" type="number" inputmode="decimal" min="0" step="0.01" value="25"><span class="input-suffix">USD</span></div></div><div class="required-price"><span>To keep <output id="goal-display">$25.00</output>, charge about</span><output id="required-price" class="secondary-number">$35.28</output></div><button class="button button-primary use-target" id="use-target" type="button">Use required price</button></article>
       </div>
       <div class="insights-grid">
-        <article class="panel insights-panel"><div class="panel-heading"><h3>Profit insights</h3><span class="subtle-label">DETAILS</span></div><p class="insight-lead" id="insight-lead">You keep $61.88 of every $100 in gross revenue.</p><div class="insight-stats"><div><span>Platform fees</span><strong id="platform-rate">10.6%</strong></div><div><span>Business costs</span><strong id="cost-rate">27.5%</strong></div><div><span>Break-even</span><strong id="insight-break-even">$7.65</strong></div><div><span>Target price</span><strong id="insight-target">$35.28</strong></div></div></article>
-        <article class="panel flow-panel"><div class="panel-heading"><h3>Where the money goes</h3></div><div class="money-flow" role="img" aria-label="Stacked view of Etsy fees, business costs, and your profit"><span class="flow-fees" id="flow-fees"></span><span class="flow-costs" id="flow-costs"></span><span class="flow-profit" id="flow-profit"></span></div><div class="flow-legend"><div><i class="legend-fees"></i><span>Fees</span><output id="flow-fees-label">10.6%</output></div><div><i class="legend-costs"></i><span>Costs</span><output id="flow-costs-label">27.5%</output></div><div><i class="legend-profit"></i><span>Your profit</span><output id="flow-profit-label">61.9%</output></div></div></article>
+        <article class="panel insights-panel"><div class="panel-heading"><h2>Profit insights</h2><span class="subtle-label">DETAILS</span></div><p class="insight-lead" id="insight-lead">You keep $61.88 of every $100 in gross revenue.</p><div class="insight-stats"><div><span>Platform fees</span><strong id="platform-rate">10.6%</strong></div><div><span>Business costs</span><strong id="cost-rate">27.5%</strong></div><div><span>Break-even</span><strong id="insight-break-even">$7.65</strong></div><div><span>Target price</span><strong id="insight-target">$35.28</strong></div></div></article>
+        <article class="panel flow-panel"><div class="panel-heading"><h2>Where the money goes</h2></div><div class="money-flow" role="img" aria-label="Stacked view of Etsy fees, business costs, and your profit"><span class="flow-fees" id="flow-fees"></span><span class="flow-costs" id="flow-costs"></span><span class="flow-profit" id="flow-profit"></span></div><div class="flow-legend"><div><i class="legend-fees"></i><span>Fees</span><output id="flow-fees-label">10.6%</output></div><div><i class="legend-costs"></i><span>Costs</span><output id="flow-costs-label">27.5%</output></div><div><i class="legend-profit"></i><span>Your profit</span><output id="flow-profit-label">61.9%</output></div></div></article>
       </div>
       <details class="panel scenarios-panel"><summary><span><strong>Compare scenarios</strong><small>See how Offsite Ads change your take-home.</small></span><span class="summary-plus" aria-hidden="true">+</span></summary><div class="table-scroll"><table class="scenario-table"><thead><tr><th>Scenario</th><th>Sale price</th><th>Fees</th><th>Costs</th><th>Net profit</th><th>Margin</th></tr></thead><tbody id="scenario-body"></tbody></table></div></details>
         </div>
@@ -339,9 +313,8 @@
   </main>
   <noscript><p class="noscript-note">The fee guide, methodology, country table, and FAQs are available below. Entering and calculating a sale requires JavaScript; your entries are not submitted.</p></noscript>
 
-  <footer class="site-footer"><div class="footer-inner page-width"><div class="footer-brand"><a class="brand" href="#top"><span class="brand-mark"><img src="/logo-mark.svg" alt="" aria-hidden="true"></span><span>ShopProfit</span></a><p>Know exactly what you keep.</p></div><div class="footer-column"><strong>Tools</strong><a href="/#calculator">Etsy profit calculator</a><a href="/fees/">Etsy fee calculator</a><a href="/#target-pricing">Etsy pricing calculator</a><a href="/#break-even-tool">Etsy break-even calculator</a><a href="/#offsite-ads">Etsy Offsite Ads calculator</a><a href="/etsy-digital-download-fee-calculator">Etsy digital product calculator</a><strong>Regional calculators</strong><a href="/etsy-fee-calculator-uk">United Kingdom</a><a href="/etsy-fee-calculator-canada">Canada</a><a href="/etsy-fee-calculator-australia">Australia</a></div><div class="footer-column"><strong>Resources</strong><a href="/fees/">Etsy fees guide</a><a href="/methodology/">Methodology</a><a href="/faq/">FAQ</a></div><div class="footer-column"><strong>Legal</strong><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/contact">Contact</a><a href="mailto:info@shopprofitcalculator.com">info@shopprofitcalculator.com</a></div></div><div class="footer-bottom page-width"><span>© <span id="copyright-year"></span> ShopProfit</span><span>Independent calculator. Not affiliated with Etsy.</span></div></footer>
+  <footer class="site-footer"><div class="footer-inner page-width"><div class="footer-brand"><a class="brand" href="#top"><span class="brand-mark"><img src="/logo-mark.svg" alt="" aria-hidden="true"></span><span>ShopProfit</span></a><p>Know exactly what you keep.</p></div><div class="footer-column"><strong>Tools</strong><a href="/#calculator">Etsy profit calculator</a><a href="/fees/">Etsy fee calculator</a><a href="/etsy-pricing-calculator/">Etsy pricing calculator</a><a href="/etsy-break-even-calculator/">Etsy break-even calculator</a><a href="/etsy-offsite-ads-calculator/">Etsy Offsite Ads calculator</a><a href="/etsy-digital-download-fee-calculator">Etsy digital product calculator</a><a href="/etsy-print-on-demand-calculator/">Etsy print on demand calculator</a><strong>Regional calculators</strong><a href="/etsy-fee-calculator-uk">United Kingdom</a><a href="/etsy-fee-calculator-canada">Canada</a><a href="/etsy-fee-calculator-australia">Australia</a></div><div class="footer-column"><strong>Resources</strong><a href="/fees/">Etsy fees guide</a><a href="/methodology/">Methodology</a><a href="/faq/">FAQ</a></div><div class="footer-column"><strong>Legal</strong><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/contact">Contact</a><a href="mailto:info@shopprofitcalculator.com">info@shopprofitcalculator.com</a></div></div><div class="footer-bottom page-width"><span>© <span id="copyright-year"></span> ShopProfit</span><span>Independent calculator. Not affiliated with Etsy.</span></div></footer>
   <div class="mobile-action-bar" id="mobile-action-bar"><div class="mobile-profit"><span>PROFIT</span><output id="mobile-profit">$23.30</output></div><a class="button button-secondary" href="#result-heading">View result</a><button type="button" class="button button-primary" id="mobile-copy">Copy</button><button type="button" class="button button-quiet" id="mobile-reset">Reset</button></div>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script type="module" src="/src/app.js"></script>
-</body>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div><script type="module" src="/src/app.js"></script>
+  </body>
 </html>

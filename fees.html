@@ -8,9 +8,7 @@
   <meta name="description" content="Calculate your exact Etsy seller fees with ShopProfit. Accurate Etsy fee calculator modeling the 6.5% transaction fee, payment processing, listing fees, and Offsite Ads.">
   <link rel="canonical" href="https://shopprofitcalculator.com/fees/">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="/fonts/silkscreen-700-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
   <link rel="modulepreload" href="/src/app.js">
   <link rel="modulepreload" href="/src/fee-intelligence-client.js">
@@ -18,32 +16,6 @@
   <link rel="modulepreload" href="/src/fee-engine.js">
   <link rel="modulepreload" href="/src/translations.js">
   <link rel="modulepreload" href="/src/i18n.js">
-  <script type="speculationrules">
-  {
-    "prerender": [
-      {
-        "source": "list",
-        "urls": [
-          "/",
-          "/fees/",
-          "/fees",
-          "/etsy-fee-calculator-uk",
-          "/etsy-fee-calculator-canada",
-          "/etsy-fee-calculator-australia",
-          "/etsy-digital-download-fee-calculator",
-          "/methodology/",
-          "/methodology",
-          "/faq/",
-          "/faq",
-          "/privacy",
-          "/terms",
-          "/contact"
-        ],
-        "eagerness": "moderate"
-      }
-    ]
-  }
-  </script>
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="ShopProfit">
   <meta property="og:title" content="Etsy Fee Calculator — Calculate Etsy Seller Fees | ShopProfit">
@@ -355,6 +327,83 @@
         </div>
       </div>
 
+      <h2>Quick Etsy Fee Breakdown: How Much Does Etsy Take?</h2>
+      <p>Here is exactly how much Etsy deducts from common domestic US sales ($0 buyer shipping, 0% Offsite Ads, standard Etsy Payments). All numbers are calculated using ShopProfit's verified fee engine:</p>
+
+      <div class="panel fee-table-wrap table-scroll" style="margin: 20px 0;">
+        <table class="fee-table">
+          <thead>
+            <tr>
+              <th scope="col">Sale Price</th>
+              <th scope="col">Listing Fee</th>
+              <th scope="col">Transaction Fee (6.5%)</th>
+              <th scope="col">Payment Processing (3% + $0.25)</th>
+              <th scope="col">Total Etsy Fees</th>
+              <th scope="col">Effective Fee %</th>
+              <th scope="col">You Keep (Before Costs)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row"><strong>$10.00</strong></th>
+              <td>$0.20</td>
+              <td>$0.65</td>
+              <td>$0.55</td>
+              <td><strong>$1.40</strong></td>
+              <td>14.00%</td>
+              <td><strong>$8.60 (86.00%)</strong></td>
+            </tr>
+            <tr>
+              <th scope="row"><strong>$25.00</strong></th>
+              <td>$0.20</td>
+              <td>$1.63</td>
+              <td>$1.00</td>
+              <td><strong>$2.83</strong></td>
+              <td>11.32%</td>
+              <td><strong>$22.17 (88.68%)</strong></td>
+            </tr>
+            <tr>
+              <th scope="row"><strong>$50.00</strong></th>
+              <td>$0.20</td>
+              <td>$3.25</td>
+              <td>$1.75</td>
+              <td><strong>$5.20</strong></td>
+              <td>10.40%</td>
+              <td><strong>$44.80 (89.60%)</strong></td>
+            </tr>
+            <tr>
+              <th scope="row"><strong>$100.00</strong></th>
+              <td>$0.20</td>
+              <td>$6.50</td>
+              <td>$3.25</td>
+              <td><strong>$9.95</strong></td>
+              <td>9.95%</td>
+              <td><strong>$90.05 (90.05%)</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-note">* Assumptions: US domestic sale, $0 shipping charged to buyer, standard US payment processing (3% + $0.25), $0.20 listing fee, 6.5% transaction fee, zero ad attribution. Fixed charges ($0.45 combined listing and processing flat fee) cause lower-priced items to experience significantly higher percentage fee drag (14.00% at $10 vs 9.95% at $100).</p>
+
+      <div class="calculator-grid" style="align-items: stretch; margin: 24px 0;">
+        <div class="panel input-panel" style="padding: 16px;">
+          <h3 style="font-size: 15px; margin: 0 0 6px;"><a href="/etsy-pricing-calculator/">Etsy Pricing Calculator →</a></h3>
+          <p style="font-size: 13px; color: var(--muted); margin: 0; line-height: 1.5;">Need to know what price to charge to hit a specific take-home profit? Solve backward through fees with our dedicated pricing tool.</p>
+        </div>
+        <div class="panel input-panel" style="padding: 16px;">
+          <h3 style="font-size: 15px; margin: 0 0 6px;"><a href="/etsy-break-even-calculator/">Etsy Break-Even Calculator →</a></h3>
+          <p style="font-size: 13px; color: var(--muted); margin: 0; line-height: 1.5;">Calculate the absolute minimum selling price required to cover all Etsy fees and business costs with zero loss.</p>
+        </div>
+        <div class="panel input-panel" style="padding: 16px;">
+          <h3 style="font-size: 15px; margin: 0 0 6px;"><a href="/etsy-offsite-ads-calculator/">Etsy Offsite Ads Calculator →</a></h3>
+          <p style="font-size: 13px; color: var(--muted); margin: 0; line-height: 1.5;">Simulate 12% vs 15% advertising fee deductions and compare side-by-side ledgers with the $100 fee cap.</p>
+        </div>
+        <div class="panel input-panel" style="padding: 16px;">
+          <h3 style="font-size: 15px; margin: 0 0 6px;"><a href="/etsy-print-on-demand-calculator/">Etsy Print on Demand Calculator →</a></h3>
+          <p style="font-size: 13px; color: var(--muted); margin: 0; line-height: 1.5;">Model print provider item and shipping expenses alongside Etsy customer fees for Printify, Printful, and Gelato.</p>
+        </div>
+      </div>
+
       <h2>1. The Core Etsy Seller Fees Explained</h2>
       <p>Whether you sell handmade ceramics, vintage clothing, craft supplies, or digital printables, Etsy deducts platform fees automatically from your payment account when an order takes place. Understanding the exact calculation basis for each fee is essential for setting profitable selling prices.</p>
 
@@ -579,20 +628,24 @@ profit margin = (net profit ÷ gross revenue) × 100
       <div class="resource-links" aria-label="Explore more seller resources">
         <a href="/">Etsy Profit Calculator</a>
         <a href="/#calculator">Open Calculator</a>
-        <a href="/methodology/">Calculation Methodology</a>
-        <a href="/faq/">Seller FAQs</a>
+        <a href="/etsy-pricing-calculator/">Etsy Pricing Calculator</a>
+        <a href="/etsy-break-even-calculator/">Etsy Break-Even Calculator</a>
+        <a href="/etsy-offsite-ads-calculator/">Etsy Offsite Ads Calculator</a>
+        <a href="/etsy-print-on-demand-calculator/">Etsy Print on Demand Calculator</a>
         <a href="/etsy-digital-download-fee-calculator">Digital Product Calculator</a>
         <a href="/etsy-fee-calculator-uk">UK Fee Calculator</a>
         <a href="/etsy-fee-calculator-canada">Canada Fee Calculator</a>
         <a href="/etsy-fee-calculator-australia">Australia Fee Calculator</a>
+        <a href="/methodology/">Calculation Methodology</a>
+        <a href="/faq/">Seller FAQs</a>
       </div>
     </article>
   </main>
 
-  <footer class="site-footer"><div class="footer-inner page-width"><div class="footer-brand"><a class="brand" href="#top"><span class="brand-mark"><img src="/logo-mark.svg" alt="" aria-hidden="true"></span><span>ShopProfit</span></a><p>Know exactly what you keep.</p></div><div class="footer-column"><strong>Tools</strong><a href="/#calculator">Etsy profit calculator</a><a href="/fees/">Etsy fee calculator</a><a href="/#target-pricing">Etsy pricing calculator</a><a href="/#break-even-tool">Etsy break-even calculator</a><a href="/#offsite-ads">Etsy Offsite Ads calculator</a><a href="/etsy-digital-download-fee-calculator">Etsy digital product calculator</a><strong>Regional calculators</strong><a href="/etsy-fee-calculator-uk">United Kingdom</a><a href="/etsy-fee-calculator-canada">Canada</a><a href="/etsy-fee-calculator-australia">Australia</a></div><div class="footer-column"><strong>Resources</strong><a href="/fees/">Etsy fees guide</a><a href="/methodology/">Methodology</a><a href="/faq/">FAQ</a></div><div class="footer-column"><strong>Legal</strong><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/contact">Contact</a><a href="mailto:info@shopprofitcalculator.com">info@shopprofitcalculator.com</a></div></div><div class="footer-bottom page-width"><span>© <span id="copyright-year"></span> ShopProfit</span><span>Independent calculator. Not affiliated with Etsy.</span></div></footer>
+  <footer class="site-footer"><div class="footer-inner page-width"><div class="footer-brand"><a class="brand" href="#top"><span class="brand-mark"><img src="/logo-mark.svg" alt="" aria-hidden="true"></span><span>ShopProfit</span></a><p>Know exactly what you keep.</p></div><div class="footer-column"><strong>Tools</strong><a href="/#calculator">Etsy profit calculator</a><a href="/fees/">Etsy fee calculator</a><a href="/etsy-pricing-calculator/">Etsy pricing calculator</a><a href="/etsy-break-even-calculator/">Etsy break-even calculator</a><a href="/etsy-offsite-ads-calculator/">Etsy Offsite Ads calculator</a><a href="/etsy-digital-download-fee-calculator">Etsy digital product calculator</a><a href="/etsy-print-on-demand-calculator/">Etsy print on demand calculator</a><strong>Regional calculators</strong><a href="/etsy-fee-calculator-uk">United Kingdom</a><a href="/etsy-fee-calculator-canada">Canada</a><a href="/etsy-fee-calculator-australia">Australia</a></div><div class="footer-column"><strong>Resources</strong><a href="/fees/">Etsy fees guide</a><a href="/methodology/">Methodology</a><a href="/faq/">FAQ</a></div><div class="footer-column"><strong>Legal</strong><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/contact">Contact</a><a href="mailto:info@shopprofitcalculator.com">info@shopprofitcalculator.com</a></div></div><div class="footer-bottom page-width"><span>© <span id="copyright-year"></span> ShopProfit</span><span>Independent calculator. Not affiliated with Etsy.</span></div></footer>
 
   <div class="mobile-action-bar" id="mobile-action-bar"><div class="mobile-profit"><span>PROFIT</span><output id="mobile-profit">$23.30</output></div><a class="button button-secondary" href="#result-heading">View result</a><button type="button" class="button button-primary" id="mobile-copy">Copy</button><button type="button" class="button button-quiet" id="mobile-reset">Reset</button></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script type="module" src="/src/app.js"></script>
-</body>
+  </body>
 </html>

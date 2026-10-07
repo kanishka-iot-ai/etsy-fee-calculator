@@ -39,13 +39,13 @@ base = replaceOnce(base, /<select class="country-nav" id="country-nav" aria-labe
   `<select class="country-nav" id="country-nav" aria-label="Seller location">${COUNTRY_ORDER.map((code) => `<option value="${code}">${GLOBAL_COUNTRY_RULES[code].name}</option>`).join("")}</select>`, "header country selector");
 base = replaceOnce(base, /<select id="country" name="country">[\s\S]*?<\/select>/,
   `<select id="country" name="country">${COUNTRY_ORDER.map((code) => `<option value="${code}">${GLOBAL_COUNTRY_RULES[code].name}</option>`).join("")}</select>`, "calculator country selector");
-base = replaceOnce(base, /<link href="https:\/\/fonts\.googleapis\.com\/css2\?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">/,
-  `<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">`, "pixel font stylesheet");
+base = replaceOnce(base, /<link rel="preload" href="\/fonts\/silkscreen-700-latin\.woff2" as="font" type="font\/woff2" crossorigin>/,
+  `<link rel="preload" href="/fonts/silkscreen-700-latin.woff2" as="font" type="font/woff2" crossorigin>`, "pixel font preload");
 const noScriptNote = `<noscript><p class="noscript-note">The fee guide, methodology, country table, and FAQs are available below. Entering and calculating a sale requires JavaScript; your entries are not submitted.</p></noscript>`;
 if (/<noscript>[\s\S]*?<\/noscript>/.test(base)) base = base.replace(/<noscript>[\s\S]*?<\/noscript>/, noScriptNote);
 else base = replaceOnce(base, /<\/main>/, `</main>\n  ${noScriptNote}`, "main closing tag");
 base = replaceOnce(base, /<div class="footer-column"><strong>Tools<\/strong>[\s\S]*?<\/div><div class="footer-column"><strong>Resources<\/strong>/,
-  `<div class="footer-column"><strong>Tools</strong><a href="/#calculator">Etsy profit calculator</a><a href="/fees/">Etsy fee calculator</a><a href="/#target-pricing">Etsy pricing calculator</a><a href="/#break-even-tool">Etsy break-even calculator</a><a href="/#offsite-ads">Etsy Offsite Ads calculator</a><a href="/etsy-digital-download-fee-calculator">Etsy digital product calculator</a><strong>Regional calculators</strong><a href="/etsy-fee-calculator-uk">United Kingdom</a><a href="/etsy-fee-calculator-canada">Canada</a><a href="/etsy-fee-calculator-australia">Australia</a></div><div class="footer-column"><strong>Resources</strong>`, "footer tool links");
+  `<div class="footer-column"><strong>Tools</strong><a href="/#calculator">Etsy profit calculator</a><a href="/fees/">Etsy fee calculator</a><a href="/etsy-pricing-calculator/">Etsy pricing calculator</a><a href="/etsy-break-even-calculator/">Etsy break-even calculator</a><a href="/etsy-offsite-ads-calculator/">Etsy Offsite Ads calculator</a><a href="/etsy-digital-download-fee-calculator">Etsy digital product calculator</a><a href="/etsy-print-on-demand-calculator/">Etsy print on demand calculator</a><strong>Regional calculators</strong><a href="/etsy-fee-calculator-uk">United Kingdom</a><a href="/etsy-fee-calculator-canada">Canada</a><a href="/etsy-fee-calculator-australia">Australia</a></div><div class="footer-column"><strong>Resources</strong>`, "footer tool links");
 base = replaceOnce(base, /<div class="footer-column"><strong>Resources<\/strong>[\s\S]*?<\/div><div class="footer-column"><strong>Legal<\/strong>/,
   `<div class="footer-column"><strong>Resources</strong><a href="/fees/">Etsy fees guide</a><a href="/methodology/">Methodology</a><a href="/faq/">FAQ</a></div><div class="footer-column"><strong>Legal</strong>`, "footer resource links");
 base = replaceOnce(base, /<div class="footer-column"><strong>Legal<\/strong>[\s\S]*?<\/div>/,
@@ -103,6 +103,42 @@ const routes = [
     intro: "Calculate your exact Etsy seller fees, unit break-even price, and net profit for digital downloads, printables, templates, and SVGs. The calculator automatically zeroes shipping and production costs while accurately modeling Etsy’s 6.5% transaction fee, country-specific payment processing, listing fees, and optional Offsite Ads. Looking for multi-currency physical product calculations? Visit the main <a href=\"/\">Etsy profit calculator</a> or browse the <a href=\"/fees/\">Etsy fees guide</a>.",
     question: "What fees does Etsy charge on digital downloads?",
     answer: "Etsy charges the same core platform fees on digital downloads as on physical items: a $0.20 USD listing fee (renewed every 4 months or upon each sale), a 6.5% transaction fee on the download price, and country-specific payment processing (such as 3% + $0.25 in the US). If attributed to an Offsite Ad, an additional 12% or 15% advertising fee applies. Digital downloads incur no postage fees unless physical items are included.",
+  },
+  {
+    file: "etsy-pricing-calculator.html", path: "/etsy-pricing-calculator/", code: "US", tool: "pricing",
+    title: "Etsy Pricing Calculator — Calculate Item Price for Profit | ShopProfit",
+    description: "Calculate the exact price to charge on Etsy to hit your target profit. Reverse pricing calculator solving backward through all 2026 Etsy fees and costs.",
+    h1: "Etsy Pricing Calculator",
+    intro: "Determine the exact item price to charge on Etsy to achieve your desired take-home profit. Unlike simple markup formulas that fail to account for Etsy's compounding deductions, ShopProfit uses an exact solver to calculate the required retail price backward from your target profit, production costs, shipping, and platform fees. Also explore our <a href=\"/etsy-break-even-calculator/\">break-even calculator</a> and complete <a href=\"/fees/\">Etsy fees guide</a>.",
+    question: "How do I calculate what price to charge on Etsy?",
+    answer: "To price an Etsy product for profit, start with your desired take-home profit and solve backward. Add your raw material costs and packaging/shipping costs. Then factor in Etsy's deductions that scale with the retail price: the 6.5% transaction fee, country payment processing (such as 3% + $0.25 in the US), statutory regulatory fees, and optional Offsite Ads (12% or 15%), plus the $0.20 listing fee. ShopProfit's pricing solver automates this reverse calculation to ensure you hit your exact profit target.",
+  },
+  {
+    file: "etsy-break-even-calculator.html", path: "/etsy-break-even-calculator/", code: "US", tool: "break-even",
+    title: "Etsy Break-Even Calculator — Find Minimum Item Price | ShopProfit",
+    description: "Calculate your exact break-even price and sales volume on Etsy. Find the minimum floor price needed to cover all Etsy fees, material costs, and shipping.",
+    h1: "Etsy Break-Even Calculator",
+    intro: "Calculate the minimum selling price needed on Etsy to cover all platform fees, production expenses, and shipping costs with exactly $0.00 loss. Selling below your break-even floor loses money on every transaction. ShopProfit solves your exact per-order floor price and monthly volume requirements. For setting target profit margins, use our <a href=\"/etsy-pricing-calculator/\">Etsy pricing calculator</a>.",
+    question: "What is an Etsy break-even price?",
+    answer: "An Etsy break-even price is the absolute lowest listing price you can charge for an item such that total revenue (item price + buyer shipping) exactly equals total expenses (Etsy listing fee, 6.5% transaction fee, payment processing fee, regulatory fee, ad fees, production costs, and actual postage costs). Selling at your break-even price yields exactly $0.00 in profit; selling below it causes a financial loss on every order.",
+  },
+  {
+    file: "etsy-offsite-ads-calculator.html", path: "/etsy-offsite-ads-calculator/", code: "US", tool: "offsite-ads",
+    title: "Etsy Offsite Ads Calculator — 12% vs 15% Fee Simulator | ShopProfit",
+    description: "Calculate the impact of Etsy Offsite Ads on your profit margins. Model 15% optional vs 12% mandatory fees with the official $100 per-order fee cap.",
+    h1: "Etsy Offsite Ads Calculator",
+    intro: "Simulate the exact impact of Etsy's 12% and 15% Offsite Ads fees on your net earnings and margins. Features a real-time comparative scenario ledger and accurately models Etsy's statutory $100 USD per-order advertising fee cap. To calculate regular non-ad sales, visit our main <a href=\"/\">Etsy profit calculator</a> or review the full <a href=\"/fees/\">Etsy fees breakdown</a>.",
+    question: "How much does Etsy charge for Offsite Ads?",
+    answer: "Etsy charges either 15% or 12% of the gross order total (item price + buyer shipping) when a sale is attributed to an external ad click on Google, Facebook, Instagram, or Pinterest. Shops making under $10,000 USD over the trailing 12 months pay 15% (optional); shops making $10,000 USD or more pay 12% (mandatory). Crucially, Etsy caps the maximum fee at $100 USD per attributed order.",
+  },
+  {
+    file: "etsy-print-on-demand-calculator.html", path: "/etsy-print-on-demand-calculator/", code: "US", tool: "pod",
+    title: "Etsy Print on Demand Calculator — POD Profit & Fee Calculator | ShopProfit",
+    description: "Calculate your real profit margins for print-on-demand products on Etsy. Account for print provider item costs, shipping, and all Etsy fees for Printify, Printful, and Gelato.",
+    h1: "Etsy Print on Demand Calculator",
+    intro: "Calculate your net take-home profit and true profit margins for print-on-demand (POD) items on Etsy. Built specifically for sellers using Printify, Printful, Gelato, or Awkward Styles, this calculator models both sides of the transaction: retail revenue and Etsy fees from the buyer, plus base production charges and fulfillment shipping from your print provider. Also explore our <a href=\"/etsy-pricing-calculator/\">Etsy pricing calculator</a> and complete <a href=\"/fees/\">Etsy fees guide</a>.",
+    question: "How do I calculate profit for Etsy print on demand?",
+    answer: "To calculate profit for an Etsy print-on-demand item, subtract both Etsy platform fees and your print provider fulfillment costs from total customer revenue. Total customer revenue equals listing price plus shipping charged to the buyer. Deduct Etsy fees ($0.20 listing, 6.5% transaction, payment processing, and any ad fees), then deduct your print provider's base product charge (blank + printing) and provider shipping fee. What remains is your net take-home profit.",
   },
 ];
 
@@ -590,16 +626,420 @@ for (const route of routes) {
       }))
     };
     html = html.replace(faqTag[0], `<script type="application/ld+json" id="faq-structured-data">\n${JSON.stringify(digitalFaqSchema)}\n  </script>`);
+  } else if (route.tool === "pricing") {
+    const pricingHowItWorks = `<section class="answer-formula page-width" id="how-it-works" aria-label="Etsy pricing and calculation methodology">
+      <article class="panel answer-panel">
+        <p class="eyebrow">Target Pricing Methodology</p>
+        <h2>How to price an Etsy item for profit</h2>
+        <p>To hit a specific take-home profit, you must solve backward through Etsy's fees. Because the 6.5% transaction fee and payment processing rate apply to the final customer price (including shipping), a simple cost-plus percentage markup will undercut your profit. ShopProfit uses an exact binary search solver to calculate the required listing price backward from your desired dollar profit.</p>
+        <p class="answer-footnote">Your required price adjusts in real-time as you enter production costs, buyer shipping, and seller location.</p>
+      </article>
+      <article class="panel formula-panel">
+        <p class="eyebrow">Reverse Pricing Formula</p>
+        <h2>How ShopProfit solves required listing price</h2>
+        <div class="formula-code" aria-label="Pricing formulas">
+          <code>required price = solver(target profit, materials, packaging, buyer shipping, platform fees)</code>
+          <code>gross revenue = calculated listing price + buyer shipping</code>
+          <code>net profit = gross revenue − platform fees − business costs = target profit</code>
+        </div>
+        <p class="formula-note">Pricing calculations account for Etsy's published fee schedules: $0.20 listing fee, 6.5% transaction fee on total order amount, country-specific payment processing, and statutory regulatory fees where applicable. If Offsite Ads applies, the solver accounts for the 12% or 15% deduction up to the $100 cap. <a href="/methodology/">Read our full methodology and calculation standards</a> or browse the <a href="/fees/">Etsy Fees Guide</a>.</p>
+      </article>
+    </section>`;
+
+    const pricingSellerGuides = `<section class="content-section page-width" id="seller-guides" aria-labelledby="guides-heading">
+      <div class="section-heading"><div><h2 id="guides-heading">Etsy Pricing Strategy &amp; Margin Protection</h2><p>Proven frameworks to price your products for consistent take-home profit without margin erosion.</p></div></div>
+      <div class="calculator-grid" style="align-items: stretch; margin-bottom: 24px;">
+        <article class="panel input-panel">
+          <p class="eyebrow">Pricing Pitfalls</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Why Simple Percentage Markups Fail on Etsy</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">A common mistake among craft and vintage sellers is applying a traditional markup—such as doubling costs (2x) or adding 20% on top of raw materials. On Etsy, this formula guarantees lower profit than expected.</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">The reason: Etsy's deductions (6.5% transaction fee, country payment processing, and optional 12% or 15% Offsite Ads) are calculated against the <em>retail selling price</em>, not your base cost. A 20% markup on a $10 cost yields $12, but Etsy fees on $12 eat away nearly all of that $2 markup. Target pricing solves backward from your desired profit to eliminate this shortfall.</p>
+        </article>
+        <article class="panel input-panel">
+          <p class="eyebrow">Reverse Math</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Target Pricing: Solving Backward Through Platform Fees</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Instead of guessing a price and discovering what is left, target pricing starts with the exact net profit you need in your bank account per sale.</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">ShopProfit models every deduction in reverse: fixed listing fees ($0.20), fixed processing ($0.25 in the US), variable percentages (6.5% + processing % + regulatory %), and postage. Our binary search solver determines the exact retail price required so that after all deductions occur, your take-home matches your exact target.</p>
+        </article>
+      </div>
+      <div class="calculator-grid" style="align-items: stretch; margin-bottom: 24px;">
+        <article class="panel input-panel">
+          <p class="eyebrow">Margin vs Dollar</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Pricing for Margin Percentage vs. Fixed Profit Dollar</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Sellers often confuse profit margin percentage with net cash in hand:</p>
+          <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; line-height: 1.6; margin: 8px 0;">
+            <li><strong>Target Profit Dollar:</strong> Asking "I want to keep $15.00 cash from every order." This provides predictable income per unit made and shipped.</li>
+            <li><strong>Target Margin Percentage:</strong> Asking "I want a 40% net margin." Margin scales with gross volume: (Net Profit ÷ Gross Revenue) × 100. Higher-ticket items require higher dollar profits to maintain the same margin.</li>
+          </ul>
+        </article>
+        <article class="panel input-panel">
+          <p class="eyebrow">Postage Integration</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Baking Shipping into Retail: The True Cost of Free Shipping</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">When offering "Free Shipping", sellers frequently roll their exact postage label cost into the item price. However, Etsy levies the 6.5% transaction fee and payment processing on the total price.</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">If you raise your item price by $6 to cover a $6 shipping label, Etsy takes an extra ~10% ($0.60) in fees from that $6 increase. To truly break even on shipping, you must markup the shipping portion by approximately 11-12% when incorporating it into your item price. Also check our <a href="/etsy-break-even-calculator/">break-even calculator</a>.</p>
+        </article>
+      </div>
+    </section>`;
+
+    const pricingFaqList = `<section class="faq-section page-width" id="faq" aria-labelledby="faq-heading">
+      <div class="section-heading"><div><h2 id="faq-heading">Frequently asked questions about Etsy pricing</h2><p>Clear answers to help you price profitably on Etsy. Browse the full <a href="/faq/">Etsy Seller FAQ</a>.</p></div></div>
+      <div class="panel faq-list" id="faq-list">
+        <details><summary>How do I calculate what price to charge on Etsy?</summary><p>To price an Etsy product for profit, start with your desired take-home profit and solve backward. Add your raw material costs and packaging/shipping costs. Then factor in Etsy's deductions that scale with the retail price: the 6.5% transaction fee, country payment processing (such as 3% + $0.25 in the US), statutory regulatory fees, and optional Offsite Ads (12% or 15%), plus the $0.20 listing fee. ShopProfit's pricing solver automates this reverse calculation to ensure you hit your exact profit target.</p></details>
+        <details><summary>Why does simple cost markup result in lower profit on Etsy?</summary><p>Simple cost markups fail because Etsy fees are calculated as a percentage of the total selling price (including shipping), not your cost of goods. If you mark up a $10 item by 20% to $12, Etsy's 6.5% transaction fee, 3% + $0.25 payment processing, and $0.20 listing fee consume $1.59 of your $2 markup, leaving only $0.41 in actual profit.</p></details>
+        <details><summary>What is the difference between markup and profit margin on Etsy?</summary><p>Markup is the percentage added to your cost to arrive at a selling price: (Price − Cost) ÷ Cost. Profit margin is the percentage of the selling price that you keep as profit: (Profit ÷ Revenue) × 100. A 50% markup on a $10 item gives a $15 price, but your profit margin after Etsy fees is substantially lower than 50%.</p></details>
+        <details><summary>How do Etsy fees affect my pricing strategy?</summary><p>Etsy fees include fixed charges ($0.20 listing + $0.25 US processing = $0.45 flat) and variable percentages (6.5% transaction + 3% processing = 9.5% minimum in the US). Fixed fees make low-priced products (under $10) disproportionately expensive to sell, requiring higher relative markups or product bundles to maintain healthy margins.</p></details>
+        <details><summary>How should I price items when offering free shipping on Etsy?</summary><p>Because Etsy charges 6.5% transaction fees and payment processing on the entire price, adding your exact carrier postage cost to the item price results in a loss on shipping. To maintain your margins, inflate the shipping component by approximately 11% to 12% before adding it to your item retail price.</p></details>
+        <details><summary>How does the Etsy target profit solver work?</summary><p>ShopProfit's target pricing tool uses a high-precision binary search algorithm. You input your desired take-home profit in dollars, your costs, and shipping, and the engine iterates through possible retail prices until it finds the exact penny where Gross Revenue minus all Etsy platform fees and business costs equals your desired profit target.</p></details>
+      </div>
+    </section>`;
+
+    const pricingFaqs = [
+      { name: "How do I calculate what price to charge on Etsy?", text: "To price an Etsy product for profit, start with your desired take-home profit and solve backward. Add your raw material costs and packaging/shipping costs. Then factor in Etsy's deductions that scale with the retail price: the 6.5% transaction fee, country payment processing (such as 3% + $0.25 in the US), statutory regulatory fees, and optional Offsite Ads (12% or 15%), plus the $0.20 listing fee. ShopProfit's pricing solver automates this reverse calculation to ensure you hit your exact profit target." },
+      { name: "Why does simple cost markup result in lower profit on Etsy?", text: "Simple cost markups fail because Etsy fees are calculated as a percentage of the total selling price (including shipping), not your cost of goods. If you mark up a $10 item by 20% to $12, Etsy's 6.5% transaction fee, 3% + $0.25 payment processing, and $0.20 listing fee consume $1.59 of your $2 markup, leaving only $0.41 in actual profit." },
+      { name: "What is the difference between markup and profit margin on Etsy?", text: "Markup is the percentage added to your cost to arrive at a selling price: (Price − Cost) ÷ Cost. Profit margin is the percentage of the selling price that you keep as profit: (Profit ÷ Revenue) × 100. A 50% markup on a $10 item gives a $15 price, but your profit margin after Etsy fees is substantially lower than 50%." },
+      { name: "How do Etsy fees affect my pricing strategy?", text: "Etsy fees include fixed charges ($0.20 listing + $0.25 US processing = $0.45 flat) and variable percentages (6.5% transaction + 3% processing = 9.5% minimum in the US). Fixed fees make low-priced products (under $10) disproportionately expensive to sell, requiring higher relative markups or product bundles to maintain healthy margins." },
+      { name: "How should I price items when offering free shipping on Etsy?", text: "Because Etsy charges 6.5% transaction fees and payment processing on the entire price, adding your exact carrier postage cost to the item price results in a loss on shipping. To maintain your margins, inflate the shipping component by approximately 11% to 12% before adding it to your item retail price." },
+      { name: "How does the Etsy target profit solver work?", text: "ShopProfit's target pricing tool uses a high-precision binary search algorithm. You input your desired take-home profit in dollars, your costs, and shipping, and the engine iterates through possible retail prices until it finds the exact penny where Gross Revenue minus all Etsy platform fees and business costs equals your desired profit target." }
+    ];
+
+    html = replaceOnce(html, /<section class="answer-formula page-width" id="how-it-works"[\s\S]*?<\/section>/, pricingHowItWorks, "pricing how-it-works section");
+    html = replaceOnce(html, /<section class="content-section page-width" id="seller-guides"[\s\S]*?<\/section>/, pricingSellerGuides, "pricing seller-guides section");
+    html = replaceOnce(html, /<section class="faq-section page-width" id="faq"[\s\S]*?<\/section>/, pricingFaqList, "pricing faq section");
+    html = html.replace(/<h2 id="fees-heading">How Etsy fees vary by country<\/h2><p>[\s\S]*?<\/p>/,
+      `<h2 id="fees-heading">Etsy Processing Rates &amp; Country Fee Schedules</h2><p>Published payment processing and statutory regulatory rates to factor into your pricing model. Explore our complete 62-country <a href="/fees/">Etsy Fees Guide</a>.</p>`);
+    html = html.replace(/<p class="table-note">\* Etsy publishes some fixed charges in USD;[\s\S]*?<\/p>/,
+      `<p class="table-note">* Etsy publishes some fixed charges in USD; local currency equivalents are estimates. When pricing items, remember that payment processing and transaction fees apply to the customer's total payment including shipping. For other sovereign markets, see the <a href="/fees/">global fee table</a>.</p>`);
+
+    const pricingFaqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": pricingFaqs.map(q => ({
+        "@type": "Question",
+        "name": q.name,
+        "acceptedAnswer": { "@type": "Answer", "text": q.text }
+      }))
+    };
+    html = html.replace(faqTag[0], `<script type="application/ld+json" id="faq-structured-data">\n${JSON.stringify(pricingFaqSchema)}\n  </script>`);
+  } else if (route.tool === "break-even") {
+    const breakEvenHowItWorks = `<section class="answer-formula page-width" id="how-it-works" aria-label="Etsy break-even calculation methodology">
+      <article class="panel answer-panel">
+        <p class="eyebrow">Break-Even Methodology</p>
+        <h2>What is an Etsy break-even price?</h2>
+        <p>Your break-even price is the exact minimum item price you must charge so that revenue covers all Etsy platform fees, production materials, and packaging/shipping costs with $0.00 net loss. Selling below your break-even floor loses money on every shipment.</p>
+        <p class="answer-footnote">Use your break-even price as an absolute floor when running sales, accepting custom offers, or running promotions.</p>
+      </article>
+      <article class="panel formula-panel">
+        <p class="eyebrow">Break-Even Formulas</p>
+        <h2>How ShopProfit calculates break-even</h2>
+        <div class="formula-code" aria-label="Break-even formulas">
+          <code>break-even price = minimum retail price where Net Profit = $0.00</code>
+          <code>gross revenue = break-even price + buyer shipping</code>
+          <code>net profit = gross revenue − Etsy platform fees − materials − packaging/shipping = $0.00</code>
+        </div>
+        <p class="formula-note">ShopProfit calculates your break-even price by iteratively solving for the price where gross revenue exactly equals the sum of fixed listing fees ($0.20), payment processing ($0.25 + variable rate), 6.5% transaction fee, regulatory fees, ad costs, and physical expenses. <a href="/methodology/">Read our full methodology and calculation standards</a> or browse the <a href="/fees/">Etsy Fees Guide</a>.</p>
+      </article>
+    </section>`;
+
+    const breakEvenSellerGuides = `<section class="content-section page-width" id="seller-guides" aria-labelledby="guides-heading">
+      <div class="section-heading"><div><h2 id="guides-heading">Etsy Break-Even Analysis &amp; Floor Price Strategy</h2><p>Essential frameworks to establish your minimum selling prices and avoid unprofitable product lines.</p></div></div>
+      <div class="calculator-grid" style="align-items: stretch; margin-bottom: 24px;">
+        <article class="panel input-panel">
+          <p class="eyebrow">Threshold Analysis</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Per-Unit Floor vs. Monthly Volume Break-Even</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Every Etsy seller must understand two distinct break-even calculations:</p>
+          <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; line-height: 1.6; margin: 8px 0;">
+            <li><strong>Per-Unit Break-Even Price:</strong> The bare minimum item price where a single sale pays for its own materials, shipping, and platform fees. Selling below this price means paying out of pocket to ship an order.</li>
+            <li><strong>Monthly Volume Break-Even:</strong> The number of units you must sell each month at your normal profit margin to cover fixed shop overhead (Etsy Plus subscriptions, studio rent, accounting software, and listing renewal cadences).</li>
+          </ul>
+        </article>
+        <article class="panel input-panel">
+          <p class="eyebrow">Fixed Fee Penalty</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">The Fixed Fee Penalty: How $0.45 Minimums Impact Cheap Items</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">On Etsy, every order carries a non-negotiable fixed charge: a $0.20 listing fee and a $0.25 payment processing flat fee (in the US), totaling $0.45 per transaction.</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Even if an item costs $0.00 to produce and $0.00 to ship, your break-even price is not zero—it is roughly $0.50 just to pay Etsy's fixed fees and transaction percentages. On low-priced items ($3 to $8), this fixed drag represents 6% to 15% of your sale before materials are considered. To raise profits, explore our <a href="/etsy-pricing-calculator/">Etsy pricing calculator</a>.</p>
+        </article>
+      </div>
+      <div class="calculator-grid" style="align-items: stretch; margin-bottom: 24px;">
+        <article class="panel input-panel">
+          <p class="eyebrow">Advertising Impact</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">How Offsite Ads Elevate Your Break-Even Floor</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">When an order is attributed to an Etsy Offsite Ad, Etsy deducts an additional 12% or 15% of the total order value. This drastically shifts your break-even floor higher.</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">An item that breaks even at $15.00 on organic sales may require an $18.50+ price point to break even if sold through an ad click. Sellers who operate on slim margins without accounting for advertising risk turning break-even sales into cash-losing orders. Model ad fees with our <a href="/etsy-offsite-ads-calculator/">Etsy Offsite Ads calculator</a>.</p>
+        </article>
+        <article class="panel input-panel">
+          <p class="eyebrow">Margin Optimization</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">3 Practical Strategies to Lower Your Break-Even Point</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Lowering your break-even floor gives you greater pricing flexibility against competitors:</p>
+          <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; line-height: 1.6; margin: 8px 0;">
+            <li><strong>Bulk Packaging Sourcing:</strong> Buying mailers, boxes, and tissue in bulk cuts per-unit packaging from $2.00+ down to $0.50, lowering your floor immediately.</li>
+            <li><strong>Product Bundling:</strong> Combining 3 complementary low-ticket items into a single listing spreads Etsy's $0.45 fixed fees across 3 units instead of paying $1.35 in separate fees.</li>
+            <li><strong>Commercial Shipping Rates:</strong> Use Etsy Shipping Labels or commercial postage providers (Pirate Ship) to access discounted commercial base rates.</li>
+          </ul>
+        </article>
+      </div>
+    </section>`;
+
+    const breakEvenFaqList = `<section class="faq-section page-width" id="faq" aria-labelledby="faq-heading">
+      <div class="section-heading"><div><h2 id="faq-heading">Frequently asked questions about Etsy break-even</h2><p>Clear guidance on finding your floor price on Etsy. Browse the full <a href="/faq/">Etsy Seller FAQ</a>.</p></div></div>
+      <div class="panel faq-list" id="faq-list">
+        <details><summary>What is an Etsy break-even price?</summary><p>An Etsy break-even price is the absolute lowest listing price you can charge for an item such that total revenue (item price + buyer shipping) exactly equals total expenses (Etsy listing fee, 6.5% transaction fee, payment processing fee, regulatory fee, ad fees, production costs, and actual postage costs). Selling at your break-even price yields exactly $0.00 in profit; selling below it causes a financial loss on every order.</p></details>
+        <details><summary>How do I calculate my break-even price on Etsy?</summary><p>To calculate break-even on Etsy, solve for the item price where Gross Revenue − Etsy Platform Fees − Production Cost − Packaging/Shipping Cost = $0.00. Because Etsy takes a percentage of the final price, you cannot simply add fees to costs. ShopProfit automatically solves this equation for your specific country and fee structure.</p></details>
+        <details><summary>What happens if I sell below my Etsy break-even price?</summary><p>If you price an item below your break-even threshold, you lose money on every completed sale. Even if your sales volume increases, every additional unit sold deepens your net operating loss because platform fees, material costs, and shipping postage exceed the money collected from the customer.</p></details>
+        <details><summary>How do fixed fees impact the break-even price of cheap items?</summary><p>Etsy's fixed charges ($0.20 listing fee + $0.25 US payment processing fee = $0.45 total) disproportionately penalize low-priced items. On a $5 item, fixed fees consume 9% of revenue before variable percentages are even applied. This creates a high break-even floor for low-ticket products.</p></details>
+        <details><summary>How does Offsite Ads affect my break-even price?</summary><p>If an order is attributed to an Offsite Ad, Etsy deducts an extra 12% or 15% from the gross order total. This additional deduction raises your break-even floor significantly. Sellers should either model their break-even with ad rates enabled or maintain profit margins wide enough to absorb ad deductions.</p></details>
+        <details><summary>What is monthly volume break-even on Etsy?</summary><p>Monthly volume break-even is the number of units you must sell in a calendar month to cover fixed shop expenses (such as the $10/month Etsy Plus subscription, studio space, listing renewal fees, and software tools). It is calculated by dividing total fixed monthly expenses by your average net profit per unit.</p></details>
+      </div>
+    </section>`;
+
+    const breakEvenFaqs = [
+      { name: "What is an Etsy break-even price?", text: "An Etsy break-even price is the absolute lowest listing price you can charge for an item such that total revenue (item price + buyer shipping) exactly equals total expenses (Etsy listing fee, 6.5% transaction fee, payment processing fee, regulatory fee, ad fees, production costs, and actual postage costs). Selling at your break-even price yields exactly $0.00 in profit; selling below it causes a financial loss on every order." },
+      { name: "How do I calculate my break-even price on Etsy?", text: "To calculate break-even on Etsy, solve for the item price where Gross Revenue − Etsy Platform Fees − Production Cost − Packaging/Shipping Cost = $0.00. Because Etsy takes a percentage of the final price, you cannot simply add fees to costs. ShopProfit automatically solves this equation for your specific country and fee structure." },
+      { name: "What happens if I sell below my Etsy break-even price?", text: "If you price an item below your break-even threshold, you lose money on every completed sale. Even if your sales volume increases, every additional unit sold deepens your net operating loss because platform fees, material costs, and shipping postage exceed the money collected from the customer." },
+      { name: "How do fixed fees impact the break-even price of cheap items?", text: "Etsy's fixed charges ($0.20 listing fee + $0.25 US payment processing fee = $0.45 total) disproportionately penalize low-priced items. On a $5 item, fixed fees consume 9% of revenue before variable percentages are even applied. This creates a high break-even floor for low-ticket products." },
+      { name: "How does Offsite Ads affect my break-even price?", text: "If an order is attributed to an Offsite Ad, Etsy deducts an extra 12% or 15% from the gross order total. This additional deduction raises your break-even floor significantly. Sellers should either model their break-even with ad rates enabled or maintain profit margins wide enough to absorb ad deductions." },
+      { name: "What is monthly volume break-even on Etsy?", text: "Monthly volume break-even is the number of units you must sell in a calendar month to cover fixed shop expenses (such as the $10/month Etsy Plus subscription, studio space, listing renewal fees, and software tools). It is calculated by dividing total fixed monthly expenses by your average net profit per unit." }
+    ];
+
+    html = replaceOnce(html, /<section class="answer-formula page-width" id="how-it-works"[\s\S]*?<\/section>/, breakEvenHowItWorks, "break-even how-it-works section");
+    html = replaceOnce(html, /<section class="content-section page-width" id="seller-guides"[\s\S]*?<\/section>/, breakEvenSellerGuides, "break-even seller-guides section");
+    html = replaceOnce(html, /<section class="faq-section page-width" id="faq"[\s\S]*?<\/section>/, breakEvenFaqList, "break-even faq section");
+    html = html.replace(/<h2 id="fees-heading">How Etsy fees vary by country<\/h2><p>[\s\S]*?<\/p>/,
+      `<h2 id="fees-heading">Etsy Fee Schedules by Country for Break-Even Analysis</h2><p>Published payment processing and statutory regulatory rates across seller jurisdictions. Explore our complete 62-country <a href="/fees/">Etsy Fees Guide</a>.</p>`);
+    html = html.replace(/<p class="table-note">\* Etsy publishes some fixed charges in USD;[\s\S]*?<\/p>/,
+      `<p class="table-note">* Etsy publishes some fixed charges in USD; local currency equivalents are estimates. Break-even analysis accounts for country-specific payment processing and regulatory fees. For other sovereign markets, see the <a href="/fees/">global fee table</a>.</p>`);
+
+    const breakEvenFaqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": breakEvenFaqs.map(q => ({
+        "@type": "Question",
+        "name": q.name,
+        "acceptedAnswer": { "@type": "Answer", "text": q.text }
+      }))
+    };
+    html = html.replace(faqTag[0], `<script type="application/ld+json" id="faq-structured-data">\n${JSON.stringify(breakEvenFaqSchema)}\n  </script>`);
+  } else if (route.tool === "offsite-ads") {
+    const adsHowItWorks = `<section class="answer-formula page-width" id="how-it-works" aria-label="Etsy Offsite Ads fees and calculation method">
+      <article class="panel answer-panel">
+        <p class="eyebrow">Offsite Ads Breakdown</p>
+        <h2>How much does Etsy take on Offsite Ads sales?</h2>
+        <p>When an order is attributed to an Etsy Offsite Ad, Etsy deducts an advertising fee of 15% (for shops under $10,000 in trailing 12-month sales) or 12% (for shops at or above $10,000) on the entire order total (item price + buyer shipping). Crucially, Etsy caps the maximum fee at $100 USD per order.</p>
+        <p class="answer-footnote">The ad fee is added on top of Etsy's standard listing fee, 6.5% transaction fee, and payment processing charges.</p>
+      </article>
+      <article class="panel formula-panel">
+        <p class="eyebrow">Transparent Methodology</p>
+        <h2>How ShopProfit models Offsite Ads fees</h2>
+        <div class="formula-code" aria-label="Offsite Ads formulas">
+          <code>ad fee = min(order total × selected ad rate, $100 USD equivalent cap)</code>
+          <code>order total = item price + buyer shipping + gift wrap</code>
+          <code>net profit (ad order) = order total − standard fees − ad fee − production − shipping</code>
+        </div>
+        <p class="formula-note">Calculations model Etsy's official advertising policy: 15% optional tier, 12% mandatory high-volume tier, and the statutory $100 per-order maximum fee cap. Ad attribution applies to orders placed within 30 days of an external ad click. <a href="/methodology/">Read our full methodology and calculation standards</a> or browse the <a href="/fees/">Etsy Fees Guide</a>.</p>
+      </article>
+    </section>`;
+
+    const adsSellerGuides = `<section class="content-section page-width" id="seller-guides" aria-labelledby="guides-heading">
+      <div class="section-heading"><div><h2 id="guides-heading">Etsy Offsite Ads Fee &amp; Margin Strategy</h2><p>Master Etsy's external advertising program, protect profit margins, and understand the $100 fee cap.</p></div></div>
+      <div class="calculator-grid" style="align-items: stretch; margin-bottom: 24px;">
+        <article class="panel input-panel">
+          <p class="eyebrow">Tiers &amp; Rules</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">15% Optional vs. 12% Mandatory: The $10,000 Threshold</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Etsy runs Offsite Ads on Google Shopping, Facebook, Instagram, Pinterest, and Bing on behalf of sellers. Participation terms depend strictly on your trailing 12-month gross revenue:</p>
+          <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; line-height: 1.6; margin: 8px 0;">
+            <li><strong>Under $10,000 USD (15% Fee):</strong> Participation is optional. You can enable or disable Offsite Ads at any time in Shop Manager.</li>
+            <li><strong>$10,000 USD or More (12% Fee):</strong> Once your shop hits $10,000 in sales over any consecutive 365-day period, participation becomes mandatory for the lifetime of your shop. Your fee rate drops from 15% to 12%.</li>
+          </ul>
+        </article>
+        <article class="panel input-panel">
+          <p class="eyebrow">Fee Protection</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">The Statutory $100 Per-Order Cap: High-Ticket Protection</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">One of the most important yet overlooked provisions in Etsy's advertising policy is the per-order maximum fee cap:</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Regardless of how large an order is, Etsy caps the maximum Offsite Ads fee at <strong>$100.00 USD</strong> (or local currency equivalent). On a $500 order, a 15% fee would normally be $75. On a $1,200 custom furniture order, 15% would be $180, but Etsy charges only $100. ShopProfit accurately models this cap; many competing calculators erroneously charge uncapped percentages.</p>
+        </article>
+      </div>
+      <div class="calculator-grid" style="align-items: stretch; margin-bottom: 24px;">
+        <article class="panel input-panel">
+          <p class="eyebrow">Tracking Window</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">The 30-Day Attribution Window: How Etsy Tracks Ad Clicks</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">When a shopper clicks an Etsy-placed ad on Google or social media, a 30-day tracking cookie is established.</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">If that customer buys <em>any listing</em> from your shop within the next 30 days—even if they buy a completely different item than the one shown in the ad—Etsy attributes the sale to the ad and levies the 12% or 15% fee. Understanding this attribution window is essential for evaluating your overall advertising ROI.</p>
+        </article>
+        <article class="panel input-panel">
+          <p class="eyebrow">Pricing Strategy</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Pricing Your Shop to Absorb Offsite Ads Profitably</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">You cannot adjust your prices dynamically based on whether a customer found you through an ad. Instead, seasoned sellers blend ad costs into their overall pricing strategy.</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">If 20% of your sales originate from Offsite Ads at a 15% rate, your effective advertising drag across your entire shop is 3% (20% × 15%). Raising catalog prices by 3% across the board absorbs the program seamlessly without hurting organic conversions. Check our <a href="/etsy-pricing-calculator/">Etsy pricing calculator</a> to model adjusted pricing.</p>
+        </article>
+      </div>
+    </section>`;
+
+    const adsFaqList = `<section class="faq-section page-width" id="faq" aria-labelledby="faq-heading">
+      <div class="section-heading"><div><h2 id="faq-heading">Frequently asked questions about Etsy Offsite Ads</h2><p>Clear, verified answers about Etsy's advertising fees. Browse the full <a href="/faq/">Etsy Seller FAQ</a>.</p></div></div>
+      <div class="panel faq-list" id="faq-list">
+        <details><summary>How much does Etsy charge for Offsite Ads?</summary><p>Etsy charges either 15% or 12% of the gross order total (item price + buyer shipping) when a sale is attributed to an external ad click on Google, Facebook, Instagram, or Pinterest. Shops making under $10,000 USD over the trailing 12 months pay 15% (optional); shops making $10,000 USD or more pay 12% (mandatory). Crucially, Etsy caps the maximum fee at $100 USD per attributed order.</p></details>
+        <details><summary>Can I opt out of Etsy Offsite Ads?</summary><p>Yes, but only if your shop has generated less than $10,000 USD in sales over the trailing 365 days. You can toggle Offsite Ads off in Shop Manager > Settings > Offsite Ads. Once your shop crosses $10,000 USD in 12-month sales, participation is mandatory for the lifetime of the shop and cannot be disabled.</p></details>
+        <details><summary>How does the $10,000 threshold for Etsy Offsite Ads work?</summary><p>Etsy calculates your sales volume over a trailing 365-day rolling window. If gross sales in that period reach or exceed $10,000 USD, your shop is permanently enrolled in mandatory Offsite Ads at the lower 12% rate. Even if your sales later drop below $10,000 in subsequent years, mandatory participation remains permanent.</p></details>
+        <details><summary>Is there a maximum limit or cap on Etsy Offsite Ads fees?</summary><p>Yes. Etsy officially caps the maximum Offsite Ads fee at $100.00 USD (or equivalent in local currency) per order, regardless of order total. On high-value sales (such as a $1,000 custom piece), your ad fee is capped at $100 rather than $150 or $120.</p></details>
+        <details><summary>Does Etsy charge the Offsite Ads fee on shipping?</summary><p>Yes. The 12% or 15% Offsite Ads fee applies to the entire order total paid by the customer, which includes item price, buyer shipping, and any gift wrapping. It does not apply to sales taxes collected directly by Etsy.</p></details>
+        <details><summary>How long does Etsy's Offsite Ads attribution window last?</summary><p>Etsy's attribution window lasts 30 days. If a shopper clicks an ad for one of your listings and purchases from your shop within 30 days, that order is subject to the Offsite Ads fee, even if they buy a different item than the one displayed in the advertisement.</p></details>
+      </div>
+    </section>`;
+
+    const adsFaqs = [
+      { name: "How much does Etsy charge for Offsite Ads?", text: "Etsy charges either 15% or 12% of the gross order total (item price + buyer shipping) when a sale is attributed to an external ad click on Google, Facebook, Instagram, or Pinterest. Shops making under $10,000 USD over the trailing 12 months pay 15% (optional); shops making $10,000 USD or more pay 12% (mandatory). Crucially, Etsy caps the maximum fee at $100 USD per attributed order." },
+      { name: "Can I opt out of Etsy Offsite Ads?", text: "Yes, but only if your shop has generated less than $10,000 USD in sales over the trailing 365 days. You can toggle Offsite Ads off in Shop Manager > Settings > Offsite Ads. Once your shop crosses $10,000 USD in 12-month sales, participation is mandatory for the lifetime of the shop and cannot be disabled." },
+      { name: "How does the $10,000 threshold for Etsy Offsite Ads work?", text: "Etsy calculates your sales volume over a trailing 365-day rolling window. If gross sales in that period reach or exceed $10,000 USD, your shop is permanently enrolled in mandatory Offsite Ads at the lower 12% rate. Even if your sales later drop below $10,000 in subsequent years, mandatory participation remains permanent." },
+      { name: "Is there a maximum limit or cap on Etsy Offsite Ads fees?", text: "Yes. Etsy officially caps the maximum Offsite Ads fee at $100.00 USD (or equivalent in local currency) per order, regardless of order total. On high-value sales (such as a $1,000 custom piece), your ad fee is capped at $100 rather than $150 or $120." },
+      { name: "Does Etsy charge the Offsite Ads fee on shipping?", text: "Yes. The 12% or 15% Offsite Ads fee applies to the entire order total paid by the customer, which includes item price, buyer shipping, and any gift wrapping. It does not apply to sales taxes collected directly by Etsy." },
+      { name: "How long does Etsy's Offsite Ads attribution window last?", text: "Etsy's attribution window lasts 30 days. If a shopper clicks an ad for one of your listings and purchases from your shop within 30 days, that order is subject to the Offsite Ads fee, even if they buy a different item than the one displayed in the advertisement." }
+    ];
+
+    html = replaceOnce(html, /<section class="answer-formula page-width" id="how-it-works"[\s\S]*?<\/section>/, adsHowItWorks, "ads how-it-works section");
+    html = replaceOnce(html, /<section class="content-section page-width" id="seller-guides"[\s\S]*?<\/section>/, adsSellerGuides, "ads seller-guides section");
+    html = replaceOnce(html, /<section class="faq-section page-width" id="faq"[\s\S]*?<\/section>/, adsFaqList, "ads faq section");
+    html = html.replace(/<h2 id="fees-heading">How Etsy fees vary by country<\/h2><p>[\s\S]*?<\/p>/,
+      `<h2 id="fees-heading">Etsy Fee Rates &amp; Offsite Ads Schedule by Country</h2><p>Published payment processing and statutory regulatory rates for shops worldwide. Explore our complete 62-country <a href="/fees/">Etsy Fees Guide</a>.</p>`);
+    html = html.replace(/<p class="table-note">\* Etsy publishes some fixed charges in USD;[\s\S]*?<\/p>/,
+      `<p class="table-note">* Etsy publishes some fixed charges in USD; local currency equivalents are estimates. The Offsite Ads fee is calculated on gross order total up to the statutory $100 USD equivalent cap. For other sovereign markets, see the <a href="/fees/">global fee table</a>.</p>`);
+
+    const adsFaqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": adsFaqs.map(q => ({
+        "@type": "Question",
+        "name": q.name,
+        "acceptedAnswer": { "@type": "Answer", "text": q.text }
+      }))
+    };
+    html = html.replace(faqTag[0], `<script type="application/ld+json" id="faq-structured-data">\n${JSON.stringify(adsFaqSchema)}\n  </script>`);
+  } else if (route.tool === "pod") {
+    const podHowItWorks = `<section class="answer-formula page-width" id="how-it-works" aria-label="Etsy print on demand fees and calculation method">
+      <article class="panel answer-panel">
+        <p class="eyebrow">Print on Demand Breakdown</p>
+        <h2>How much does Etsy take from a print-on-demand sale?</h2>
+        <p>For print-on-demand sales, Etsy takes its standard fees: $0.20 listing fee, 6.5% transaction fee on total customer payment, and payment processing (3% + $0.25 in the US). In addition, your print provider (Printify, Printful, Gelato) charges you directly for the product blank, printing, and customer shipping.</p>
+        <p class="answer-footnote">Your net profit is the margin remaining after deducting both Etsy's platform cut and your provider's fulfillment invoice.</p>
+      </article>
+      <article class="panel formula-panel">
+        <p class="eyebrow">Transparent Methodology</p>
+        <h2>How ShopProfit calculates POD profit</h2>
+        <div class="formula-code" aria-label="Print on demand profit formulas">
+          <code>gross revenue = retail price + shipping charged to buyer</code>
+          <code>Etsy platform fees = $0.20 listing + 6.5% transaction + processing + ads</code>
+          <code>fulfillment costs = print provider item cost + print provider shipping cost</code>
+          <code>net profit = gross revenue − Etsy platform fees − fulfillment costs</code>
+        </div>
+        <p class="formula-note">ShopProfit is provider-agnostic: enter your exact wholesale product charges and shipping invoices from Printify, Printful, Gelato, or Awkward Styles. Calculations accurately model Etsy's 6.5% fee on buyer shipping, payment processing, and optional ad deductions. <a href="/methodology/">Read our full methodology and calculation standards</a> or browse the <a href="/fees/">Etsy Fees Guide</a>.</p>
+      </article>
+    </section>`;
+
+    const podSellerGuides = `<section class="content-section page-width" id="seller-guides" aria-labelledby="guides-heading">
+      <div class="section-heading"><div><h2 id="guides-heading">Etsy Print on Demand Profit &amp; Margin Strategy</h2><p>Essential frameworks to manage fulfillment costs, avoid negative margins, and price POD products for profit.</p></div></div>
+      <div class="calculator-grid" style="align-items: stretch; margin-bottom: 24px;">
+        <article class="panel input-panel">
+          <p class="eyebrow">Fulfillment Economics</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">The 2-Leg Shipping Trap in Print on Demand</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">The most frequent reason new POD sellers lose money is misunderstanding the two separate shipping transactions involved in every order:</p>
+          <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; line-height: 1.6; margin: 8px 0;">
+            <li><strong>Customer Shipping Leg:</strong> The shipping amount you charge the buyer on Etsy. Etsy levies its 6.5% transaction fee and payment processing fee directly on this amount.</li>
+            <li><strong>Provider Shipping Leg:</strong> The shipping fee your print provider (Printify, Printful) invoices you to print and ship the item. This is a real out-of-pocket production expense.</li>
+          </ul>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">If you charge the buyer $4.50 shipping and your provider charges you $4.50 shipping, you lose money because Etsy deducts ~$0.45 from that customer shipping revenue. Always model both legs in ShopProfit.</p>
+        </article>
+        <article class="panel input-panel">
+          <p class="eyebrow">Category Margins</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Realistic Profit Margin Benchmarks for Etsy POD</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Typical healthy net margin benchmarks for popular print-on-demand categories after all Etsy fees and provider costs:</p>
+          <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; line-height: 1.6; margin: 8px 0;">
+            <li><strong>T-Shirts &amp; Apparel:</strong> 20% to 30% ($5.00 to $9.00 net profit on a $26–$30 retail price).</li>
+            <li><strong>Sweatshirts &amp; Hoodies:</strong> 25% to 35% ($10.00 to $16.00 net profit on a $42–$50 retail price).</li>
+            <li><strong>Mugs &amp; Drinkware:</strong> 15% to 25% ($3.00 to $5.50 net profit on a $16–$20 retail price). High shipping relative to price makes mugs margin-sensitive.</li>
+            <li><strong>Posters &amp; Wall Art:</strong> 35% to 50% ($8.00 to $18.00 net profit on a $22–$36 retail price). Low provider production costs yield strong margins.</li>
+          </ul>
+        </article>
+      </div>
+      <div class="calculator-grid" style="align-items: stretch; margin-bottom: 24px;">
+        <article class="panel input-panel">
+          <p class="eyebrow">Advertising Economics</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Why Offsite Ads Can Wipe Out Thin POD Margins</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Because print-on-demand items have fixed baseline costs from your print provider, your gross profit margins (20–30%) are much narrower than handmade or digital goods (60–85%).</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">If an order triggers a 15% Etsy Offsite Ads fee on a $30 sale ($4.50 deduction), a $6.00 expected profit shrinks to just $1.50 (a 5% margin). If unexpected customer returns occur, that sale becomes unprofitable. Sellers must price POD items with sufficient buffer using our <a href="/etsy-pricing-calculator/">Etsy pricing calculator</a>.</p>
+        </article>
+        <article class="panel input-panel">
+          <p class="eyebrow">Provider Agnostic</p>
+          <h3 style="font-size: 18px; margin: 0 0 10px;">Provider Agnostic: Modeling Printify, Printful, and Gelato</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Rather than relying on outdated hardcoded provider tables that fail to reflect live vendor price changes, ShopProfit uses transparent direct inputs:</p>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Simply look at your print provider catalog (e.g., Bella+Canvas 3001 on Printify for $9.50 with $4.50 shipping), enter those figures directly into "Print provider item cost" and "Print provider shipping cost", and ShopProfit gives you the exact take-home profit down to the penny.</p>
+        </article>
+      </div>
+    </section>`;
+
+    const podFaqList = `<section class="faq-section page-width" id="faq" aria-labelledby="faq-heading">
+      <div class="section-heading"><div><h2 id="faq-heading">Frequently asked questions about Etsy print on demand</h2><p>Clear, verified answers for POD sellers. Browse the full <a href="/faq/">Etsy Seller FAQ</a>.</p></div></div>
+      <div class="panel faq-list" id="faq-list">
+        <details><summary>How do I calculate profit for Etsy print on demand?</summary><p>To calculate profit for an Etsy print-on-demand item, subtract both Etsy platform fees and your print provider fulfillment costs from total customer revenue. Total customer revenue equals listing price plus shipping charged to the buyer. Deduct Etsy fees ($0.20 listing, 6.5% transaction, payment processing, and any ad fees), then deduct your print provider's base product charge (blank + printing) and provider shipping fee. What remains is your net take-home profit.</p></details>
+        <details><summary>What fees does Etsy charge on print on demand products?</summary><p>Etsy does not charge any special fee for print on demand. You pay the exact same platform fees as physical sellers: a $0.20 listing fee, a 6.5% transaction fee on total order revenue (item + buyer shipping), country payment processing (3% + $0.25 in the US), and optional 12% or 15% Offsite Ads fees if applicable.</p></details>
+        <details><summary>What is a realistic profit margin for print on demand on Etsy?</summary><p>A healthy net profit margin for Etsy POD is between 20% and 35%. On a standard $28 t-shirt with $4.50 buyer shipping ($32.50 revenue), after ~$3.50 in Etsy fees and ~$14.00 in provider production and shipping, you should expect to take home roughly $7.00 to $9.00 per shirt (22% to 28% margin).</p></details>
+        <details><summary>Does Etsy charge fees on print-on-demand shipping?</summary><p>Yes. Etsy levies its 6.5% transaction fee and payment processing fee on the entire shipping amount charged to the buyer. This means if you charge $4.50 for shipping, Etsy retains roughly $0.43 to $0.45 in platform fees directly from that shipping charge.</p></details>
+        <details><summary>How do Printify and Printful production costs interact with Etsy fees?</summary><p>Your print provider operates independently of Etsy. When an order occurs, Etsy deposits customer revenue (minus Etsy platform fees) into your Etsy Payment account, while your print provider automatically charges your credit card or PayPal for fulfillment. ShopProfit models both transactions simultaneously to show your true consolidated take-home.</p></details>
+        <details><summary>How should I price a POD t-shirt or hoodie on Etsy?</summary><p>Start with your total print provider cost (item blank + print fee + fulfillment postage), add your desired profit in dollars (e.g., $8.00 per shirt), and use ShopProfit's target pricing tool to calculate backward. For apparel, retail prices between $26.00 and $32.00 for t-shirts and $42.00 to $52.00 for hoodies generally balance competitive conversion rates with solid margins.</p></details>
+      </div>
+    </section>`;
+
+    const podFaqs = [
+      { name: "How do I calculate profit for Etsy print on demand?", text: "To calculate profit for an Etsy print-on-demand item, subtract both Etsy platform fees and your print provider fulfillment costs from total customer revenue. Total customer revenue equals listing price plus shipping charged to the buyer. Deduct Etsy fees ($0.20 listing, 6.5% transaction, payment processing, and any ad fees), then deduct your print provider's base product charge (blank + printing) and provider shipping fee. What remains is your net take-home profit." },
+      { name: "What fees does Etsy charge on print on demand products?", text: "Etsy does not charge any special fee for print on demand. You pay the exact same platform fees as physical sellers: a $0.20 listing fee, a 6.5% transaction fee on total order revenue (item + buyer shipping), country payment processing (3% + $0.25 in the US), and optional 12% or 15% Offsite Ads fees if applicable." },
+      { name: "What is a realistic profit margin for print on demand on Etsy?", text: "A healthy net profit margin for Etsy POD is between 20% and 35%. On a standard $28 t-shirt with $4.50 buyer shipping ($32.50 revenue), after ~$3.50 in Etsy fees and ~$14.00 in provider production and shipping, you should expect to take home roughly $7.00 to $9.00 per shirt (22% to 28% margin)." },
+      { name: "Does Etsy charge fees on print-on-demand shipping?", text: "Yes. Etsy levies its 6.5% transaction fee and payment processing fee on the entire shipping amount charged to the buyer. This means if you charge $4.50 for shipping, Etsy retains roughly $0.43 to $0.45 in platform fees directly from that shipping charge." },
+      { name: "How do Printify and Printful production costs interact with Etsy fees?", text: "Your print provider operates independently of Etsy. When an order occurs, Etsy deposits customer revenue (minus Etsy platform fees) into your Etsy Payment account, while your print provider automatically charges your credit card or PayPal for fulfillment. ShopProfit models both transactions simultaneously to show your true consolidated take-home." },
+      { name: "How should I price a POD t-shirt or hoodie on Etsy?", text: "Start with your total print provider cost (item blank + print fee + fulfillment postage), add your desired profit in dollars (e.g., $8.00 per shirt), and use ShopProfit's target pricing tool to calculate backward. For apparel, retail prices between $26.00 and $32.00 for t-shirts and $42.00 to $52.00 for hoodies generally balance competitive conversion rates with solid margins." }
+    ];
+
+    html = replaceOnce(html, /<section class="answer-formula page-width" id="how-it-works"[\s\S]*?<\/section>/, podHowItWorks, "pod how-it-works section");
+    html = replaceOnce(html, /<section class="content-section page-width" id="seller-guides"[\s\S]*?<\/section>/, podSellerGuides, "pod seller-guides section");
+    html = replaceOnce(html, /<section class="faq-section page-width" id="faq"[\s\S]*?<\/section>/, podFaqList, "pod faq section");
+    html = html.replace(/<h2 id="fees-heading">How Etsy fees vary by country<\/h2><p>[\s\S]*?<\/p>/,
+      `<h2 id="fees-heading">Etsy Fee Rates &amp; Processing Schedules for POD Sellers</h2><p>Published payment processing and statutory regulatory rates for international POD shops. Explore our complete 62-country <a href="/fees/">Etsy Fees Guide</a>.</p>`);
+    html = html.replace(/<p class="table-note">\* Etsy publishes some fixed charges in USD;[\s\S]*?<\/p>/,
+      `<p class="table-note">* Etsy publishes some fixed charges in USD; local currency equivalents are estimates. On print-on-demand orders, remember that Etsy deducts transaction fees from customer shipping while your print provider invoices you separately for fulfillment postage. For other sovereign markets, see the <a href="/fees/">global fee table</a>.</p>`);
+
+    const podFaqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": podFaqs.map(q => ({
+        "@type": "Question",
+        "name": q.name,
+        "acceptedAnswer": { "@type": "Answer", "text": q.text }
+      }))
+    };
+    html = html.replace(faqTag[0], `<script type="application/ld+json" id="faq-structured-data">\n${JSON.stringify(podFaqSchema)}\n  </script>`);
   } else {
     const faq = JSON.parse(faqTag[1]);
     faq.mainEntity[0].name = route.question; faq.mainEntity[0].acceptedAnswer.text = route.answer;
     html = html.replace(faqTag[0], `<script type="application/ld+json" id="faq-structured-data">\n${JSON.stringify(faq)}\n  </script>`);
   }
-  if (route.code === "OTHER") html = html.replace('id="shipping" name="shipping" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="5"', 'id="shipping" name="shipping" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="0"')
-    .replace('id="production" name="production" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="7"', 'id="production" name="production" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="0"')
-    .replace('id="packaging" name="packaging" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="4"', 'id="packaging" name="packaging" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="0"')
-    .replace('id="digital-preset" aria-pressed="false"', 'id="digital-preset" aria-pressed="true"')
-    .replace('id="digital-mode-note" hidden', 'id="digital-mode-note"');
+  if (route.code === "OTHER") {
+    html = html.replace('id="shipping" name="shipping" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="5"', 'id="shipping" name="shipping" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="0"')
+      .replace('id="production" name="production" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="7"', 'id="production" name="production" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="0"')
+      .replace('id="packaging" name="packaging" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="4"', 'id="packaging" name="packaging" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="0"')
+      .replace('id="digital-preset" aria-pressed="false"', 'id="digital-preset" aria-pressed="true"')
+      .replace('id="digital-mode-note" hidden', 'id="digital-mode-note"');
+  } else if (route.tool === "pricing" || route.tool === "break-even") {
+    html = html.replace('<details class="advanced-options" id="advanced-options">', '<details class="advanced-options" id="advanced-options" open>');
+  } else if (route.tool === "offsite-ads") {
+    html = html.replace('<details class="advanced-options" id="advanced-options">', '<details class="advanced-options" id="advanced-options" open>')
+      .replace('<details class="panel scenarios-panel">', '<details class="panel scenarios-panel" open>')
+      .replace('<input type="radio" name="offsite" value="0" checked>', '<input type="radio" name="offsite" value="0">')
+      .replace('<input type="radio" name="offsite" value="0.15">', '<input type="radio" name="offsite" value="0.15" checked>');
+  } else if (route.tool === "pod") {
+    html = html.replace('id="item-price" name="itemPrice" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="35"', 'id="item-price" name="itemPrice" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="28"')
+      .replace('id="shipping" name="shipping" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="5"', 'id="shipping" name="shipping" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="4.50"')
+      .replace('id="production" name="production" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="7"', 'id="production" name="production" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="9.50"')
+      .replace('id="packaging" name="packaging" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="4"', 'id="packaging" name="packaging" type="number" inputmode="decimal" min="0" max="99999999" step="0.01" value="4.50"')
+      .replace('<label for="production">Production / material cost</label>', '<label for="production">Print provider item cost</label>')
+      .replace('<label for="packaging">Packaging &amp; shipping cost</label>', '<label for="packaging">Print provider shipping cost</label>')
+      .replace('<small id="item-price-help" class="field-help">Your item price before shipping.</small>', '<small id="item-price-help" class="field-help">Retail price charged to Etsy customer.</small>');
+  }
   await writeFile(new URL(`../${route.file}`, import.meta.url), html);
   // Also write to slug/index.html so Cloudflare Pages serves the clean URL natively
   // (avoids _redirects 200-rewrite loops caused by Cloudflare's Pretty URLs feature)

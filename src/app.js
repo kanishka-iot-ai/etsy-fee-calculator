@@ -77,11 +77,13 @@ function translate(value) { return LANGUAGES[activeLanguage]?.strings[value] || 
 function fitHeroHeading() {
   const hero = $("#hero-title");
   if (!hero || hero.classList.contains("route-h1")) return;
-  hero.style.removeProperty("font-size");
+  const parent = hero.parentElement;
+  if (!parent) return;
+  const available = parent.clientWidth;
+  if (!available) return;
   const style = getComputedStyle(hero);
   const baseSize = Number.parseFloat(style.fontSize);
-  const available = hero.parentElement.clientWidth;
-  if (!available) return;
+  if (!baseSize) return;
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
   context.font = `${style.fontWeight} ${baseSize}px ${style.fontFamily}`;
@@ -89,6 +91,8 @@ function fitHeroHeading() {
   const textWidth = context.measureText(text).width + baseSize * 0.3;
   if (textWidth > available && available > 0) {
     hero.style.fontSize = `${Math.max(14, Math.floor((baseSize * (available - 8)) / textWidth))}px`;
+  } else if (hero.style.fontSize) {
+    hero.style.removeProperty("font-size");
   }
 }
 function translatePage() {
@@ -912,7 +916,10 @@ if (typeof document !== "undefined" && typeof window !== "undefined") {
  * Asynchronously loads authoritative v1.1.1 fee intelligence.
  */
 export async function loadFeeData(customOptions = {}) {
-  showLoadingState();
+  const isRetry = customOptions.showLoading || !!feeDataError;
+  if (isRetry) {
+    showLoadingState();
+  }
   const client = customOptions.client || feeClient;
   const storage = customOptions.storage !== undefined ? customOptions.storage : store;
 
@@ -972,8 +979,5 @@ export {
   getState
 };
 
-// Initiate startup loading in browser environment
-if (typeof window !== "undefined") {
-  loadFeeData();
-}
+// Startup initialization is handled above in the DOM ready block
 

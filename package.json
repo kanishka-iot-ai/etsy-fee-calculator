@@ -4,8 +4,8 @@
   "type": "module",
   "scripts": {
     "start": "node scripts/dev-server.mjs",
-    "build": "node scripts/generate-seo-pages.mjs",
-    "build:seo": "node scripts/generate-seo-pages.mjs",
+    "build": "node scripts/generate-seo-pages.mjs && node scripts/minify-css.mjs",
+    "build:seo": "node scripts/generate-seo-pages.mjs && node scripts/minify-css.mjs",
     "test": "node --test",
     "verify:fees": "node scripts/verify-etsy-fees.mjs",
     "check:launch": "node scripts/verify-etsy-fees.mjs && node scripts/check-launch-readiness.mjs",

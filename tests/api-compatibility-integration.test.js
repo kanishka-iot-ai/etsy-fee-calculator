@@ -533,3 +533,48 @@ test("Step 11C.13: Legacy Parity Audit via Full v1.1.1 Pipeline Across All 12 Ba
 
   assert.equal(Object.keys(comparisonResults).length, 12);
 });
+
+test("Production Regression: browser native fetch binding, custom fetch injection, and v1.1.1 62-market loading", async () => {
+  const originalFetch = globalThis.fetch;
+  try {
+    // 1. Emulate strict browser Window.fetch which fails if unbound
+    function strictBrowserFetch(url, init) {
+      if (this !== globalThis) {
+        throw new TypeError("Failed to execute 'fetch' on 'Window': Illegal invocation");
+      }
+      return Promise.resolve({
+        ok: true,
+        json: async () => V1_1_1_API_FIXTURE
+      });
+    }
+
+    globalThis.fetch = strictBrowserFetch;
+
+    // Default client with no options must use bound fetch without error
+    const client = new FeeIntelligenceClient("https://mock.etsy.test");
+    const payload = await client.fetchFees();
+    assert.equal(payload.version_id, "v1.1.1");
+    assert.equal(payload.countryOrder.length, 62);
+
+    // 2. Custom injected fetch functions continue to work
+    let customCalls = 0;
+    const customFetch = async () => {
+      customCalls++;
+      return {
+        ok: true,
+        json: async () => V1_1_1_API_FIXTURE
+      };
+    };
+    const customClient = new FeeIntelligenceClient("https://mock.etsy.test", { fetch: customFetch });
+    const customPayload = await customClient.fetchFees();
+    assert.equal(customCalls, 1);
+    assert.equal(customPayload.countryOrder.length, 62);
+
+    // 3. Normalized loading yields all 62 markets
+    const schedules = await client.getAllNormalizedFeeSchedules();
+    assert.equal(schedules.size, 62);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
