@@ -551,4 +551,59 @@ test("methodology page enforces authoritative formula separation, binary search,
   assert.match(html, /"@id":\s*"https:\/\/shopprofitcalculator\.com\/methodology\/#article"/);
 });
 
+test("/fees/ route satisfies all Phase 2 Step 2 search-intent, authority, and fee consistency standards", async () => {
+  const html = await read("../fees.html");
+
+  // 1. Primary intent & metadata
+  assert.equal(attr(html, /<link rel="canonical" href="([^"]+)"/), "https://shopprofitcalculator.com/fees/");
+  assert.equal(attr(html, /<title>([^<]+)<\/title>/), "Etsy Fee Calculator — Calculate Etsy Seller Fees | ShopProfit");
+  assert.match(html, /<h1\b[^>]*>Etsy Fee Calculator<\/h1>/);
+  assert.equal((html.match(/<h1\b/g) || []).length, 1, "exactly one H1");
+
+  // 2. Interactive calculator integration
+  assert.ok(html.includes('id="sale-form"'), "interactive calculator form present");
+  assert.ok(html.includes('id="result-heading"'), "fee breakdown ledger present");
+  assert.ok(html.includes('id="net-profit"'), "net profit output present");
+
+  // 3. Official fee rates & terminology
+  assert.match(html, /6\.5% transaction fee/);
+  assert.match(html, /\$0\.20 USD listing fee/);
+  assert.match(html, /Etsy Payments processing fees/);
+
+  // 4. Regulatory Operating Fees (9 statutory jurisdictions, no synthetic zeroes)
+  const regMarkets = ["United Kingdom", "France", "Hungary", "India", "Italy", "Spain", "Türkiye", "Canada", "Vietnam"];
+  for (const m of regMarkets) {
+    assert.ok(html.includes(m), `Regulatory jurisdiction ${m} present`);
+  }
+  assert.ok(!html.includes("No regulatory operating fee is currently charged (0.00%)"), "No synthetic zeroes for unlisted jurisdictions");
+
+  // 5. Offsite Ads statutory cap & link
+  assert.match(html, /\$100\.00 USD/);
+  assert.match(html, /30-day attribution window/);
+  assert.ok(html.includes('href="/etsy-offsite-ads-calculator/"'), "links to dedicated offsite ads tool");
+
+  // 6. Other Etsy Charges section
+  assert.match(html, /Other Etsy Charges \(Account-Level &amp; Non-Transaction Costs\)/);
+  assert.match(html, /Etsy Ads \(On-Platform CPC\)/);
+  assert.match(html, /Shipping Labels/);
+  assert.match(html, /Statutory Deposit &amp; Bank Transfer Fees/);
+  assert.match(html, /Currency Conversion \(2\.5%\)/);
+
+  // 7. Why Etsy fees vary by country section
+  assert.match(html, /Why Etsy Fees Vary by Country/);
+
+  // 8. Separated formula & Methodology link
+  assert.match(html, /platform fees = listing fee \+ transaction fee \+ payment processing fee \+ regulatory operating fee \+ offsite ads fee/);
+  assert.ok(html.includes('href="/methodology/"'), "links to methodology");
+
+  // 9. Structured data
+  const appSchema = html.match(/"@type":\s*"WebApplication"/);
+  assert.ok(appSchema, "WebApplication schema present");
+  const faqMatch = html.match(/<script type="application\/ld\+json" id="fees-faq-schema">([\s\S]*?)<\/script>/);
+  assert.ok(faqMatch, "FAQPage schema present");
+  const parsedFaq = JSON.parse(faqMatch[1]);
+  assert.ok(parsedFaq.mainEntity.length >= 6, "at least 6 FAQs");
+});
+
+
 
