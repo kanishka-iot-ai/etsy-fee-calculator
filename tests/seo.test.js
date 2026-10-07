@@ -297,7 +297,7 @@ test("fees, methodology and FAQ routes are indexable, crawlable resources with c
   assert.match(faq, /id="faq-schema"/);
   assert.match(faq, /<details[^>]*><summary>How do I calculate Etsy profit\?/);
   const methodology = await read("../methodology.html");
-  assert.match(methodology, /net profit = gross revenue − platform fees − production cost − packaging\/shipping cost − Etsy Plus allocation/);
+  assert.match(methodology, /net profit = gross revenue − platform fees − order costs − shop overhead/);
   for (const [path, target] of [
     ["/etsy-profit-calculator", "/ 301"], ["/etsy-fee-calculator", "/fees/ 301"],
     ["/etsy-pricing-calculator", "/etsy-pricing-calculator/ 301"], ["/etsy-break-even-calculator", "/etsy-break-even-calculator/ 301"],
@@ -504,4 +504,51 @@ test("sitemap.xml is valid XML with exactly 15 canonical URLs and explicit appli
   );
   assert.ok(!headers.includes("/sitemap.xml\n  X-Robots-Tag"), "sitemap rule has no noindex");
 });
+
+test("methodology page enforces authoritative formula separation, binary search, 62 markets, and canonical official sources", async () => {
+  const html = await read("../methodology.html");
+
+  // 1. Formula accuracy: Platform fees must NOT include Etsy Plus
+  assert.match(html, /platform fees = listing fee \+ transaction fee \+ payment processing fee \+ regulatory operating fee \+ offsite ads fee/);
+  assert.ok(!html.includes("platform fees = listing fee + transaction fee + payment processing + regulatory operating fee + offsite ads + etsy plus allocation"), "No double-counted Etsy Plus in platform fees");
+
+  // 2. Net profit formula
+  assert.match(html, /net profit = gross revenue − platform fees − order costs − shop overhead/);
+  assert.match(html, /shop overhead = Etsy Plus monthly amortization/);
+
+  // 3. Algorithm: Integer binary search, not linear/ascending search
+  assert.match(html, /integer binary-search algorithm/);
+  assert.ok(!html.includes("cent-by-cent ascending search"), "No misleading linear ascending search claim");
+
+  // 4. 62-market architecture
+  assert.match(html, /62 sovereign Etsy Payments markets/);
+  assert.match(html, /Cloudflare Worker API/);
+  assert.match(html, /v1\.1\.1/);
+  assert.match(html, /src\/fee-intelligence-client\.js/);
+
+  // 5. Official Etsy sources (canonical en-us links only)
+  assert.match(html, /https:\/\/help\.etsy\.com\/hc\/en-us\/articles\/115014483627/);
+  assert.match(html, /https:\/\/help\.etsy\.com\/hc\/en-us\/articles\/115015628847/);
+  assert.match(html, /https:\/\/help\.etsy\.com\/hc\/en-us\/articles\/1500011073202/);
+  assert.match(html, /https:\/\/help\.etsy\.com\/hc\/en-us\/articles\/360000338367/);
+  assert.match(html, /https:\/\/help\.etsy\.com\/hc\/en-us\/articles\/360000344668/);
+  assert.ok(!html.includes("/hc/en-in/"), "No localized en-in links; standard canonical only");
+
+  // 6. Regulatory fee jurisdictions (all 9 statutory markets)
+  const statutoryRegMarkets = ["United Kingdom", "France", "Italy", "Spain", "Canada", "Türkiye", "India", "Vietnam", "Hungary"];
+  for (const m of statutoryRegMarkets) {
+    assert.ok(html.includes(m), `Regulatory jurisdiction ${m} present`);
+  }
+
+  // 7. Statutory deposit schedules
+  assert.match(html, /42 TRY/);
+  assert.match(html, /45,000 VND/);
+  assert.match(html, /28,000 IDR/);
+  assert.match(html, /charged per bank payout event/);
+
+  // 8. TechArticle structured data
+  assert.match(html, /"@type":\s*"TechArticle"/);
+  assert.match(html, /"@id":\s*"https:\/\/shopprofitcalculator\.com\/methodology\/#article"/);
+});
+
 

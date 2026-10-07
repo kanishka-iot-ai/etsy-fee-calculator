@@ -52,6 +52,16 @@
         "isPartOf": { "@id": "https://shopprofitcalculator.com/#website" }
       },
       {
+        "@type": "TechArticle",
+        "@id": "https://shopprofitcalculator.com/methodology/#article",
+        "isPartOf": { "@id": "https://shopprofitcalculator.com/methodology/#webpage" },
+        "headline": "Etsy Profit Calculator Methodology & Fee Calculation Standards",
+        "description": "Technical documentation of ShopProfit's integer-arithmetic fee models, 62-market fee intelligence architecture, binary-search pricing algorithms, and official Etsy regulatory schedules.",
+        "inLanguage": "en-US",
+        "author": { "@id": "https://shopprofitcalculator.com/#organization" },
+        "publisher": { "@id": "https://shopprofitcalculator.com/#organization" }
+      },
+      {
         "@type": "BreadcrumbList",
         "itemListElement": [
           {
@@ -87,6 +97,7 @@
     .resource-copy ul { padding-left: 24px; margin-bottom: 20px; }
     .direct-answer { background: color-mix(in srgb, var(--lime, #c8ff00) 15%, transparent); border-left: 4px solid var(--ink, #080808); padding: 20px; margin: 24px 0 32px; font-size: 16px; line-height: 1.7; }
     .formula { display: block; overflow-wrap: anywhere; margin: 16px 0 24px; padding: 16px 20px; border: 2px solid currentColor; background: #080808; color: #c8ff00; font: 700 13px/1.8 ui-monospace, monospace; }
+    .table-scroll { overflow-x: auto; margin: 20px 0; }
     .provenance-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
     .provenance-table th, .provenance-table td { padding: 12px 14px; border: 1px solid var(--border, #ccc); text-align: left; }
     .provenance-table th { background: var(--bg, #f2f1ec); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -118,50 +129,212 @@
       <h1>How ShopProfit Estimates Etsy Take-Home &amp; Net Profit</h1>
 
       <div class="direct-answer" role="region" aria-label="Methodology Overview">
-        <strong>Calculation Philosophy:</strong> ShopProfit estimates single-order Etsy economics by combining your pricing inputs, direct fulfillment costs, official Etsy fee schedules, and seller country regulations. All calculations are executed locally in the browser using integer-cent arithmetic (avoiding floating-point inaccuracies), providing instantaneous updates with 100% data privacy.
+        <strong>Calculation Philosophy:</strong> ShopProfit estimates single-order Etsy economics by combining your pricing inputs, direct fulfillment costs, official Etsy fee schedules, and registered seller country regulations. All calculations are executed locally in the browser using integer-cent arithmetic (avoiding floating-point inaccuracies), providing instantaneous updates with 100% data privacy.
       </div>
 
-      <h2>1. The Revenue &amp; Deductions Formula</h2>
-      <p>Every calculation reconciles gross customer payment with platform fees and direct business costs to arrive at true net take-home profit:</p>
-      <code class="formula">gross revenue = item price + shipping charged to buyer</code>
-      <code class="formula">total platform fees = listing fee + transaction fee + payment processing + regulatory operating fee + offsite ads + etsy plus allocation</code>
-      <code class="formula">net profit = gross revenue − platform fees − production cost − packaging/shipping cost − Etsy Plus allocation</code>
-      <code class="formula">profit margin = (net profit ÷ gross revenue) × 100</code>
+      <h2>1. The Core Revenue &amp; Net Profit Model</h2>
+      <p>Every ShopProfit calculation reconciles customer payment with direct transaction platform fees, order fulfillment expenses, and optional account overhead to compute true take-home net profit. Order-level deductions are strictly separated from shop-level subscription amortizations:</p>
+
+      <code class="formula">gross revenue = item price + shipping charged to buyer + gift wrapping</code>
+      <code class="formula">platform fees = listing fee + transaction fee + payment processing fee + regulatory operating fee + offsite ads fee</code>
+      <code class="formula">order costs = production cost + packaging/shipping paid + optional marketing</code>
+      <code class="formula">shop overhead = Etsy Plus monthly amortization</code>
+      <code class="formula">net profit = gross revenue − platform fees − order costs − shop overhead</code>
+      <code class="formula">profit margin % = (net profit ÷ gross revenue) × 100</code>
 
       <p class="formula-note">Fee information is based on Etsy's published fee schedules and may change. Check Etsy's current fee policy for the latest applicable fees. Fee schedule reviewed: October 2026.</p>
 
-      <h2>2. Individual Fee Component Mathematics</h2>
-      <h3>A. Listing Fee</h3>
-      <p>Billed at $0.20 USD per listing. All fixed-cost platform fees are published by Etsy in USD and converted to your payment account currency at current market rates when the fee is posted; our models approximate these currency conversions (£0.16 GBP, CA$0.27 CAD, A$0.28 AUD, 0,18 € EUR, ₹16.50 INR, ￥30 JPY, ₺7.00 TRY), subject to floating foreign exchange fluctuations.</p>
+      <h2>2. The Four Distinct Etsy Fee Bases</h2>
+      <p>A common error in amateur fee estimates is applying every percentage fee to the same order sum. In Etsy's actual ledger accounting, different fees assess four distinct financial bases:</p>
+
+      <div class="table-scroll">
+        <table class="provenance-table">
+          <thead>
+            <tr>
+              <th scope="col">Fee Component</th>
+              <th scope="col">Statutory Calculation Base</th>
+              <th scope="col">Inclusions &amp; Exclusions</th>
+              <th scope="col">Official Policy Citation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Transaction Fee (6.5%)</strong></td>
+              <td><code>Item Price + Shipping Charged + Gift Wrap</code></td>
+              <td>Charged on total buyer payment for the item and shipping. <strong>Excludes</strong> sales tax or VAT collected directly by Etsy.</td>
+              <td>Help Center Article 115014483627</td>
+            </tr>
+            <tr>
+              <td><strong>Payment Processing Fee</strong></td>
+              <td><code>Item Price + Shipping Charged + Gift Wrap + Buyer Tax/VAT</code></td>
+              <td>Charged on the <strong>gross settled card payment</strong>. Payment processors charge their percentage on total funds transferred, including marketplace sales tax.</td>
+              <td>Help Center Article 115015628847</td>
+            </tr>
+            <tr>
+              <td><strong>Regulatory Operating Fee</strong></td>
+              <td><code>Item Price + Shipping Charged + Gift Wrap</code></td>
+              <td>Assessed in 9 regulated countries to offset Digital Services Taxes. <strong>Explicitly excludes</strong> sales tax/VAT collected by Etsy.</td>
+              <td>Help Center Article 1500011073202</td>
+            </tr>
+            <tr>
+              <td><strong>Currency Conversion (2.5%)</strong></td>
+              <td><code>Converted Payout Amount</code></td>
+              <td>Assessed when the currency of your item listing differs from the payout currency of your payment account.</td>
+              <td>Help Center Article 360000344668</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>3. Individual Fee Component Mathematics</h2>
+
+      <h3>A. Listing Fee ($0.20 USD equivalent)</h3>
+      <p>Fixed at $0.20 USD per listing. All fixed platform fees are published by Etsy in USD and converted to your payment account currency at current market rates when the fee is posted. Our models reflect standard published equivalents (£0.16 GBP, CA$0.27 CAD, A$0.28 AUD, 0,18 € EUR, ₹16.50 INR, ¥30 JPY, ₺7.00 TRY), subject to exchange-rate adjustments by Etsy.</p>
 
       <h3>B. Transaction Fee (6.5%)</h3>
-      <p>Calculated as 6.5% of gross revenue:</p>
-      <code class="formula">transaction fee = Math.round(gross revenue in cents × 0.065)</code>
+      <p>Assessed as a flat 6.5% on the transaction base (item price + buyer shipping + gift wrapping):</p>
+      <code class="formula">transaction fee = Math.round(transaction base in cents × 0.065)</code>
 
-      <h3>C. Payment Processing Fee</h3>
-      <p>Varies based on seller location. Calculated on gross revenue plus any applicable buyer taxes:</p>
-      <code class="formula">processing fee = Math.round(gross revenue in cents × country processing rate) + country fixed fee in cents</code>
+      <h3>C. Payment Processing Fee (Country Schedule)</h3>
+      <p>Assessed on the gross payment processing base according to your registered seller country:</p>
+      <code class="formula">processing fee = Math.round(processing base in cents × country processing rate) + country fixed fee in cents</code>
+      <p>Our calculator models domestic default schedules by default, with international buyer rate variations documented for dual-tier jurisdictions such as Canada (3.0% + $0.25 CAD domestic vs. 4.0% + $0.25 CAD international) and Australia (3.0% + A$0.25 domestic vs. 4.0% + A$0.25 international).</p>
 
-      <h3>D. Regulatory Operating Fee</h3>
-      <p>Where applicable across 9 regulated jurisdictions (UK: 0.48%, France: 1.14%, Italy: 0.80%, Spain: 0.88%, Canada: 0.50%, Turkey: 1.67%, India: 0.05%, Vietnam: 1.24%, Hungary: 1.97%):</p>
-      <code class="formula">regulatory fee = Math.round(gross revenue in cents × country regulatory rate)</code>
+      <h3>D. Regulatory Operating Fee (9 Statutory Jurisdictions)</h3>
+      <p>Assessed exclusively in nine statutory jurisdictions where local governments levy Digital Services Taxes on platform operators:</p>
+      <ul>
+        <li><strong>United Kingdom:</strong> 0.48%</li>
+        <li><strong>France:</strong> 1.14%</li>
+        <li><strong>Italy:</strong> 0.80%</li>
+        <li><strong>Spain:</strong> 0.88%</li>
+        <li><strong>Canada:</strong> 0.50%</li>
+        <li><strong>Türkiye:</strong> 1.67%</li>
+        <li><strong>India:</strong> 0.05%</li>
+        <li><strong>Vietnam:</strong> 1.24%</li>
+        <li><strong>Hungary:</strong> 1.97%</li>
+      </ul>
+      <code class="formula">regulatory fee = Math.round(regulatory base in cents × country regulatory rate)</code>
+      <p>All other sovereign jurisdictions are officially unlisted by Etsy (modeled as unassessed/null in ShopProfit metadata, not synthetic zeroes).</p>
 
-      <h3>E. Offsite Ads Fee (0%, 12%, or 15%)</h3>
-      <p>When an order is attributed to an external ad, the selected fee rate is assessed and capped at $100.00 USD (or equivalent in local currency):</p>
-      <code class="formula">offsite fee = Math.min(Math.round(gross revenue in cents × offsite rate), country offsite cap in cents)</code>
+      <h3>E. Offsite Ads Fee (0%, 12%, or 15% with Statutory Cap)</h3>
+      <p>When an order is attributed to an external advertising click within a 30-day window, Etsy charges an advertising fee based on trailing 12-month sales volume:</p>
+      <ul>
+        <li><strong>15% optional tier:</strong> Applied to shops earning under $10,000 USD in trailing 365-day gross sales (sellers may opt out).</li>
+        <li><strong>12% mandatory tier:</strong> Applied to shops earning $10,000 USD or more in trailing 365-day gross sales (mandatory for the lifetime of the shop).</li>
+        <li><strong>Statutory fee cap:</strong> Under official Etsy policy, the maximum Offsite Ads fee on any single attributed order is strictly <strong>$100.00 USD</strong> (or local currency equivalent converted at settlement).</li>
+      </ul>
+      <code class="formula">offsite fee = Math.min(Math.round(gross revenue in cents × offsite rate), statutory cap in cents)</code>
+      <p>ShopProfit's fee engine represents the cap internally as <code>{ amount: 100, currency: "USD", type: "usd_equivalent" }</code> without hardcoding approximate local fiat caps (£80, CA$135) or inventing synthetic exchange rates.</p>
 
-      <h3>F. Etsy Plus Proration</h3>
-      <p>When the Etsy Plus subscription toggle is enabled, the monthly $10 subscription is prorated across your estimated monthly sales volume:</p>
+      <h3>F. Currency Conversion Fee (2.5%)</h3>
+      <p>When a seller lists products in a currency different from their bank account deposit currency, Etsy applies a 2.5% currency conversion charge on the payment amount. For single-currency domestic listings, this conversion fee is $0.00.</p>
+
+      <h3>G. Etsy Plus Monthly Amortization</h3>
+      <p>When the optional Etsy Plus subscription toggle is enabled, the fixed $10.00 USD/month subscription (or local currency equivalent) is amortized across your estimated monthly sales volume:</p>
       <code class="formula">etsy plus per sale = Math.round(monthly plus cost in cents ÷ sales per month)</code>
 
-      <h2>3. Pricing Helpers: Break-Even &amp; Target Profit</h2>
-      <h3>A. Break-Even Price Calculation</h3>
-      <p>The break-even price is the exact minimum item selling price required so that net profit equals $0.00, keeping buyer shipping, production costs, shipping costs, and advertising rates constant. ShopProfit solves for break-even through an exact cent-by-cent ascending search that guarantees mathematical convergence even under nonlinear fee caps.</p>
+      <h2>4. Account-Level Disbursement &amp; Deposit Schedules</h2>
+      <p>In addition to per-order sale deductions, Etsy assesses statutory deposit and bank transfer fees on disbursements in nine countries under official Help Center Article 115015628847 Table 2. These fees are charged per bank payout event when the deposit amount falls below the statutory threshold, rather than per individual sale:</p>
 
-      <h3>B. Target Profit Price Calculation</h3>
-      <p>Target profit pricing calculates the necessary item price to yield your desired dollar take-home amount after covering all platform deductions and fulfillment costs.</p>
+      <div class="table-scroll">
+        <table class="provenance-table">
+          <thead>
+            <tr>
+              <th scope="col">Country</th>
+              <th scope="col">Currency</th>
+              <th scope="col">Daily Minimum Deposit</th>
+              <th scope="col">Fee Threshold</th>
+              <th scope="col">Disbursement Fee Below Threshold</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Indonesia (ID)</strong></td>
+              <td>IDR</td>
+              <td>28,000 IDR</td>
+              <td>1,400,000 IDR</td>
+              <td>28,000 IDR</td>
+            </tr>
+            <tr>
+              <td><strong>Israel (IL)</strong></td>
+              <td>ILS</td>
+              <td>7 ILS</td>
+              <td>350 ILS</td>
+              <td>7 ILS</td>
+            </tr>
+            <tr>
+              <td><strong>Malaysia (MY)</strong></td>
+              <td>MYR</td>
+              <td>9 MYR</td>
+              <td>400 MYR</td>
+              <td>8 MYR</td>
+            </tr>
+            <tr>
+              <td><strong>Mexico (MX)</strong></td>
+              <td>MXN</td>
+              <td>40 MXN</td>
+              <td>2,000 MXN</td>
+              <td>40 MXN</td>
+            </tr>
+            <tr>
+              <td><strong>Morocco (MA)</strong></td>
+              <td>MAD</td>
+              <td>20 MAD</td>
+              <td>1,000 MAD</td>
+              <td>20 MAD</td>
+            </tr>
+            <tr>
+              <td><strong>Philippines (PH)</strong></td>
+              <td>PHP</td>
+              <td>100 PHP</td>
+              <td>5,000 PHP</td>
+              <td>100 PHP</td>
+            </tr>
+            <tr>
+              <td><strong>South Africa (ZA)</strong></td>
+              <td>ZAR</td>
+              <td>35 ZAR</td>
+              <td>1,500 ZAR</td>
+              <td>30 ZAR</td>
+            </tr>
+            <tr>
+              <td><strong>Türkiye (TR)</strong></td>
+              <td>TRY</td>
+              <td>50 TRY</td>
+              <td>600 TRY</td>
+              <td>42 TRY</td>
+            </tr>
+            <tr>
+              <td><strong>Vietnam (VN)</strong></td>
+              <td>VND</td>
+              <td>45,000 VND</td>
+              <td>2,300,000 VND</td>
+              <td>45,000 VND</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <h2>4. Data Provenance &amp; System Assumptions</h2>
+      <h2>5. Pricing Solvers: Integer Binary Search Algorithm</h2>
+
+      <h3>A. Break-Even Price Solver</h3>
+      <p>The unit break-even price is the exact minimum item selling price required for net profit to equal $0.00 while keeping shipping, production costs, and marketing selections constant. ShopProfit solves for break-even through an <strong>integer binary-search algorithm</strong> that guarantees convergence in under 32 iterations ($O(\log N)$) while accounting for component-level integer rounding and fee caps. Explore our standalone <a href="/etsy-break-even-calculator/">Etsy break-even calculator</a> for targeted unit economics.</p>
+
+      <h3>B. Target Profit Price Solver</h3>
+      <p>Target profit pricing calculates the item price required to achieve an exact dollar net profit target after all platform deductions and expenses. The solver executes the same logarithmic binary search against the unified calculation engine. Plan custom pricing strategies with our <a href="/etsy-pricing-calculator/">Etsy pricing calculator</a>.</p>
+
+      <h2>6. 62-Market Edge Fee Intelligence Architecture</h2>
+      <p>ShopProfit delivers fee schedules across <strong>62 sovereign Etsy Payments markets</strong> through a robust multi-tier data architecture:</p>
+      <ul>
+        <li><strong>Cloudflare Worker API:</strong> Public, read-only endpoint (<code>/v1/fees</code>) serving normalized fee schedules across all 62 sovereign Etsy Payments markets.</li>
+        <li><strong>D1 Storage Layer:</strong> Backed by edge SQL storage maintaining strict version control (active version: <code>v1.1.1</code>).</li>
+        <li><strong>Client-Side Schema Validation:</strong> The client engine (<code>src/fee-intelligence-client.js</code>) verifies response structures, currency codes, and version tags at runtime.</li>
+        <li><strong>Stale-While-Revalidate Client Caching:</strong> Stores validated fee tables in local browser storage with a 1-hour time-to-live (TTL) to ensure rapid loading without redundant network transfers.</li>
+        <li><strong>Deterministic Baseline Fallback:</strong> If network connectivity is unavailable, the calculator falls back immediately to immutable baseline schedules, preventing application errors.</li>
+        <li><strong>Cryptographic Policy Watchdog:</strong> Automated CI/CD tools verify official Etsy Help Center policy hashes daily to flag fee modifications.</li>
+      </ul>
+
+      <h2>7. Data Provenance &amp; System Assumptions</h2>
       <div class="table-scroll">
         <table class="provenance-table">
           <thead>
@@ -183,13 +356,13 @@
               <td><strong>Materials &amp; Packaging</strong></td>
               <td>User input</td>
               <td>Exact cents</td>
-              <td>Direct variable costs entered by seller.</td>
+              <td>Direct variable fulfillment costs entered by seller.</td>
             </tr>
             <tr>
               <td><strong>6.5% Transaction Fee</strong></td>
               <td>Etsy Official Policy</td>
               <td>Rounded cent</td>
-              <td>Charged on item price + shipping charged.</td>
+              <td>Charged on item price + shipping charged + gift wrap.</td>
             </tr>
             <tr>
               <td><strong>Payment Processing</strong></td>
@@ -207,7 +380,7 @@
               <td><strong>Offsite Ads Rate</strong></td>
               <td>User selector</td>
               <td>12% or 15%</td>
-              <td>Strictly capped at $100 USD (or local currency cap).</td>
+              <td>Strictly capped at $100 USD (or converted local currency cap).</td>
             </tr>
             <tr>
               <td><strong>Sales Tax &amp; VAT</strong></td>
@@ -219,28 +392,42 @@
               <td><strong>Currency Conversion</strong></td>
               <td>Local schedule</td>
               <td>Static table</td>
-              <td>Fee models correspond to local bank account currency; FX conversion not modeled.</td>
+              <td>Fee models correspond to local bank account currency; FX conversion modeled when currencies differ.</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <h2>5. Official Etsy Documentation Sources</h2>
-      <p>ShopProfit audits all fee schedules against official Etsy Help Center documentation. Fee schedules reviewed: <strong>October 2026</strong>.</p>
+      <h2>8. Official Etsy Documentation Sources</h2>
+      <p>ShopProfit audits all fee schedules against authoritative Etsy Help Center documentation. Fee schedules reviewed: <strong>October 2026</strong>.</p>
       <ul>
-        <li><a href="https://help.etsy.com/hc/en-in/articles/115014483627-What-are-the-Fees-and-Taxes-for-Selling-on-Etsy" target="_blank" rel="noopener noreferrer">What are the Fees and Taxes for Selling on Etsy? (Etsy Help Center)</a></li>
-        <li><a href="https://help.etsy.com/hc/en-us/articles/115015628847-What-are-Payment-Processing-Fees-for-Selling-on-Etsy" target="_blank" rel="noopener noreferrer">What are Payment Processing Fees for Selling on Etsy?</a></li>
-        <li><a href="https://help.etsy.com/hc/en-us/articles/1500011073202-What-is-a-Regulatory-Operating-Fee" target="_blank" rel="noopener noreferrer">What is a Regulatory Operating Fee?</a></li>
-        <li><a href="https://help.etsy.com/hc/en-us/articles/360000338367-How-Etsy-s-Offsite-Ads-Work" target="_blank" rel="noopener noreferrer">How Etsy's Offsite Ads Work</a></li>
-        <li><a href="https://help.etsy.com/hc/en-us/articles/360001589928-What-is-Etsy-Plus" target="_blank" rel="noopener noreferrer">What is Etsy Plus?</a></li>
+        <li><a href="https://help.etsy.com/hc/en-us/articles/115014483627-What-are-the-Fees-and-Taxes-for-Selling-on-Etsy" target="_blank" rel="noopener noreferrer">What are the Fees and Taxes for Selling on Etsy? (Etsy Help Center Article 115014483627)</a> — Authoritative schedule for the $0.20 listing fee and 6.5% transaction fee.</li>
+        <li><a href="https://help.etsy.com/hc/en-us/articles/115015628847-What-are-Payment-Processing-Fees-for-Selling-on-Etsy" target="_blank" rel="noopener noreferrer">What are Payment Processing Fees for Selling on Etsy? (Etsy Help Center Article 115015628847)</a> — Sovereign payment processing percentages, fixed fees, and Table 2 statutory deposit thresholds.</li>
+        <li><a href="https://help.etsy.com/hc/en-us/articles/1500011073202-What-is-a-Regulatory-Operating-Fee" target="_blank" rel="noopener noreferrer">What is a Regulatory Operating Fee? (Etsy Help Center Article 1500011073202)</a> — Digital Services Tax pass-through schedules across 9 regulated jurisdictions.</li>
+        <li><a href="https://help.etsy.com/hc/en-us/articles/360000338367-How-Etsy-s-Offsite-Ads-Work" target="_blank" rel="noopener noreferrer">How Etsy's Offsite Ads Work (Etsy Help Center Article 360000338367)</a> — 12% mandatory and 15% optional advertising tiers, 30-day attribution, and $100 USD cap.</li>
+        <li><a href="https://help.etsy.com/hc/en-us/articles/360000344668-Currency-Conversion-on-Etsy" target="_blank" rel="noopener noreferrer">Currency Conversion on Etsy (Etsy Help Center Article 360000344668)</a> — 2.5% currency conversion fee on foreign currency listings.</li>
+        <li><a href="https://help.etsy.com/hc/en-us/articles/360001589928-What-is-Etsy-Plus" target="_blank" rel="noopener noreferrer">What is Etsy Plus? (Etsy Help Center Article 360001589928)</a> — Monthly shop subscription package and credits.</li>
+      </ul>
+
+      <h2>9. Limitations &amp; Practical Disclaimers</h2>
+      <p>While ShopProfit strives for exact calculation accuracy, sellers should be aware of standard operational parameters:</p>
+      <ul>
+        <li><strong>Policy Changes:</strong> Etsy updates payment processing rates, regulatory surcharges, and country availability periodically. Always refer to your active shop dashboard for contractual updates.</li>
+        <li><strong>Foreign Exchange:</strong> Fixed USD charges ($0.20 listing fee, $100 Offsite Ads cap) are converted into local settlement currencies by Etsy using daily bank exchange rates.</li>
+        <li><strong>Taxes and Withholdings:</strong> Local sales taxes, VAT, GST, and income taxes vary by seller circumstances, tax residency, and registration thresholds.</li>
+        <li><strong>Independent Service:</strong> ShopProfit is an independent educational and analytical utility. It is not affiliated with, sponsored by, or endorsed by Etsy, Inc.</li>
+        <li><strong>Verification:</strong> Always verify your actual disbursements and ledger entries against your official Etsy Payment Account statement.</li>
       </ul>
 
       <div class="resource-links" aria-label="Explore more seller resources">
         <a href="/#calculator">Open Calculator</a>
         <a href="/fees/">Etsy Fees Guide</a>
-        <a href="/faq/">Seller FAQs</a>
+        <a href="/etsy-pricing-calculator/">Pricing Calculator</a>
+        <a href="/etsy-break-even-calculator/">Break-Even Calculator</a>
+        <a href="/etsy-offsite-ads-calculator/">Offsite Ads Calculator</a>
         <a href="/etsy-digital-download-fee-calculator">Digital Product Calculator</a>
-        <a href="/etsy-fee-calculator-uk">UK Fee Calculator</a>
+        <a href="/etsy-print-on-demand-calculator/">Print on Demand Calculator</a>
+        <a href="/faq/">Seller FAQs</a>
       </div>
     </article>
 
@@ -248,5 +435,5 @@
       <a href="/">ShopProfit</a> · Independent calculator. Not affiliated with Etsy, Inc.
     </p>
   </main>
-  </body>
+</body>
 </html>
