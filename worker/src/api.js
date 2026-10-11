@@ -70,6 +70,9 @@ export function formatDepositSchedule(row) {
   };
 }
 
+const VERSION_PARAM_RE = /^v?\d+\.\d+\.\d+(?:-[A-Za-z0-9._-]+)?$/;
+const COUNTRY_CODE_RE = /^(?:[A-Z]{2}|OTHER)$/;
+
 /**
  * Handles GET /v1/fees
  * Returns the complete active fee schedule across all supported countries.
@@ -80,7 +83,18 @@ export async function handleGetFees(request, env) {
 
   // Query version: specified historical version or current active version
   let versionRes;
-  if (requestedVersion) {
+  if (requestedVersion !== null) {
+    if (!VERSION_PARAM_RE.test(requestedVersion) || requestedVersion.length > 32) {
+      return new Response(JSON.stringify({ error: "Invalid fee version format" }), {
+        status: 400,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          ...PUBLIC_SECURITY_HEADERS
+        }
+      });
+    }
+
     versionRes = await env.DB.prepare(`
       SELECT version_id, version_label, published_at, source_hash, notes
       FROM fee_versions
@@ -218,7 +232,18 @@ export async function handleGetFees(request, env) {
  * Handles GET /v1/fees/:country
  */
 export async function handleGetCountryFee(request, env, countryCode) {
-  const code = countryCode.toUpperCase();
+  const code = String(countryCode || "").toUpperCase();
+  if (!COUNTRY_CODE_RE.test(code)) {
+    return new Response(JSON.stringify({ error: "Invalid country code format" }), {
+      status: 400,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        ...PUBLIC_SECURITY_HEADERS
+      }
+    });
+  }
+
   const query = `
     SELECT 
       c.country_code,

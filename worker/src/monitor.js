@@ -7,6 +7,86 @@
 const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 ShopProfitMonitor/1.0";
 
 /**
+ * Etsy Help Center article IDs are 12–13 digit numeric strings (e.g. "115015628847", "1500011073202").
+ * Matches the exact format of all registered source IDs in governance.js OFFICIAL_SOURCES.
+ * Reject anything else to prevent SSRF or path traversal via source_id (L3).
+ */
+export const ETSY_SOURCE_ID_RE = /^\d{12,13}$/;
+
+export function isValidEtsySourceId(sourceId) {
+  return typeof sourceId === "string" && ETSY_SOURCE_ID_RE.test(sourceId);
+}
+
+/**
+ * Approved outbound host for Etsy Help Center monitoring fetches.
+ */
+export const ETSY_HELP_HOST = "help.etsy.com";
+
+/**
+ * Default approved webhook destination hosts (L4).
+ * Can be extended via env.ALLOWED_WEBHOOK_HOSTS (comma-separated hostnames).
+ */
+export const DEFAULT_APPROVED_WEBHOOK_HOSTS = new Set([
+  "hooks.slack.com",
+  "discord.com",
+  "discordapp.com",
+  "events.pagerduty.com",
+  "api.opsgenie.com",
+  "shopprofitcalculator.com",
+  "api.shopprofitcalculator.com"
+]);
+
+function isDisallowedHostname(hostname) {
+  const host = hostname.toLowerCase();
+  if (
+    host === "localhost" ||
+    host.endsWith(".localhost") ||
+    host.endsWith(".local") ||
+    host.endsWith(".internal") ||
+    host.startsWith("[") || // IPv6 literal
+    /^\d{1,3}(\.\d{1,3}){3}$/.test(host) // IPv4 literal
+  ) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Validates and returns a normalized HTTPS webhook URL string, or null if invalid (L4).
+ * - Requires https: scheme.
+ * - Rejects malformed URLs, embedded credentials, and IP/localhost/internal hosts.
+ * - Restricts destination host to approved webhook hosts (default allowlist + optional env override).
+ * Callers must also pass redirect: "error" in fetch() to prevent redirect-based bypass.
+ */
+export function validateWebhookUrl(raw, options = {}) {
+  if (!raw || typeof raw !== "string") return null;
+  let parsed;
+  try {
+    parsed = new URL(raw);
+  } catch {
+    return null;
+  }
+  if (parsed.protocol !== "https:") return null;
+  if (parsed.username || parsed.password) return null;
+
+  const host = parsed.hostname.toLowerCase();
+  if (!host || isDisallowedHostname(host)) return null;
+
+  const customHosts = typeof options.allowedHosts === "string"
+    ? options.allowedHosts.split(",").map(h => h.trim().toLowerCase()).filter(Boolean)
+    : Array.isArray(options.allowedHosts)
+      ? options.allowedHosts.map(h => String(h).trim().toLowerCase()).filter(Boolean)
+      : [];
+
+  const allowlist = new Set([...DEFAULT_APPROVED_WEBHOOK_HOSTS, ...customHosts]);
+  if (!allowlist.has(host)) {
+    return null;
+  }
+
+  return parsed.href;
+}
+
+/**
  * Computes SHA-256 hex string using native Web Crypto API
  */
 async function computeSha256(text) {
@@ -37,6 +117,7 @@ function generateId(prefix = "id") {
 export async function executeMonitorRun(env) {
   const runId = generateId("run");
   const startedAt = new Date().toISOString();
+  const fetchFn = env?.fetchOverride || fetch;
 
   let sourcesChecked = 0;
   let sourcesChanged = 0;
@@ -56,11 +137,23 @@ export async function executeMonitorRun(env) {
 
     for (const source of sources) {
       sourcesChecked++;
-      const apiUrl = `https://help.etsy.com/api/v2/help_center/en-us/articles/${source.source_id}.json`;
+
+      // L3: Validate source_id matches the exact numeric Etsy article ID format
+      // before constructing the Etsy URL.
+      const sourceIdStr = String(source.source_id ?? "");
+      if (!isValidEtsySourceId(sourceIdStr)) {
+        errors++;
+        lastErrorMessage = "Invalid source_id format in source_registry";
+        console.error(`[Monitor] Skipping source with invalid source_id format: ${sourceIdStr}`);
+        continue;
+      }
+
+      const apiUrl = `https://${ETSY_HELP_HOST}/api/v2/help_center/en-us/articles/${encodeURIComponent(sourceIdStr)}.json`;
       const fetchedAt = new Date().toISOString();
 
       try {
-        const response = await fetch(apiUrl, {
+        const response = await fetchFn(apiUrl, {
+          redirect: "error",
           headers: {
             "User-Agent": USER_AGENT,
             "Accept": "application/json"
@@ -72,7 +165,7 @@ export async function executeMonitorRun(env) {
           await env.DB.prepare(`
             INSERT INTO snapshots (snapshot_id, source_id, fetched_at, http_status, success, error_message)
             VALUES (?, ?, ?, ?, 0, ?);
-          `).bind(generateId("snap"), source.source_id, fetchedAt, response.status, `HTTP ${response.status}`).run();
+          `).bind(generateId("snap"), sourceIdStr, fetchedAt, response.status, `HTTP ${response.status}`).run();
           continue;
         }
 
@@ -94,7 +187,7 @@ export async function executeMonitorRun(env) {
             raw_content, normalized_content, content_hash, normalized_hash,
             parser_version, success
           ) VALUES (?, ?, ?, 200, 'application/json', ?, ?, ?, ?, '1.0.0', 1);
-        `).bind(snapshotId, source.source_id, fetchedAt, rawBody.substring(0, 10000), cleanText.substring(0, 5000), liveHash, liveHash).run();
+        `).bind(snapshotId, sourceIdStr, fetchedAt, rawBody.substring(0, 10000), cleanText.substring(0, 5000), liveHash, liveHash).run();
 
         // Check if content hash changed
         if (source.latest_hash && liveHash !== source.latest_hash) {
@@ -108,7 +201,7 @@ export async function executeMonitorRun(env) {
               old_value, new_value, change_type, detected_at,
               status, validation_message
             ) VALUES (?, ?, ?, 'article_body', ?, ?, 'content_hash_update', ?, 'pending_review', 'Article content changed on help.etsy.com');
-          `).bind(changeId, source.source_id, snapshotId, source.latest_hash, liveHash, fetchedAt).run();
+          `).bind(changeId, sourceIdStr, snapshotId, source.latest_hash, liveHash, fetchedAt).run();
 
           const reviewId = generateId("rev");
           reviewsCreated++;
@@ -120,23 +213,33 @@ export async function executeMonitorRun(env) {
             ) VALUES (?, ?, 'high', 'Official Etsy Policy Content Changed', ?, ?, ?, ?, 'pending');
           `).bind(reviewId, changeId, source.latest_hash, liveHash, source.source_url, fetchedAt).run();
 
-          // Dispatch alert webhook if configured
+          // Dispatch alert webhook if configured.
+          // L4: Validate URL is https://, parseable, and targets an approved host before dispatch.
+          // redirect:"error" prevents a 3xx redirect from bypassing destination validation.
           if (env.ALERT_WEBHOOK_URL) {
-            try {
-              await fetch(env.ALERT_WEBHOOK_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  event: "ETSY_FEE_POLICY_CHANGED",
-                  source: source.source_name,
-                  url: source.source_url,
-                  detectedAt: fetchedAt,
-                  oldHash: source.latest_hash,
-                  newHash: liveHash
-                })
-              });
-            } catch (webhookErr) {
-              console.warn("Webhook dispatch failed:", webhookErr.message);
+            const safeWebhookUrl = validateWebhookUrl(env.ALERT_WEBHOOK_URL, {
+              allowedHosts: env.ALLOWED_WEBHOOK_HOSTS
+            });
+            if (safeWebhookUrl) {
+              try {
+                await fetchFn(safeWebhookUrl, {
+                  method: "POST",
+                  redirect: "error",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    event: "ETSY_FEE_POLICY_CHANGED",
+                    source: source.source_name,
+                    url: source.source_url,
+                    detectedAt: fetchedAt,
+                    oldHash: source.latest_hash,
+                    newHash: liveHash
+                  })
+                });
+              } catch (webhookErr) {
+                console.warn("Webhook dispatch failed:", webhookErr.message);
+              }
+            } else {
+              console.warn("[Monitor] ALERT_WEBHOOK_URL failed security validation — skipping webhook dispatch.");
             }
           }
         }

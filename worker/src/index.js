@@ -21,10 +21,20 @@ import {
   handleGlobalDiscoveryRun
 } from "./admin.js";
 
+// Public API CORS headers — wildcard is appropriate for the read-only public fee API.
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization, If-None-Match",
+  ...PUBLIC_SECURITY_HEADERS
+};
+
+// Admin API response headers — omit Access-Control-Allow-Origin.
+// Admin endpoints require Bearer token auth and are accessed via CLI/scripts only,
+// not from browser contexts. Emitting CORS wildcard on admin routes is unnecessary
+// and contrary to least-privilege (M2).
+const ADMIN_HEADERS = {
+  "Content-Type": "application/json",
   ...PUBLIC_SECURITY_HEADERS
 };
 
@@ -36,8 +46,16 @@ export default {
     const url = new URL(request.url);
     const method = request.method.toUpperCase();
 
+    const isAdminRoute = url.pathname.startsWith("/api/admin/");
+
     // 1. Handle CORS Preflight
     if (method === "OPTIONS") {
+      if (isAdminRoute) {
+        return new Response(null, {
+          status: 204,
+          headers: ADMIN_HEADERS
+        });
+      }
       return new Response(null, {
         status: 204,
         headers: CORS_HEADERS
@@ -92,15 +110,25 @@ export default {
       }
 
       // 4. Protected Admin Routes
-      if (url.pathname.startsWith("/api/admin/")) {
+      if (isAdminRoute) {
+        // M2: Admin 401 uses ADMIN_HEADERS — no CORS wildcard on auth rejection.
         if (!verifyAdminAuth(request, env)) {
           return new Response(JSON.stringify({ error: "Unauthorized: Invalid or missing Bearer token" }), {
             status: 401,
-            headers: {
-              ...CORS_HEADERS,
-              "Content-Type": "application/json"
-            }
+            headers: ADMIN_HEADERS
           });
+        }
+
+        // L2: Reject admin POST requests with unsupported Content-Type.
+        // Only application/json bodies are accepted; other types are invalid.
+        if (method === "POST") {
+          const ct = request.headers.get("Content-Type") || "";
+          if (!ct.toLowerCase().includes("application/json")) {
+            return new Response(JSON.stringify({ error: "Unsupported Media Type: Content-Type must be application/json" }), {
+              status: 415,
+              headers: ADMIN_HEADERS
+            });
+          }
         }
 
         if (method === "GET") {
@@ -150,20 +178,27 @@ export default {
 
       return new Response(JSON.stringify({ error: "Not Found" }), {
         status: 404,
-        headers: {
-          ...CORS_HEADERS,
-          "Content-Type": "application/json"
-        }
+        headers: isAdminRoute
+          ? ADMIN_HEADERS
+          : {
+              ...CORS_HEADERS,
+              "Content-Type": "application/json"
+            }
       });
 
     } catch (err) {
-      console.error("Worker unhandled error:", err);
-      return new Response(JSON.stringify({ error: "Internal Server Error", message: err.message }), {
+      // Log concise server-side diagnostic without exposing request headers or secrets.
+      console.error("Worker unhandled error:", err instanceof Error ? err.message : "Unknown error");
+      // M1: Return only a generic message — internal details (stack, query fragments,
+      // D1 schema) must never be exposed to untrusted callers.
+      return new Response(JSON.stringify({ error: "Internal Server Error" }), {
         status: 500,
-        headers: {
-          ...CORS_HEADERS,
-          "Content-Type": "application/json"
-        }
+        headers: isAdminRoute
+          ? ADMIN_HEADERS
+          : {
+              ...CORS_HEADERS,
+              "Content-Type": "application/json"
+            }
       });
     }
   },

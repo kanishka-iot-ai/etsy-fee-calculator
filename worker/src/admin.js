@@ -9,6 +9,24 @@ import { executeMonitorRun } from "./monitor.js";
 import { publishApprovedChanges, rollbackVersion, getDataQualityReport } from "./publisher.js";
 
 /**
+ * Performs a constant-time string comparison to prevent timing side-channel attacks.
+ * Equivalent to crypto.timingSafeEqual but works on strings without allocating Buffers
+ * in the Workers runtime (which lacks Node.js Buffer). Uses TextEncoder for byte-level ops.
+ */
+function timingSafeEqual(a, b) {
+  const enc = new TextEncoder();
+  const ba = enc.encode(a);
+  const bb = enc.encode(b);
+  // If lengths differ, compare full length of 'a' anyway to prevent length oracle.
+  let result = ba.length === bb.length ? 0 : 1;
+  const len = Math.max(ba.length, bb.length);
+  for (let i = 0; i < len; i++) {
+    result |= (ba[i] ?? 0) ^ (bb[i] ?? 0);
+  }
+  return result === 0;
+}
+
+/**
  * Validates Bearer token authentication
  */
 export function verifyAdminAuth(request, env) {
@@ -21,13 +39,49 @@ export function verifyAdminAuth(request, env) {
   if (!validKey) {
     return false;
   }
-  return token === validKey;
+  // L1: Use constant-time comparison to prevent timing oracle on the token value.
+  return timingSafeEqual(token, validKey);
 }
+
+import { PUBLIC_SECURITY_HEADERS } from "./api.js";
 
 const HEADERS = {
   "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*"
+  "Cache-Control": "no-store",
+  ...PUBLIC_SECURITY_HEADERS
 };
+
+/**
+ * Safely parses a JSON object body from a Request.
+ * Empty bodies resolve to {}; malformed JSON or non-object payloads return an error response.
+ */
+async function parseJsonObject(request) {
+  const raw = await request.text();
+  if (!raw || !raw.trim()) {
+    return { ok: true, body: {} };
+  }
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return {
+        ok: false,
+        response: new Response(JSON.stringify({ error: "Bad Request: JSON body must be an object" }), {
+          status: 400,
+          headers: HEADERS
+        })
+      };
+    }
+    return { ok: true, body: parsed };
+  } catch {
+    return {
+      ok: false,
+      response: new Response(JSON.stringify({ error: "Bad Request: Malformed JSON body" }), {
+        status: 400,
+        headers: HEADERS
+      })
+    };
+  }
+}
 
 /**
  * Handles GET /api/admin/review and GET /api/admin/review-queue
@@ -82,10 +136,23 @@ export async function handleGetReviews(request, env) {
   }), { status: 200, headers: HEADERS });
 }
 
+const ADMIN_ID_RE = /^[A-Za-z0-9._-]{1,128}$/;
+
+function isValidAdminId(value) {
+  return typeof value === "string" && ADMIN_ID_RE.test(value);
+}
+
 /**
  * Handles GET /api/admin/review/:id
  */
 export async function handleGetReviewDetail(request, env, reviewId) {
+  if (!isValidAdminId(reviewId)) {
+    return new Response(JSON.stringify({ error: "Invalid reviewId format" }), {
+      status: 400,
+      headers: HEADERS
+    });
+  }
+
   const query = `
     SELECT 
       r.review_id,
@@ -130,10 +197,9 @@ export async function handleGetReviewDetail(request, env, reviewId) {
  * Approves a detected change with optimistic concurrency checks and idempotency
  */
 export async function handleApproveChange(request, env) {
-  let body = {};
-  try {
-    body = await request.json();
-  } catch {}
+  const parsed = await parseJsonObject(request);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.body;
 
   const reviewId = body.review_id || body.reviewId;
   const changeId = body.change_id || body.changeId;
@@ -144,6 +210,13 @@ export async function handleApproveChange(request, env) {
 
   if (!reviewId && !changeId) {
     return new Response(JSON.stringify({ error: "Missing required review_id or change_id" }), {
+      status: 400,
+      headers: HEADERS
+    });
+  }
+
+  if ((reviewId && !isValidAdminId(reviewId)) || (changeId && !isValidAdminId(changeId))) {
+    return new Response(JSON.stringify({ error: "Invalid review_id or change_id format" }), {
       status: 400,
       headers: HEADERS
     });
@@ -213,10 +286,9 @@ export async function handleApproveChange(request, env) {
  * Rejects a detected change idempotently
  */
 export async function handleRejectChange(request, env) {
-  let body = {};
-  try {
-    body = await request.json();
-  } catch {}
+  const parsed = await parseJsonObject(request);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.body;
 
   const reviewId = body.review_id || body.reviewId;
   const changeId = body.change_id || body.changeId;
@@ -225,6 +297,13 @@ export async function handleRejectChange(request, env) {
 
   if (!reviewId && !changeId) {
     return new Response(JSON.stringify({ error: "Missing required review_id or change_id" }), {
+      status: 400,
+      headers: HEADERS
+    });
+  }
+
+  if ((reviewId && !isValidAdminId(reviewId)) || (changeId && !isValidAdminId(changeId))) {
+    return new Response(JSON.stringify({ error: "Invalid review_id or change_id format" }), {
       status: 400,
       headers: HEADERS
     });
@@ -283,10 +362,9 @@ export async function handleRejectChange(request, env) {
  * Atomically releases approved changes into a new active fee version
  */
 export async function handlePublishVersion(request, env) {
-  let body = {};
-  try {
-    body = await request.json();
-  } catch {}
+  const parsed = await parseJsonObject(request);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.body;
 
   const reviewerFromHeader = request.headers.get("X-Reviewer-Id");
   if (!body.approved_by && !body.reviewed_by && reviewerFromHeader) {
@@ -304,13 +382,19 @@ export async function handlePublishVersion(request, env) {
  * Atomically rolls back to a previous archived fee version
  */
 export async function handleRollbackVersion(request, env) {
-  let body = {};
-  try {
-    body = await request.json();
-  } catch {}
+  const parsed = await parseJsonObject(request);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.body;
 
   const targetVersionId = body.target_version_id || body.targetVersionId || null;
   const reason = body.reason || "Manual rollback initiated via admin API";
+
+  if (targetVersionId !== null && !isValidAdminId(targetVersionId)) {
+    return new Response(JSON.stringify({ error: "Invalid target_version_id format" }), {
+      status: 400,
+      headers: HEADERS
+    });
+  }
 
   try {
     const result = await rollbackVersion(env, targetVersionId, reason);
