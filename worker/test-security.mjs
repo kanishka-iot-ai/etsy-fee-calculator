@@ -28,6 +28,25 @@ const mockDB = {
     return {
       bind(...params) { return this; },
       async first() {
+        if (sql.includes("country_code = ?")) {
+          return {
+            country_code: "US",
+            country_name: "United States",
+            currency_code: "USD",
+            currency_symbol: "$",
+            locale: "en-US",
+            transaction_rate: 0.065,
+            listing_fee_amount: 0.20,
+            processing_rate: 0.03,
+            processing_fixed_amount: 0.25,
+            regulatory_rate: 0,
+            plus_monthly_amount: 10,
+            offsite_cap_amount: 100,
+            version_id: "v1.0.0",
+            version_label: "1.0.0",
+            published_at: "2026-10-06T00:00:00Z"
+          };
+        }
         if (sql.includes("FROM fee_versions")) {
           return {
             version_id: "v1.0.0", version_label: "1.0.0", status: "active",
@@ -463,3 +482,152 @@ test("Existing: GET /health still returns healthy after hardening", async () => 
   const data = await res.json();
   assert.equal(data.status, "healthy");
 });
+
+// ─── Admin rate-limit bucket (/api/admin/*, 20 req / 60s) ─────────────────
+
+test("Admin RL 1 & 2 & 4: /api/admin/* allows 20 requests per 60s and returns 429 without wildcard CORS on the 21st", async () => {
+  const { resetRateLimiter } = await import("./src/rate-limiter.js");
+  resetRateLimiter();
+
+  const clientIp = "203.0.113.77";
+  const headers = {
+    "cf-connecting-ip": clientIp,
+    "Authorization": "Bearer valid-test-token-abc123"
+  };
+
+  // First 20 authenticated admin requests succeed (200)
+  for (let i = 0; i < 20; i++) {
+    const req = new Request("https://api.shopprofitcalculator.com/api/admin/review-queue", { headers });
+    const res = await worker.fetch(req, mockEnv);
+    assert.equal(res.status, 200, `Admin request ${i + 1} should return 200`);
+  }
+
+  // 21st request exceeds the 20 req / 60s admin threshold -> 429
+  const blockedReq = new Request("https://api.shopprofitcalculator.com/api/admin/review-queue", { headers });
+  const blockedRes = await worker.fetch(blockedReq, mockEnv);
+  assert.equal(blockedRes.status, 429, "21st admin request within 60s must return 429");
+  assert.ok(blockedRes.headers.get("Retry-After"), "Admin 429 must include Retry-After header");
+  assert.equal(
+    blockedRes.headers.get("Access-Control-Allow-Origin"),
+    null,
+    "Admin 429 must NOT include Access-Control-Allow-Origin"
+  );
+  assert.equal(blockedRes.headers.get("X-Content-Type-Options"), "nosniff");
+  const blockedBody = await blockedRes.json();
+  assert.deepEqual(blockedBody, { error: "rate_limited" });
+
+  resetRateLimiter();
+});
+
+test("Admin RL 3: Exhausting the admin rate-limit bucket does not affect public API routes for the same IP", async () => {
+  const { resetRateLimiter } = await import("./src/rate-limiter.js");
+  resetRateLimiter();
+
+  const clientIp = "203.0.113.88";
+
+  // Exhaust admin bucket with 20 unauthenticated requests (each returns 401)
+  for (let i = 0; i < 20; i++) {
+    const req = new Request("https://api.shopprofitcalculator.com/api/admin/review-queue", {
+      headers: { "cf-connecting-ip": clientIp }
+    });
+    const res = await worker.fetch(req, mockEnv);
+    assert.equal(res.status, 401);
+  }
+
+  // 21st admin request is rate-limited (429)
+  const adminBlocked = await worker.fetch(
+    new Request("https://api.shopprofitcalculator.com/api/admin/review-queue", {
+      headers: { "cf-connecting-ip": clientIp }
+    }),
+    mockEnv
+  );
+  assert.equal(adminBlocked.status, 429);
+
+  // Public endpoints from the exact same IP remain completely unaffected (200)
+  for (const path of ["/v1/fees", "/v1/fees/US", "/v1/version", "/health"]) {
+    const pubRes = await worker.fetch(
+      new Request(`https://api.shopprofitcalculator.com${path}`, {
+        headers: { "cf-connecting-ip": clientIp }
+      }),
+      mockEnv
+    );
+    assert.equal(pubRes.status, 200, `Public route ${path} must remain 200 when admin bucket is exhausted`);
+  }
+
+  resetRateLimiter();
+});
+
+test("Admin RL 5 & 6: OPTIONS preflight is not rate-limited by the admin bucket and unauthorized requests within limit return 401", async () => {
+  const { resetRateLimiter } = await import("./src/rate-limiter.js");
+  resetRateLimiter();
+
+  const clientIp = "203.0.113.99";
+
+  // Send 25 OPTIONS preflight requests to /api/admin/review-queue — none should consume or trigger 429
+  for (let i = 0; i < 25; i++) {
+    const optRes = await worker.fetch(
+      new Request("https://api.shopprofitcalculator.com/api/admin/review-queue", {
+        method: "OPTIONS",
+        headers: { "cf-connecting-ip": clientIp }
+      }),
+      mockEnv
+    );
+    assert.equal(optRes.status, 204);
+    assert.equal(optRes.headers.get("Access-Control-Allow-Origin"), null);
+  }
+
+  // Subsequent unauthorized GET still returns 401 (bucket was not consumed by OPTIONS)
+  const unauthRes = await worker.fetch(
+    new Request("https://api.shopprofitcalculator.com/api/admin/review-queue", {
+      headers: { "cf-connecting-ip": clientIp }
+    }),
+    mockEnv
+  );
+  assert.equal(unauthRes.status, 401);
+
+  resetRateLimiter();
+});
+
+test("Admin RL 7: No D1 access occurs on unauthorized (401) or rate-limited (429) admin requests", async () => {
+  const { resetRateLimiter } = await import("./src/rate-limiter.js");
+  resetRateLimiter();
+
+  let d1Calls = 0;
+  const spyEnv = {
+    ADMIN_API_KEY: "valid-test-token-abc123",
+    ADMIN_RATE_LIMIT_OPTIONS: { maxRequests: 2, windowMs: 60_000 },
+    DB: {
+      prepare() {
+        d1Calls++;
+        throw new Error("D1 must not be accessed before authentication or when rate-limited");
+      }
+    }
+  };
+
+  const clientHeaders = { "cf-connecting-ip": "203.0.113.101" };
+
+  // Request 1 & 2: Unauthorized -> 401, 0 D1 calls
+  for (let i = 0; i < 2; i++) {
+    const res = await worker.fetch(
+      new Request("https://api.shopprofitcalculator.com/api/admin/review-queue", { headers: clientHeaders }),
+      spyEnv
+    );
+    assert.equal(res.status, 401);
+  }
+
+  // Request 3 (even with valid token): Rate-limited -> 429, 0 D1 calls
+  const rlRes = await worker.fetch(
+    new Request("https://api.shopprofitcalculator.com/api/admin/review-queue", {
+      headers: {
+        ...clientHeaders,
+        "Authorization": "Bearer valid-test-token-abc123"
+      }
+    }),
+    spyEnv
+  );
+  assert.equal(rlRes.status, 429);
+  assert.equal(d1Calls, 0, "D1 must never be queried on 401 or 429 admin responses");
+
+  resetRateLimiter();
+});
+

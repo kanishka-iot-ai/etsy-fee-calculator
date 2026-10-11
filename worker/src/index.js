@@ -6,7 +6,12 @@
  */
 
 import { handleGetFees, handleGetCountryFee, handleGetVersion, PUBLIC_SECURITY_HEADERS } from "./api.js";
-import { checkRateLimit, createRateLimitResponse } from "./rate-limiter.js";
+import {
+  checkRateLimit,
+  createRateLimitResponse,
+  DEFAULT_WINDOW_MS,
+  DEFAULT_ADMIN_MAX_REQUESTS
+} from "./rate-limiter.js";
 import { executeMonitorRun } from "./monitor.js";
 import {
   verifyAdminAuth,
@@ -111,6 +116,16 @@ export default {
 
       // 4. Protected Admin Routes
       if (isAdminRoute) {
+        // Isolated admin rate-limit bucket (20 req / 60s per IP) enforced before auth or D1 access.
+        const adminRl = checkRateLimit(request, "admin", {
+          windowMs: DEFAULT_WINDOW_MS,
+          maxRequests: DEFAULT_ADMIN_MAX_REQUESTS,
+          ...env?.ADMIN_RATE_LIMIT_OPTIONS
+        });
+        if (!adminRl.allowed) {
+          return createRateLimitResponse(adminRl.retryAfter, ADMIN_HEADERS);
+        }
+
         // M2: Admin 401 uses ADMIN_HEADERS — no CORS wildcard on auth rejection.
         if (!verifyAdminAuth(request, env)) {
           return new Response(JSON.stringify({ error: "Unauthorized: Invalid or missing Bearer token" }), {
