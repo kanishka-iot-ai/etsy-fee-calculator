@@ -21,6 +21,15 @@ import {
   asCents,
   OFFICIAL_TRANSACTION_RATE as TRANSACTION_RATE
 } from "./fee-engine.js";
+import {
+  BULK_LIMITS,
+  previewBulkCsv,
+  calculateBulkProducts,
+  filterAndSortBulkResults,
+  generateSampleCsv,
+  serializeBulkResultsToCsv,
+  formatBulkCurrency
+} from "./bulk-analyzer.js";
 
 const DEFAULT_BASELINE_ORDER = Object.freeze([
   "US", "UK", "CA", "AU", "DE", "FR", "IT", "ES", "IN", "JP", "TR", "OTHER"
@@ -69,6 +78,7 @@ let digitalMode = routeCountry === "OTHER";
 let physicalSnapshot = null;
 let toastTimer;
 let outputAnimationFrame = 0;
+let headingResizeFrame = 0;
 let lastCalculation;
 const translatedTextNodes = new WeakMap();
 const translatedAttributes = new WeakMap();
@@ -99,7 +109,7 @@ function translatePage() {
   document.documentElement.lang = LANGUAGES[activeLanguage]?.locale || "en";
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
-      if (!node.nodeValue.trim() || node.parentElement.closest("script, style, #language-nav")) return NodeFilter.FILTER_REJECT;
+      if (!node.nodeValue.trim() || node.parentElement.closest("script, style, #language-nav, #bulk-results-body, #bulk-invalid-rows-list, #bulk-file-name, #bulk-unknown-cols, #bulk-error-banner")) return NodeFilter.FILTER_REJECT;
       return NodeFilter.FILTER_ACCEPT;
     },
   });
@@ -425,6 +435,10 @@ function render() {
   $("#sales-count-wrap").hidden = !state.plus;
   setOutput("#plus-fee", `−${formatCents(data.plusCents)}`);
 
+  const bulkCountryEl = $("#bulk-context-country");
+  if (bulkCountryEl) bulkCountryEl.textContent = countryData.name;
+  refreshBulkOnCalculatorChange();
+
   renderScenarios(state);
   translatePage();
 }
@@ -728,6 +742,450 @@ function setupMenu() {
   });
 }
 
+const bulkState = {
+  rawCsvInput: null,
+  preview: null,
+  results: [],
+  summary: null,
+  activeFilter: "all",
+  sortBy: "rowNumber",
+  sortDir: "asc",
+  isAnalyzed: false
+};
+
+function getBulkDefaults() {
+  return {
+    countryCode: activeCountryCode || "US",
+    orderOrigin: "domestic",
+    offsiteAdsRate: Number($("input[name=offsite]:checked")?.value || 0),
+    plusEnabled: Boolean($("#etsy-plus")?.checked),
+    salesPerMonth: Math.max(1, Math.min(10_000, Number($("#sales-per-month")?.value) || 30)),
+    activeFeeSchedules
+  };
+}
+
+function setBulkErrorBanner(message) {
+  const banner = $("#bulk-error-banner");
+  if (!banner) return;
+  if (!message) {
+    banner.hidden = true;
+    banner.textContent = "";
+    return;
+  }
+  banner.hidden = false;
+  banner.textContent = message;
+}
+
+function renderBulkPreview(preview) {
+  const previewPanel = $("#bulk-preview-panel");
+  const validCountEl = $("#bulk-valid-count");
+  const invalidBadgeEl = $("#bulk-invalid-badge");
+  const invalidCountEl = $("#bulk-invalid-count");
+  const unknownBadgeEl = $("#bulk-unknown-cols-badge");
+  const unknownColsEl = $("#bulk-unknown-cols");
+  const invalidBoxEl = $("#bulk-invalid-box");
+  const invalidListEl = $("#bulk-invalid-rows-list");
+  const analyzeBtn = $("#bulk-analyze-btn");
+  const clearBtn = $("#bulk-clear-btn");
+
+  if (!previewPanel) return;
+
+  if (!preview || !preview.ok) {
+    previewPanel.hidden = true;
+    if (analyzeBtn) analyzeBtn.disabled = true;
+    if (clearBtn) clearBtn.hidden = !bulkState.rawCsvInput;
+    return;
+  }
+
+  previewPanel.hidden = false;
+  if (validCountEl) validCountEl.textContent = String(preview.validCount);
+
+  if (invalidBadgeEl && invalidCountEl) {
+    invalidBadgeEl.hidden = preview.invalidCount === 0;
+    invalidCountEl.textContent = String(preview.invalidCount);
+  }
+
+  if (unknownBadgeEl && unknownColsEl) {
+    const hasUnknown = Array.isArray(preview.unknownHeaders) && preview.unknownHeaders.length > 0;
+    unknownBadgeEl.hidden = !hasUnknown;
+    unknownColsEl.textContent = hasUnknown ? preview.unknownHeaders.join(", ") : "";
+  }
+
+  if (invalidBoxEl && invalidListEl) {
+    invalidListEl.replaceChildren();
+    if (preview.invalidCount > 0) {
+      invalidBoxEl.hidden = false;
+      preview.invalidRows.forEach((inv) => {
+        const li = document.createElement("li");
+        li.textContent = `Row ${inv.rowNumber} (${inv.productName}): ${inv.errors.join(" ")}`;
+        invalidListEl.append(li);
+      });
+    } else {
+      invalidBoxEl.hidden = true;
+    }
+  }
+
+  if (analyzeBtn) analyzeBtn.disabled = preview.validCount === 0;
+  if (clearBtn) clearBtn.hidden = false;
+}
+
+function renderBulkResultsTable() {
+  const tbody = $("#bulk-results-body");
+  const emptyFilterNote = $("#bulk-empty-filter");
+  if (!tbody) return;
+
+  tbody.replaceChildren();
+  const visibleRows = filterAndSortBulkResults(bulkState.results, {
+    filter: bulkState.activeFilter,
+    sortBy: bulkState.sortBy,
+    sortDir: bulkState.sortDir
+  });
+
+  if (emptyFilterNote) {
+    emptyFilterNote.hidden = visibleRows.length > 0;
+  }
+
+  visibleRows.forEach((item) => {
+    const tr = document.createElement("tr");
+    if (item.minorUnits.netProfit < 0) {
+      tr.className = "is-loss-row";
+    }
+
+    const totalSellerCosts = item.totalDirectSellerCosts + item.totals.totalAccountLevelCosts;
+
+    // 1. Product Name
+    const tdName = document.createElement("td");
+    tdName.textContent = item.productName;
+    tr.append(tdName);
+
+    // 2. Price
+    const tdPrice = document.createElement("td");
+    tdPrice.textContent = formatBulkCurrency(item.itemPrice, item);
+    tr.append(tdPrice);
+
+    // 3. Etsy Fees
+    const tdFees = document.createElement("td");
+    tdFees.textContent = formatBulkCurrency(item.totals.totalEtsyFees, item);
+    tr.append(tdFees);
+
+    // 4. Seller Costs
+    const tdCosts = document.createElement("td");
+    tdCosts.textContent = formatBulkCurrency(totalSellerCosts, item);
+    tr.append(tdCosts);
+
+    // 5. Net Profit
+    const tdNet = document.createElement("td");
+    if (item.minorUnits.netProfit < 0) tdNet.className = "is-negative-cell";
+    tdNet.textContent = formatBulkCurrency(item.totals.totalProfit, item);
+    tr.append(tdNet);
+
+    // 6. Margin
+    const tdMargin = document.createElement("td");
+    if (item.minorUnits.netProfit < 0) tdMargin.className = "is-negative-cell";
+    tdMargin.textContent = `${(item.totals.margin * 100).toFixed(1)}%`;
+    tr.append(tdMargin);
+
+    // 7. Break-Even
+    const tdBreakEven = document.createElement("td");
+    tdBreakEven.textContent = formatBulkCurrency(item.totals.breakEvenPrice, item);
+    tr.append(tdBreakEven);
+
+    // 8. Target Price (optional)
+    const tdTarget = document.createElement("td");
+    tdTarget.textContent = item.requiredPriceForTarget !== null
+      ? formatBulkCurrency(item.requiredPriceForTarget, item)
+      : "—";
+    tr.append(tdTarget);
+
+    // 9. 12% Ads Profit
+    const tdAds12 = document.createElement("td");
+    if (item.scenarios.offsiteAds12.minorUnits.netProfit < 0) tdAds12.className = "is-negative-cell";
+    tdAds12.textContent = formatBulkCurrency(item.scenarios.offsiteAds12.totals.totalProfit, item);
+    tr.append(tdAds12);
+
+    // 10. 15% Ads Profit
+    const tdAds15 = document.createElement("td");
+    if (item.scenarios.offsiteAds15.minorUnits.netProfit < 0) tdAds15.className = "is-negative-cell";
+    tdAds15.textContent = formatBulkCurrency(item.scenarios.offsiteAds15.totals.totalProfit, item);
+    tr.append(tdAds15);
+
+    // 11. Status pill + 15% Offsite Ads risk tag
+    const tdStatus = document.createElement("td");
+    const statusPill = document.createElement("span");
+    statusPill.className = `bulk-status-pill status-${item.profitStatus}`;
+    statusPill.textContent = item.profitStatusLabel;
+    tdStatus.append(statusPill);
+
+    if (item.becomesUnprofitableAt15Pct) {
+      const riskTag = document.createElement("span");
+      riskTag.className = "bulk-risk-tag";
+      riskTag.textContent = "15% Ad Loss";
+      tdStatus.append(riskTag);
+    }
+    tr.append(tdStatus);
+
+    tbody.append(tr);
+  });
+}
+
+function renderBulkSummaryAndResults() {
+  const resultsWrap = $("#bulk-results-wrap");
+  if (!resultsWrap) return;
+
+  if (!bulkState.isAnalyzed || !bulkState.summary || bulkState.results.length === 0) {
+    resultsWrap.hidden = true;
+    return;
+  }
+
+  resultsWrap.hidden = false;
+  const s = bulkState.summary;
+
+  const setStat = (sel, val) => {
+    const el = $(sel);
+    if (el) el.textContent = String(val);
+  };
+
+  setStat("#bulk-metric-total", s.productsAnalyzed);
+  setStat("#bulk-metric-profitable", s.profitableCount);
+  setStat("#bulk-metric-losses", s.lossMakingCount);
+  setStat("#bulk-metric-thin", s.thinMarginCount);
+  setStat("#bulk-metric-avg-margin", `${(s.averageMargin * 100).toFixed(1)}%`);
+  setStat("#bulk-metric-offsite-risk", s.offsiteAds15RiskCount);
+
+  setStat("#bulk-filter-count-all", s.productsAnalyzed);
+  setStat("#bulk-filter-count-losses", s.lossMakingCount);
+  setStat("#bulk-filter-count-thin", s.thinMarginCount);
+  setStat("#bulk-filter-count-risk", s.offsiteAds15RiskCount);
+
+  renderBulkResultsTable();
+}
+
+function runBulkAnalysis(showNotification = true) {
+  if (!bulkState.preview || !bulkState.preview.ok || bulkState.preview.validCount === 0) {
+    return;
+  }
+  const defaults = getBulkDefaults();
+  const { results, summary } = calculateBulkProducts(bulkState.preview.validRows, defaults);
+  bulkState.results = results;
+  bulkState.summary = summary;
+  bulkState.isAnalyzed = true;
+  renderBulkSummaryAndResults();
+  if (showNotification) {
+    showToast("Bulk profit analysis complete");
+  }
+}
+
+function handleBulkCsvInput(rawInput, labelName = "Uploaded CSV") {
+  setBulkErrorBanner("");
+  bulkState.rawCsvInput = rawInput;
+  bulkState.isAnalyzed = false;
+  bulkState.results = [];
+  bulkState.summary = null;
+
+  const fileNameEl = $("#bulk-file-name");
+  if (fileNameEl) {
+    fileNameEl.textContent = labelName;
+  }
+
+  const preview = previewBulkCsv(rawInput, getBulkDefaults());
+  bulkState.preview = preview;
+
+  if (!preview.ok) {
+    setBulkErrorBanner(preview.error || "Unable to parse CSV file.");
+    renderBulkPreview(null);
+    renderBulkSummaryAndResults();
+    return false;
+  }
+
+  if (preview.validCount === 0 && preview.invalidCount > 0) {
+    setBulkErrorBanner("No valid product rows found. Please fix the validation errors listed below.");
+  }
+
+  renderBulkPreview(preview);
+  renderBulkSummaryAndResults();
+  return preview.validCount > 0;
+}
+
+function refreshBulkOnCalculatorChange() {
+  if (!bulkState.rawCsvInput) return;
+  const preview = previewBulkCsv(bulkState.rawCsvInput, getBulkDefaults());
+  bulkState.preview = preview;
+  renderBulkPreview(preview);
+  if (bulkState.isAnalyzed && preview.ok && preview.validCount > 0) {
+    runBulkAnalysis(false);
+  }
+}
+
+function clearBulkAnalyzer() {
+  bulkState.rawCsvInput = null;
+  bulkState.preview = null;
+  bulkState.results = [];
+  bulkState.summary = null;
+  bulkState.isAnalyzed = false;
+  bulkState.activeFilter = "all";
+  bulkState.sortBy = "rowNumber";
+  bulkState.sortDir = "asc";
+
+  const fileInput = $("#bulk-file-input");
+  if (fileInput) fileInput.value = "";
+  const fileNameEl = $("#bulk-file-name");
+  if (fileNameEl) fileNameEl.textContent = translate("Drop your product CSV here, or click to browse");
+
+  setBulkErrorBanner("");
+  renderBulkPreview(null);
+  renderBulkSummaryAndResults();
+  const clearBtn = $("#bulk-clear-btn");
+  if (clearBtn) clearBtn.hidden = true;
+}
+
+function downloadTextCsv(csvContent, filename) {
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function setupBulkAnalyzer() {
+  const section = $("#bulk-analyzer");
+  if (!section) return;
+
+  const dropzone = $("#bulk-dropzone");
+  const fileInput = $("#bulk-file-input");
+  const sampleBtn = $("#bulk-download-sample");
+  const demoBtn = $("#bulk-load-demo");
+  const analyzeBtn = $("#bulk-analyze-btn");
+  const clearBtn = $("#bulk-clear-btn");
+  const exportBtn = $("#bulk-export-csv");
+
+  sampleBtn?.addEventListener("click", () => {
+    downloadTextCsv(generateSampleCsv(), "shopprofit-sample-products.csv");
+    showToast("Sample CSV downloaded");
+  });
+
+  demoBtn?.addEventListener("click", () => {
+    const ok = handleBulkCsvInput(generateSampleCsv(), "Demo Catalog (5 sample Etsy products)");
+    if (ok) {
+      runBulkAnalysis(true);
+    }
+  });
+
+  analyzeBtn?.addEventListener("click", () => {
+    runBulkAnalysis(true);
+  });
+
+  clearBtn?.addEventListener("click", () => {
+    clearBulkAnalyzer();
+  });
+
+  exportBtn?.addEventListener("click", () => {
+    if (!bulkState.isAnalyzed || bulkState.results.length === 0) return;
+    const visibleRows = filterAndSortBulkResults(bulkState.results, {
+      filter: bulkState.activeFilter,
+      sortBy: bulkState.sortBy,
+      sortDir: bulkState.sortDir
+    });
+    const rowsToExport = visibleRows.length > 0 ? visibleRows : bulkState.results;
+    const csv = serializeBulkResultsToCsv(rowsToExport);
+    downloadTextCsv(csv, `shopprofit-bulk-analysis-${new Date().toISOString().slice(0, 10)}.csv`);
+    showToast("Enriched CSV exported");
+  });
+
+  const processUploadedFile = async (file) => {
+    if (!file) return;
+    const safeName = String(file.name || "Uploaded file").slice(0, 100);
+    if (file.size > BULK_LIMITS.MAX_FILE_BYTES) {
+      const fileNameEl = $("#bulk-file-name");
+      if (fileNameEl) fileNameEl.textContent = safeName;
+      bulkState.rawCsvInput = null;
+      bulkState.preview = null;
+      bulkState.isAnalyzed = false;
+      setBulkErrorBanner(
+        `File "${safeName}" (${file.size.toLocaleString("en-US")} bytes) exceeds the maximum allowed 1 MiB (${BULK_LIMITS.MAX_FILE_BYTES.toLocaleString("en-US")} bytes).`
+      );
+      renderBulkPreview(null);
+      renderBulkSummaryAndResults();
+      const clr = $("#bulk-clear-btn");
+      if (clr) clr.hidden = false;
+      return;
+    }
+
+    try {
+      const buffer = await file.arrayBuffer();
+      handleBulkCsvInput(new Uint8Array(buffer), safeName);
+    } catch {
+      setBulkErrorBanner("Could not read the selected file. Please verify it is a valid UTF-8 CSV file.");
+    }
+  };
+
+  dropzone?.addEventListener("click", (event) => {
+    if (event.target === fileInput) return;
+    fileInput?.click();
+  });
+
+  dropzone?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      fileInput?.click();
+    }
+  });
+
+  fileInput?.addEventListener("change", () => {
+    const file = fileInput.files?.[0];
+    if (file) processUploadedFile(file);
+  });
+
+  dropzone?.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    dropzone.classList.add("is-dragover");
+  });
+
+  dropzone?.addEventListener("dragleave", () => {
+    dropzone.classList.remove("is-dragover");
+  });
+
+  dropzone?.addEventListener("drop", (event) => {
+    event.preventDefault();
+    dropzone.classList.remove("is-dragover");
+    const file = event.dataTransfer?.files?.[0];
+    if (file) processUploadedFile(file);
+  });
+
+  $$("[data-bulk-filter]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      bulkState.activeFilter = btn.dataset.bulkFilter || "all";
+      $$("[data-bulk-filter]").forEach((b) => {
+        const active = b === btn;
+        b.classList.toggle("is-active", active);
+        b.setAttribute("aria-pressed", String(active));
+      });
+      renderBulkResultsTable();
+    });
+  });
+
+  $$("[data-bulk-sort]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const field = btn.dataset.bulkSort || "rowNumber";
+      if (bulkState.sortBy === field) {
+        bulkState.sortDir = bulkState.sortDir === "asc" ? "desc" : "asc";
+      } else {
+        bulkState.sortBy = field;
+        bulkState.sortDir = field === "productName" ? "asc" : "desc";
+      }
+      $$("#bulk-results-table thead th").forEach((th) => th.setAttribute("aria-sort", "none"));
+      const parentTh = btn.closest("th");
+      if (parentTh) {
+        parentTh.setAttribute("aria-sort", bulkState.sortDir === "asc" ? "ascending" : "descending");
+      }
+      renderBulkResultsTable();
+    });
+  });
+}
+
 if (typeof document !== "undefined" && typeof window !== "undefined") {
   fillCountryOptions();
   applyRouteContent();
@@ -891,7 +1349,7 @@ if (typeof document !== "undefined" && typeof window !== "undefined") {
     });
   }
 
-  setupMenu(); setupPointerEffects(); setupInstantNavigation();
+  setupMenu(); setupPointerEffects(); setupInstantNavigation(); setupBulkAnalyzer();
   window.addEventListener("scroll", () => $(".site-header")?.classList.toggle("scrolled", window.scrollY > 10), { passive: true });
   window.addEventListener("resize", () => {
     if (headingResizeFrame) return;

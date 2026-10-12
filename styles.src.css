@@ -1121,3 +1121,319 @@ body.dark .fee-status-banner.is-error {
   to { transform: rotate(360deg); }
 }
 
+/* ============================================================
+   Bulk Etsy Profit Analyzer Section
+   ============================================================ */
+#bulk-analyzer .section-heading::before { content: "01B / BULK CSV"; }
+#bulk-analyzer .section-heading::after { content: "CSV"; }
+.bulk-panel {
+  padding: 22px 24px;
+  border: 2px solid var(--ink);
+  background: var(--surface);
+  box-shadow: 5px 5px 0 #080808;
+}
+.bulk-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 0 14px;
+}
+.bulk-toolbar .button {
+  min-height: 40px;
+}
+.bulk-toolbar .button[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none !important;
+}
+.bulk-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 112px;
+  padding: 18px 20px;
+  border: 2px dashed var(--ink);
+  background: var(--surface-soft);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.bulk-dropzone:hover,
+.bulk-dropzone:focus-visible,
+.bulk-dropzone.is-dragover {
+  border-style: solid;
+  border-color: var(--ink);
+  background: color-mix(in srgb, #c8ff00 22%, var(--surface));
+  box-shadow: 4px 4px 0 #080808;
+  outline: none;
+}
+.bulk-dropzone-title {
+  margin: 0;
+  color: var(--ink);
+  font: 800 12px var(--font-display);
+  letter-spacing: -.02em;
+  text-transform: uppercase;
+}
+.bulk-dropzone-sub {
+  max-width: 680px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.bulk-dropzone-sub code {
+  padding: 1px 4px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font: 600 10px var(--mono);
+}
+.bulk-alert {
+  margin-top: 14px;
+  padding: 11px 14px;
+  border: 2px solid var(--ink);
+  font: 700 11px var(--mono);
+}
+.bulk-alert.is-error {
+  border-color: #dc2626;
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
+}
+body.dark .bulk-alert.is-error {
+  color: #ff7777;
+  border-color: #ff7777;
+  background: rgba(220, 38, 38, 0.16);
+}
+.bulk-preview {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--ink);
+  background: var(--surface-soft);
+}
+.bulk-preview-counts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.bulk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border: 1px solid var(--ink);
+  font: 700 10px var(--mono);
+  text-transform: uppercase;
+}
+.bulk-badge.is-valid {
+  color: #080808;
+  background: #c8ff00;
+}
+.bulk-badge.is-invalid {
+  color: #fff;
+  background: #8a1313;
+  border-color: #8a1313;
+}
+.bulk-badge.is-note {
+  color: var(--ink);
+  background: var(--surface);
+}
+.bulk-invalid-box {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  font-size: 11px;
+}
+.bulk-invalid-box > strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--negative);
+  font: 700 10px var(--mono);
+  text-transform: uppercase;
+}
+.bulk-invalid-list {
+  max-height: 140px;
+  overflow-y: auto;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--ink);
+  font: 11px var(--mono);
+  line-height: 1.5;
+}
+.bulk-results-wrap {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 2px solid var(--ink);
+}
+.bulk-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+}
+.bulk-stat-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 2px solid var(--ink);
+  background: var(--surface);
+  box-shadow: 3px 3px 0 #080808;
+}
+.bulk-stat-card span {
+  color: var(--muted);
+  font: 700 9px var(--mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.bulk-stat-card output {
+  color: var(--ink);
+  font: 700 20px/1.1 var(--font-display);
+  font-variant-numeric: tabular-nums;
+}
+.bulk-stat-card.is-loss-card output {
+  color: var(--negative);
+}
+.bulk-threshold-note {
+  margin: 12px 0 14px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.bulk-controls-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.bulk-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.bulk-filter-btn {
+  min-height: 36px;
+  padding: 0 11px;
+  border: 2px solid var(--ink);
+  color: var(--ink);
+  background: var(--surface);
+  font: 700 9px var(--font-display);
+  letter-spacing: -.02em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.bulk-filter-btn:hover {
+  background: var(--surface-soft);
+}
+.bulk-filter-btn.is-active,
+.bulk-filter-btn[aria-pressed="true"] {
+  color: #080808;
+  background: #c8ff00;
+  box-shadow: 3px 3px 0 #080808;
+}
+.bulk-table-scroll {
+  border: 2px solid var(--ink);
+}
+.bulk-results-table {
+  min-width: 960px;
+}
+.bulk-results-table th:first-child,
+.bulk-results-table td:first-child {
+  text-align: left;
+}
+.bulk-sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+.bulk-results-table tr.is-loss-row td {
+  background: rgba(220, 38, 38, 0.08);
+}
+body.dark .bulk-results-table tr.is-loss-row td {
+  background: rgba(220, 38, 38, 0.18);
+}
+.bulk-results-table td.is-negative-cell {
+  color: var(--negative);
+  font-weight: 700;
+}
+.bulk-status-pill {
+  display: inline-block;
+  padding: 3px 6px;
+  border: 1px solid var(--ink);
+  font: 700 8px var(--mono);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.bulk-status-pill.status-profitable {
+  color: #080808;
+  background: #c8ff00;
+}
+.bulk-status-pill.status-thin_margin {
+  color: var(--ink);
+  background: var(--surface-soft);
+}
+.bulk-status-pill.status-break_even {
+  color: var(--ink);
+  background: var(--surface);
+}
+.bulk-status-pill.status-loss {
+  color: #fff;
+  background: #8a1313;
+  border-color: #8a1313;
+}
+.bulk-risk-tag {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 2px 5px;
+  border: 1px solid #8a1313;
+  color: var(--negative);
+  background: transparent;
+  font: 700 8px var(--mono);
+  text-transform: uppercase;
+}
+.bulk-empty-filter {
+  margin: 12px 0 0;
+  padding: 14px;
+  border: 1px dashed var(--border);
+  color: var(--muted);
+  text-align: center;
+  font: 700 11px var(--mono);
+}
+@media (max-width: 1024px) {
+  .bulk-summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 699px) {
+  .bulk-panel {
+    padding: 16px 14px;
+  }
+  .bulk-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .bulk-stat-card output {
+    font-size: 16px;
+  }
+  .bulk-controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .bulk-controls-bar #bulk-export-csv {
+    width: 100%;
+  }
+}
+
+
