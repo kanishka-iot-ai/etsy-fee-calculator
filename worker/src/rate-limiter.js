@@ -17,6 +17,7 @@ const MAX_BUCKETS = 10_000;
 export const DEFAULT_WINDOW_MS = 60 * 1000; // 1 minute
 export const DEFAULT_MAX_REQUESTS = 60;     // 60 requests per minute per IP per public endpoint
 export const DEFAULT_ADMIN_MAX_REQUESTS = 20; // 20 requests per minute per IP for /api/admin/*
+export const DEFAULT_ADVISOR_MAX_REQUESTS = 10; // 10 requests per minute per IP for /v1/advisor
 
 /**
  * Extracts client IP identifier from request headers.

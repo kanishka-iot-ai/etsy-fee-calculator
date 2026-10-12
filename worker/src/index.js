@@ -6,6 +6,7 @@
  */
 
 import { handleGetFees, handleGetCountryFee, handleGetVersion, PUBLIC_SECURITY_HEADERS } from "./api.js";
+import { handleAdvisorRequest } from "./advisor.js";
 import {
   checkRateLimit,
   createRateLimitResponse,
@@ -112,6 +113,11 @@ export default {
           }
           return await handleGetVersion(request, env);
         }
+      }
+
+      // 3B. Controlled Profit Advisor Route (POST /v1/advisor; AI disabled by default)
+      if (url.pathname === "/v1/advisor") {
+        return await handleAdvisorRequest(request, env);
       }
 
       // 4. Protected Admin Routes
