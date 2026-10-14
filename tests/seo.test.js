@@ -274,7 +274,7 @@ test("fees, methodology and FAQ routes are indexable, crawlable resources with c
   const redirects = await read("../_redirects");
   const sitemap = await read("../sitemap.xml");
   for (const [file, route, expectedTitle] of [
-    ["../fees.html", "/fees/", "Etsy Fee Calculator — Calculate Etsy Seller Fees | ShopProfit"],
+    ["../fees.html", "/fees/", "Etsy Fee Calculator: Calculate Selling Fees &amp; Costs | ShopProfit"],
     ["../methodology.html", "/methodology/", "Etsy Profit Calculator Methodology | How ShopProfit Calculates Profit"],
     ["../faq.html", "/faq/", "Etsy Profit Calculator FAQ – Etsy Fees &amp; Profit Questions | ShopProfit"],
   ]) {
@@ -556,7 +556,7 @@ test("/fees/ route satisfies all Phase 2 Step 2 search-intent, authority, and fe
 
   // 1. Primary intent & metadata
   assert.equal(attr(html, /<link rel="canonical" href="([^"]+)"/), "https://shopprofitcalculator.com/fees/");
-  assert.equal(attr(html, /<title>([^<]+)<\/title>/), "Etsy Fee Calculator — Calculate Etsy Seller Fees | ShopProfit");
+  assert.equal(attr(html, /<title>([^<]+)<\/title>/), "Etsy Fee Calculator: Calculate Selling Fees &amp; Costs | ShopProfit");
   assert.match(html, /<h1\b[^>]*>Etsy Fee Calculator<\/h1>/);
   assert.equal((html.match(/<h1\b/g) || []).length, 1, "exactly one H1");
 
