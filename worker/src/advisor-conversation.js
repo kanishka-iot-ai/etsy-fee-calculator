@@ -1691,6 +1691,9 @@ export async function handleAdvisorConversationTurn(rawPayload, env = {}) {
         if (rawArgsObj.materialsCost !== undefined && rawArgsObj.production === undefined) rawArgsObj.production = rawArgsObj.materialsCost;
         if (rawArgsObj.price !== undefined && rawArgsObj.itemPrice === undefined) rawArgsObj.itemPrice = rawArgsObj.price;
         if (rawArgsObj.postage !== undefined && rawArgsObj.shippingCost === undefined) rawArgsObj.shippingCost = rawArgsObj.postage;
+        if (rawArgsObj.margin !== undefined && rawArgsObj.targetMarginPct === undefined) rawArgsObj.targetMarginPct = rawArgsObj.margin;
+        if (rawArgsObj.marginPct !== undefined && rawArgsObj.targetMarginPct === undefined) rawArgsObj.targetMarginPct = rawArgsObj.marginPct;
+        if (rawArgsObj.targetMargin !== undefined && rawArgsObj.targetMarginPct === undefined) rawArgsObj.targetMarginPct = rawArgsObj.targetMargin;
 
         const safeArgs = {};
         for (const [k, v] of Object.entries(rawArgsObj)) {
@@ -1700,7 +1703,8 @@ export async function handleAdvisorConversationTurn(rawPayload, env = {}) {
         }
 
         let updated = {
-          ...parsedRaw,
+          action: parsedRaw.action,
+          tool: parsedRaw.tool ?? parsedRaw.name ?? null,
           arguments: safeArgs,
           clarificationQuestion: null,
           missingFields: []
