@@ -95,7 +95,7 @@ const ALLOWED_TOP_LEVEL_EXTRACTION_KEYS = new Set([
   "clarificationQuestion"
 ]);
 
-const ALLOWED_EXTRACTION_ARGUMENT_KEYS = new Set([
+export const ALLOWED_EXTRACTION_ARGUMENT_KEYS = new Set([
   "country",
   "itemPrice",
   "shipping",

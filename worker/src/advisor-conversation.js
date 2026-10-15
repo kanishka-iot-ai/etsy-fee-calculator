@@ -35,7 +35,8 @@ import {
   MAX_SELLER_MESSAGE_LENGTH,
   extractMessageEvidence,
   validateAiExtractedInput,
-  validateAndExecuteAdvisorExtraction
+  validateAndExecuteAdvisorExtraction,
+  ALLOWED_EXTRACTION_ARGUMENT_KEYS
 } from "./advisor-input-guard.js";
 import {
   checkRateLimit,
@@ -79,16 +80,17 @@ export const CONVERSATION_STATES = Object.freeze({
   TEMPORARILY_UNAVAILABLE: "temporarily_unavailable"
 });
 
-export const DEFAULT_CONVERSATION_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct";
+export const DEFAULT_CONVERSATION_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fp8";
 export const APPROVED_CONVERSATION_MODELS = Object.freeze(new Set([
-  "@cf/meta/llama-3.1-8b-instruct",
   "@cf/meta/llama-3.1-8b-instruct-fp8",
-  "@cf/meta/llama-3.2-3b-instruct"
+  "@cf/meta/llama-3.2-3b-instruct",
+  "@cf/meta/llama-3.2-1b-instruct",
+  "@cf/meta/llama-3.1-8b-instruct"
 ]));
 
 export const MAX_CONVERSATION_REQUEST_BYTES = 4096;   // 4 KB strict request size cap
 export const MAX_CONVERSATION_RESPONSE_BYTES = 131072; // 128 KB strict response size cap (supports full opportunity reports with 5 sources)
-export const DEFAULT_EXTRACTION_TIMEOUT_MS = 4500;    // 4.5s max model inference timeout
+export const DEFAULT_EXTRACTION_TIMEOUT_MS = 7000;    // 7s max model inference timeout
 export const MAX_EXTRACTION_TOKENS = 768;             // Bounded completion tokens
 export const CONVERSATION_TTL_MS = 5 * 60 * 1000;     // 5-minute short-lived session expiration
 export const MAX_CLARIFICATION_TURNS = 3;             // Hard cap on clarification attempts per conversation
@@ -475,18 +477,22 @@ async function consumeNonceWithCoordinator(
   }
 }
 
-// Per-isolate ephemeral signing secret (used if env.CONVERSATION_HMAC_SECRET is not provided)
-const ISOLATE_EPHEMERAL_SECRET = (() => {
-  const bytes = new Uint8Array(32);
-  crypto.getRandomValues(bytes);
-  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
-})();
+// Per-isolate ephemeral signing secret (lazily generated inside handlers to prevent global scope evaluation error)
+let isolateEphemeralSecret = null;
+function getIsolateEphemeralSecret() {
+  if (!isolateEphemeralSecret) {
+    const bytes = new Uint8Array(32);
+    crypto.getRandomValues(bytes);
+    isolateEphemeralSecret = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+  }
+  return isolateEphemeralSecret;
+}
 
 function getSigningSecret(env) {
   if (typeof env?.CONVERSATION_HMAC_SECRET === "string" && env.CONVERSATION_HMAC_SECRET.length >= 16) {
     return env.CONVERSATION_HMAC_SECRET;
   }
-  return ISOLATE_EPHEMERAL_SECRET;
+  return getIsolateEphemeralSecret();
 }
 
 function generateRandomHex(byteCount = 16) {
@@ -951,22 +957,41 @@ async function runStructuredModelExtraction(sellerMessage, env) {
       ? Math.min(10_000, Number(env.AI_TIMEOUT_MS))
       : DEFAULT_EXTRACTION_TIMEOUT_MS;
 
-  const aiPromise = env.AI.run(model, {
-    messages: [
-      { role: "system", content: CONVERSATION_EXTRACTION_SYSTEM_PROMPT },
-      { role: "user", content: sellerMessage }
-    ],
-    response_format: {
-      type: "json_schema",
-      json_schema: {
-        name: "shopprofit_advisor_intent_router",
-        strict: true,
-        schema: CONVERSATION_EXTRACTION_JSON_SCHEMA
+  const invokeAi = async (formatType) => {
+    const payload = {
+      messages: [
+        { role: "system", content: CONVERSATION_EXTRACTION_SYSTEM_PROMPT },
+        { role: "user", content: sellerMessage }
+      ],
+      temperature: 0,
+      max_tokens: MAX_EXTRACTION_TOKENS
+    };
+    if (formatType === "json_schema") {
+      payload.response_format = {
+        type: "json_schema",
+        json_schema: {
+          name: "shopprofit_advisor_intent_router",
+          strict: true,
+          schema: CONVERSATION_EXTRACTION_JSON_SCHEMA
+        }
+      };
+    } else {
+      payload.response_format = { type: "json_object" };
+    }
+    return await env.AI.run(model, payload);
+  };
+
+  const aiPromise = (async () => {
+    try {
+      return await invokeAi(env?.AI_RESPONSE_FORMAT || "json_schema");
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      if (errMsg.includes("JSON Schema") || errMsg.includes("json_schema") || errMsg.includes("5025")) {
+        return await invokeAi("json_object");
       }
-    },
-    temperature: 0,
-    max_tokens: MAX_EXTRACTION_TOKENS
-  });
+      throw err;
+    }
+  })();
 
   let timerId;
   const timeoutPromise = new Promise((_, reject) => {
@@ -1003,7 +1028,8 @@ async function runStructuredModelExtraction(sellerMessage, env) {
     return {
       ok: false,
       model,
-      reason
+      reason,
+      errorDetail: err instanceof Error ? `${err.name}: ${err.message}` : String(err)
     };
   } finally {
     clearTimeout(timerId);
@@ -1660,7 +1686,19 @@ export async function handleAdvisorConversationTurn(rawPayload, env = {}) {
     try {
       const parsedRaw = typeof rawExtraction === "string" ? JSON.parse(rawExtraction) : rawExtraction;
       if (isPlainSafeObject(parsedRaw) && parsedRaw.action !== "refuse") {
-        const safeArgs = isPlainSafeObject(parsedRaw.arguments) ? parsedRaw.arguments : {};
+        const rawArgsObj = isPlainSafeObject(parsedRaw.arguments) ? { ...parsedRaw.arguments } : {};
+        if (rawArgsObj.cost !== undefined && rawArgsObj.production === undefined) rawArgsObj.production = rawArgsObj.cost;
+        if (rawArgsObj.materialsCost !== undefined && rawArgsObj.production === undefined) rawArgsObj.production = rawArgsObj.materialsCost;
+        if (rawArgsObj.price !== undefined && rawArgsObj.itemPrice === undefined) rawArgsObj.itemPrice = rawArgsObj.price;
+        if (rawArgsObj.postage !== undefined && rawArgsObj.shippingCost === undefined) rawArgsObj.shippingCost = rawArgsObj.postage;
+
+        const safeArgs = {};
+        for (const [k, v] of Object.entries(rawArgsObj)) {
+          if (ALLOWED_EXTRACTION_ARGUMENT_KEYS.has(k)) {
+            safeArgs[k] = v;
+          }
+        }
+
         let updated = {
           ...parsedRaw,
           arguments: safeArgs,

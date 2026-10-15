@@ -759,6 +759,7 @@ export function setupSellerAdvisor(options = {}) {
 
     const payload = {
       conversationId: state.pendingClarification.conversationId,
+      message: state.pendingClarification.originalMessage,
       confirmationToken: state.pendingClarification.confirmationToken,
       confirmedInputs: validation.confirmedInputs
     };
