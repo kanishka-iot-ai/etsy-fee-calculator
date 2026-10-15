@@ -1702,9 +1702,16 @@ export async function handleAdvisorConversationTurn(rawPayload, env = {}) {
           }
         }
 
+        let action = parsedRaw.action;
+        let tool = parsedRaw.tool ?? parsedRaw.name ?? null;
+        if (ALLOWED_ADVISOR_TOOLS.includes(action)) {
+          tool = action;
+          action = "call_tool";
+        }
+
         let updated = {
-          action: parsedRaw.action,
-          tool: parsedRaw.tool ?? parsedRaw.name ?? null,
+          action,
+          tool,
           arguments: safeArgs,
           clarificationQuestion: null,
           missingFields: []
