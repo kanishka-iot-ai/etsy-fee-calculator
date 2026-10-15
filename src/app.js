@@ -30,6 +30,7 @@ import {
   serializeBulkResultsToCsv,
   formatBulkCurrency
 } from "./bulk-analyzer.js";
+import { setupSellerAdvisor } from "./advisor-client.js";
 
 const DEFAULT_BASELINE_ORDER = Object.freeze([
   "US", "UK", "CA", "AU", "DE", "FR", "IT", "ES", "IN", "JP", "TR", "OTHER"
@@ -1373,7 +1374,7 @@ if (typeof document !== "undefined" && typeof window !== "undefined") {
     });
   }
 
-  setupMenu(); setupPointerEffects(); setupInstantNavigation(); setupBulkAnalyzer();
+  setupMenu(); setupPointerEffects(); setupInstantNavigation(); setupBulkAnalyzer(); setupSellerAdvisor();
   window.addEventListener("scroll", () => $(".site-header")?.classList.toggle("scrolled", window.scrollY > 10), { passive: true });
   window.addEventListener("resize", () => {
     if (headingResizeFrame) return;
