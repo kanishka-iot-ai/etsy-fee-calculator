@@ -51,6 +51,16 @@ const getCountryRoute = () => {
 };
 
 const routeCountry = getCountryRoute();
+const isFeesRoute = () => {
+  if (typeof location !== "undefined") {
+    const path = location.pathname.toLowerCase();
+    if (path === "/fees" || path === "/fees/" || path === "/fees.html" || path.endsWith("/fees/") || path.endsWith("/fees") || path.endsWith("/fees.html")) return true;
+  }
+  const canonical = typeof document !== "undefined" ? (document.querySelector('link[rel="canonical"]')?.getAttribute("href") || "") : "";
+  if (canonical.includes("/fees/")) return true;
+  return false;
+};
+const isFeesPage = isFeesRoute();
 const store = {
   get(key) { try { return typeof localStorage !== "undefined" ? localStorage.getItem(key) : null; } catch { return null; } },
   set(key, value) { try { if (typeof localStorage !== "undefined") localStorage.setItem(key, value); } catch { /* Private browsing can disable storage. */ } },
@@ -178,7 +188,21 @@ function applyLanguage() {
     AU: { en: "Etsy Fee Calculator Australia — ShopProfit", "zh-CN": "澳大利亚 Etsy 费用计算器 — ShopProfit", "hi-IN": "Etsy शुल्क कैलकुलेटर ऑस्ट्रेलिया — ShopProfit", "fr-FR": "Calculateur de frais Etsy Australie — ShopProfit", "de-DE": "Etsy-Gebührenrechner Australien — ShopProfit", "es-ES": "Calculadora de tarifas Etsy Australia — ShopProfit", ar: "حاسبة رسوم Etsy أستراليا — ShopProfit" },
     OTHER: { en: "Etsy Digital Download Fee Calculator — ShopProfit", "zh-CN": "Etsy 数字下载费用计算器 — ShopProfit", "hi-IN": "Etsy डिजिटल डाउनलोड शुल्क कैलकुलेटर — ShopProfit", "fr-FR": "Calculateur de frais Etsy pour produits numériques — ShopProfit", "de-DE": "Etsy-Gebührenrechner für digitale Produkte — ShopProfit", "es-ES": "Calculadora de tarifas Etsy para descargas digitales — ShopProfit", ar: "حاسبة رسوم التنزيل الرقمي Etsy — ShopProfit" },
   };
-  document.title = routeTitles[routeCountry]?.[activeLanguage] || routeTitles[routeCountry]?.en || titles[activeLanguage] || titles.en;
+  const feesTitles = {
+    en: "Etsy Fee Calculator: Calculate Selling Fees & Costs | ShopProfit",
+    "zh-CN": "Etsy 费用计算器 — ShopProfit",
+    "hi-IN": "Etsy शुल्क कैलकुलेटर — ShopProfit",
+    "fr-FR": "Calculateur de frais Etsy — ShopProfit",
+    "de-DE": "Etsy-Gebührenrechner — ShopProfit",
+    "es-ES": "Calculadora de tarifas Etsy — ShopProfit",
+    "ja-JP": "Etsy 手数料計算機 — ShopProfit",
+    ar: "حاسبة رسوم Etsy — ShopProfit"
+  };
+  if (isFeesPage) {
+    document.title = feesTitles[activeLanguage] || feesTitles.en;
+  } else {
+    document.title = routeTitles[routeCountry]?.[activeLanguage] || routeTitles[routeCountry]?.en || titles[activeLanguage] || titles.en;
+  }
   const autoLabels = { en: "Auto", "zh-CN": "自动", "hi-IN": "स्वचालित", "fr-FR": "Auto", "de-DE": "Automatisch", "es-ES": "Auto", "ja-JP": "自動", ar: "تلقائي" };
   const autoOption = languageSelect.querySelector('[value="auto"]');
   if (autoOption) {
@@ -1434,7 +1458,9 @@ export {
   solveRequiredPrice,
   formatCents,
   render,
-  getState
+  getState,
+  isFeesRoute,
+  isFeesPage
 };
 
 // Startup initialization is handled above in the DOM ready block
