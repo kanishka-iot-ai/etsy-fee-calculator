@@ -620,5 +620,42 @@ test("/fees/ route satisfies all Phase 2 Step 2 search-intent, authority, and fe
   assert.match(html, /Scenario 3: £28 Handmade Item with 0\.48% Regulatory Fee[\s\S]*?£18\.63 \(58\.22% Margin\)/, "Scenario 3 matches engine");
 });
 
+test("Phase 10F: /fees/ client-side runtime title consistency verification", async () => {
+  const { isFeesRoute } = await import("../src/app.js");
+  assert.equal(typeof isFeesRoute, "function");
+
+  const originalLocation = globalThis.location;
+  try {
+    globalThis.location = { pathname: "/fees/" };
+    assert.equal(isFeesRoute(), true, "/fees/ detected as fees route");
+
+    globalThis.location = { pathname: "/fees" };
+    assert.equal(isFeesRoute(), true, "/fees detected as fees route");
+
+    globalThis.location = { pathname: "/fees.html" };
+    assert.equal(isFeesRoute(), true, "/fees.html detected as fees route");
+
+    globalThis.location = { pathname: "/" };
+    assert.equal(isFeesRoute(), false, "/ not detected as fees route");
+
+    globalThis.location = { pathname: "/etsy-pricing-calculator/" };
+    assert.equal(isFeesRoute(), false, "/etsy-pricing-calculator/ not detected as fees route");
+  } finally {
+    if (originalLocation) globalThis.location = originalLocation;
+    else delete globalThis.location;
+  }
+
+  const feesHtml = await read("../fees.html");
+  const feesDirHtml = await read("../fees/index.html");
+  const expectedTitle = "Etsy Fee Calculator: Calculate Selling Fees &amp; Costs | ShopProfit";
+  const expectedDesc = "Calculate estimated Etsy seller fees, order costs, and country-specific processing rates. Use ShopProfit's fee calculator to estimate your take-home proceeds.";
+
+  assert.equal(attr(feesHtml, /<title>([^<]+)<\/title>/), expectedTitle);
+  assert.equal(attr(feesHtml, /<meta name="description" content="([^"]+)"/), expectedDesc);
+  assert.equal(attr(feesDirHtml, /<title>([^<]+)<\/title>/), expectedTitle);
+  assert.equal(attr(feesDirHtml, /<meta name="description" content="([^"]+)"/), expectedDesc);
+});
+
+
 
 
