@@ -16,3 +16,7 @@ database_id = "758e36ac-4d94-45a7-9c0d-d6a18d32780e"
 [triggers]
 crons = ["0 8 * * *"]
 
+# Cloudflare Workers AI Binding
+[ai]
+binding = "AI"
+
