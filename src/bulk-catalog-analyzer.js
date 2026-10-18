@@ -1242,7 +1242,9 @@ export function computeMarginHistogram(items = []) {
   const total = items.length;
 
   for (const item of items) {
-    const m = typeof item.margin === "number" ? item.margin : 0;
+    const m = typeof item.marginPct === "number"
+      ? item.marginPct
+      : (typeof item.margin === "number" ? (item.margin >= -1 && item.margin <= 1 ? item.margin * 100 : item.margin) : 0);
     if (m < 0) {
       buckets.losses.count++;
       buckets.losses.items.push(item);
@@ -1410,7 +1412,9 @@ export function computeScatterBounds(items = []) {
   }
 
   const prices = items.map((i) => Number(i.itemPrice) || 0);
-  const margins = items.map((i) => Number(i.margin) || 0);
+  const margins = items.map((i) => typeof i.marginPct === "number"
+    ? i.marginPct
+    : (typeof i.margin === "number" ? (i.margin >= -1 && i.margin <= 1 ? i.margin * 100 : i.margin) : 0));
 
   const sortedPrices = [...prices].sort((a, b) => a - b);
   const medianPrice = sortedPrices[Math.floor(sortedPrices.length / 2)] || 25;
@@ -1428,7 +1432,9 @@ export function computeScatterBounds(items = []) {
 
   const points = items.map((item, idx) => {
     const price = Number(item.itemPrice) || 0;
-    const margin = Number(item.margin) || 0;
+    const margin = typeof item.marginPct === "number"
+      ? item.marginPct
+      : (typeof item.margin === "number" ? (item.margin >= -1 && item.margin <= 1 ? item.margin * 100 : item.margin) : 0);
     const profit = Number(item.netProfit) || 0;
 
     let quadrant = "standard";

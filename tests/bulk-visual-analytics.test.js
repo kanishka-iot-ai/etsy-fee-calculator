@@ -40,6 +40,19 @@ test("Visual Analytics: computeMarginHistogram categorizes items correctly into 
   assert.equal(emptyHist.buckets.losses.count, 0);
 });
 
+test("Visual Analytics: computeMarginHistogram and computeScatterBounds handle both fractional ratios and percentages", () => {
+  const ratioItems = [
+    { id: "1", productName: "Item 1", itemPrice: 20, margin: 0.589, netProfit: 11.78 },
+    { id: "2", productName: "Item 2", itemPrice: 40, marginPct: 58.9, netProfit: 23.56 }
+  ];
+  const hist = computeMarginHistogram(ratioItems);
+  assert.equal(hist.buckets.stars.count, 2);
+
+  const scatter = computeScatterBounds(ratioItems);
+  assert.equal(scatter.points[0].margin, 58.9);
+  assert.equal(scatter.points[1].margin, 58.9);
+});
+
 test("Visual Analytics: computeCostWaterfall maintains exact deduction accounting balance", () => {
   const { results, summary } = calculateCatalogBatch(EXPANDED_DEMO_CATALOG, { fallbackCountry: "US" });
   assert.ok(results.length > 0);

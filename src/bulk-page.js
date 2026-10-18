@@ -475,7 +475,7 @@ function renderScatterChart(items, containerEl) {
     });
 
     circle.addEventListener("click", () => {
-      const row = document.querySelector(`[data-product-id="${pt.id}"]`);
+      const row = document.querySelector(`tr[data-product-id="${pt.id}"]`);
       if (row) {
         document.querySelectorAll(".grid-row--highlighted").forEach((r) => r.classList.remove("grid-row--highlighted"));
         row.classList.add("grid-row--highlighted");
