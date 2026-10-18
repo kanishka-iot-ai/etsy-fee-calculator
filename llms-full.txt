@@ -13,6 +13,21 @@ ShopProfit operates under a strict Zero-Data-Transmission client-side architectu
 - Deterministic Integer Arithmetic: Fee calculations are performed using minor currency units (cents, pence, yen) to eliminate floating-point rounding divergence.
 - Static Edge Delivery: Hosted on Cloudflare Pages with zero client tracking cookies or fingerprinting.
 
+### Canonical Tools & Specialized Solvers:
+- **Etsy Profit Calculator (Homepage):** `https://shopprofitcalculator.com/`
+- **Bulk Catalog & Sourcing Analyzer:** `https://shopprofitcalculator.com/bulk/`
+- **62-Market Etsy Fee Schedule:** `https://shopprofitcalculator.com/fees/`
+- **Mathematical Methodology & Proofs:** `https://shopprofitcalculator.com/methodology/`
+- **Reverse Target Pricing Calculator:** `https://shopprofitcalculator.com/etsy-pricing-calculator/`
+- **Break-Even Floor Price Calculator:** `https://shopprofitcalculator.com/etsy-break-even-calculator/`
+- **Offsite Ads Fee & Cap Calculator:** `https://shopprofitcalculator.com/etsy-offsite-ads-calculator/`
+- **Print on Demand (POD) Calculator:** `https://shopprofitcalculator.com/etsy-print-on-demand-calculator/`
+- **Digital Download Fee Calculator:** `https://shopprofitcalculator.com/etsy-digital-download-fee-calculator`
+- **UK Regional Fee Calculator:** `https://shopprofitcalculator.com/etsy-fee-calculator-uk`
+- **Canada Regional Fee Calculator:** `https://shopprofitcalculator.com/etsy-fee-calculator-canada`
+- **Australia Regional Fee Calculator:** `https://shopprofitcalculator.com/etsy-fee-calculator-australia`
+- **Seller Knowledge Base & FAQ:** `https://shopprofitcalculator.com/faq/`
+
 ---
 
 ## 2. Mathematical Formulas & Accounting Definitions
