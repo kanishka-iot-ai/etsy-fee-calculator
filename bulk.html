@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#F2F1EC">
+  <meta name="description" content="Professional bulk spreadsheet analysis, wholesale sourcing, and Etsy profit calculation software. Scan supplier catalogs, compare ROI, and filter high-margin winners.">
+  <link rel="canonical" href="https://shopprofitcalculator.com/bulk/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ShopProfit">
+  <meta property="og:title" content="Etsy Bulk Profit &amp; Sourcing Analyzer — ShopProfit">
+  <meta property="og:description" content="Professional bulk spreadsheet analysis, wholesale sourcing, and Etsy profit calculation software. Scan supplier catalogs, compare ROI, and filter high-margin winners.">
+  <meta property="og:url" content="https://shopprofitcalculator.com/bulk/">
+  <meta property="og:image" content="https://shopprofitcalculator.com/social-preview.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Etsy Bulk Profit &amp; Sourcing Analyzer — ShopProfit">
+  <meta name="twitter:description" content="Professional bulk spreadsheet analysis, wholesale sourcing, and Etsy profit calculation software. Scan supplier catalogs, compare ROI, and filter high-margin winners.">
+  <meta name="twitter:image" content="https://shopprofitcalculator.com/social-preview.png">
+  <title>Etsy Bulk Profit &amp; Sourcing Analyzer — ShopProfit</title>
+  <link rel="preload" href="/fonts/silkscreen-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="modulepreload" href="/src/bulk-catalog-analyzer.js">
+  <link rel="modulepreload" href="/src/bulk-page.js">
+  <link rel="modulepreload" href="/src/fee-engine.js">
+  <link rel="modulepreload" href="/src/bulk-analyzer.js">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "ShopProfit Etsy Bulk Catalog & Sourcing Analyzer",
+        "url": "https://shopprofitcalculator.com/bulk/",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Any",
+        "description": "Professional client-side bulk Etsy fee, profit margin, ROI, and sourcing catalog scanner for Etsy sellers.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://shopprofitcalculator.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Bulk Analyzer", "item": "https://shopprofitcalculator.com/bulk/" }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bulk-dedicated-page">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="site-header" id="top">
+    <div class="nav-wrap">
+      <a class="brand" href="/" aria-label="ShopProfit home">
+        <span class="brand-mark"><img src="/logo-mark.svg" alt="" aria-hidden="true"></span>
+        <span>ShopProfit</span>
+      </a>
+      <nav class="desktop-nav" aria-label="Main navigation">
+        <a href="/#calculator">Calculator</a>
+        <a class="active" href="/bulk/">Bulk Sourcing</a>
+        <a href="/#seller-advisor">AI Advisor</a>
+        <a href="/fees/">Fees</a>
+        <a href="/methodology/">Method</a>
+        <a href="/faq/">FAQ</a>
+      </nav>
+      <div class="nav-actions">
+        <label class="sr-only" for="catalog-country-select">Seller country</label>
+        <select class="bulk-select" id="catalog-country-select" aria-label="Seller market location">
+          <option value="US">United States (USD)</option>
+        </select>
+        <button class="icon-button theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" title="Toggle color theme">
+          <span aria-hidden="true">◐</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="page-width">
+    <!-- Hero Header -->
+    <section class="bulk-hero" aria-labelledby="bulk-hero-heading">
+      <div class="bulk-hero__inner">
+        <div>
+          <p class="eyebrow">Enterprise Bulk Analysis &amp; Sourcing Engine</p>
+          <h1 id="bulk-hero-heading" class="bulk-hero-title">Etsy Bulk Profit &amp; Sourcing Analyzer</h1>
+          <p class="bulk-hero-desc">
+            Inspired by professional bulk analysis software like Analyzer.Tools, tailored specifically for Etsy sellers.
+            Scan supplier catalogs, calculate multi-item Etsy net profit and ROI across 62 countries, and isolate high-margin winners in seconds. 100% private and client-side.
+          </p>
+        </div>
+        <div class="bulk-toolbar__group">
+          <button type="button" class="button button-quiet" id="load-demo-btn">⚡ Load Demo Catalog</button>
+          <button type="button" class="button button-primary" id="open-upload-btn">+ Ingest Supplier CSV</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Top KPI Cards -->
+    <section class="kpi-dashboard" id="kpi-dashboard" aria-label="Portfolio Summary KPIs">
+      <!-- Populated dynamically by src/bulk-page.js -->
+    </section>
+
+    <!-- Toolbar Controls -->
+    <section class="bulk-toolbar" aria-label="Catalog Grid Controls">
+      <div class="bulk-toolbar__group">
+        <label for="preset-view-select" class="sr-only">View Preset</label>
+        <select class="bulk-select" id="preset-view-select" aria-label="Select Grid View Preset">
+          <option value="sourcing">Sourcing &amp; ROI View</option>
+          <option value="winners">Potential Winners (High Margin)</option>
+          <option value="full">Full Data View (All Columns)</option>
+          <option value="fees">Fee Breakdown View</option>
+          <option value="ads">Offsite Ads Vulnerability View</option>
+        </select>
+
+        <div class="bulk-search-box">
+          <input type="search" id="catalog-search-input" placeholder="Search SKU, title, category..." aria-label="Filter catalog products">
+        </div>
+      </div>
+
+      <div class="bulk-toolbar__group">
+        <button type="button" class="button button-secondary" id="toggle-adjustments-btn" aria-label="Open expense adjustments drawer">
+          ⚙ Additional Expenses
+        </button>
+        <button type="button" class="button button-secondary" id="toggle-columns-btn" aria-label="Open column chooser">
+          ⊞ Column Chooser
+        </button>
+        <button type="button" class="button button-secondary" id="export-favs-btn" title="Export shortlisted items to CSV">
+          ★ Export Shortlist
+        </button>
+        <button type="button" class="button button-secondary" id="export-all-btn" title="Export all catalog products to CSV">
+          ⬇ Export All CSV
+        </button>
+      </div>
+    </section>
+
+    <!-- Quick Filter Tabs -->
+    <nav class="filter-tabs" id="filter-tabs" aria-label="Quick Filter Categories">
+      <!-- Populated dynamically by src/bulk-page.js -->
+    </nav>
+
+    <!-- Main Spreadsheet Grid Card -->
+    <div class="bulk-grid-card">
+      <div class="bulk-grid-header-meta">
+        <span id="grid-item-count">Loading catalog...</span>
+        <div>
+          <button type="button" class="button button-quiet" id="add-row-btn">+ Add Custom Product Row</button>
+        </div>
+      </div>
+
+      <div class="bulk-grid-container" id="grid-container" tabindex="0" role="region" aria-label="Product Analysis Spreadsheet Grid">
+        <!-- Rendered dynamically by src/bulk-page.js -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Upload Wizard Modal -->
+  <div class="modal-overlay" id="upload-wizard-modal" role="dialog" aria-modal="true" aria-labelledby="upload-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 class="modal-title" id="upload-modal-title">Ingest Supplier &amp; Product Catalog</h2>
+        <button type="button" class="modal-close-btn" data-close-modal aria-label="Close modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="upload-step-1">
+          <p style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">
+            Upload your supplier price sheet, materials list, or Etsy inventory export (.csv).
+            All processing is 100% client-side inside your browser—no supplier or pricing data is ever transmitted.
+          </p>
+
+          <input type="file" id="catalog-file-input" accept=".csv,text/csv" class="sr-only">
+          <div class="drop-zone" id="catalog-drop-zone">
+            <div class="drop-zone-icon">📄</div>
+            <strong>Click to select CSV or drag and drop file here</strong>
+            <p style="font-size: 12px; color: var(--muted); margin: 6px 0 0;">Supported format: UTF-8 CSV (up to 500 products)</p>
+          </div>
+          <p id="selected-file-label" class="hidden" style="margin-top: 10px; font-weight: 600; font-family: var(--mono); color: #16a34a;"></p>
+        </div>
+
+        <div id="upload-step-2" class="hidden">
+          <h3 style="font-size: 14px; margin-bottom: 8px;">Step 2: Column Mapping Confirmation</h3>
+          <p style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">
+            We automatically detected the following column mappings from your CSV headers. Review the preview below:
+          </p>
+          <div id="mapping-preview-container" style="overflow-x: auto; margin-bottom: 16px;"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="button button-secondary" data-close-modal>Cancel</button>
+        <button type="button" class="button button-primary" id="btn-process-upload" disabled>Process &amp; Analyze Catalog</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Additional Expenses / Adjustments Drawer Modal -->
+  <div class="modal-overlay" id="adjustments-drawer-modal" role="dialog" aria-modal="true" aria-labelledby="adjustments-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 class="modal-title" id="adjustments-modal-title">Additional Expenses &amp; Fee Modifiers</h2>
+        <button type="button" class="modal-close-btn" data-close-modal aria-label="Close modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">
+          Adjust portfolio-wide fee and shipping assumptions. Modifying these values updates calculations across your entire catalog in real time.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div>
+            <label for="setting-offsite-ads" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
+              Etsy Offsite Ads Rate
+            </label>
+            <select class="bulk-select" id="setting-offsite-ads" style="width: 100%;">
+              <option value="0">No Offsite Ads (0%) — Direct / Organic Sales</option>
+              <option value="0.15">Standard Offsite Ads (15%) — Standard Shop Rate</option>
+              <option value="0.12">High-Volume Offsite Ads (12%) — &gt;$10k USD Annual Sales</option>
+            </select>
+            <span style="font-size: 11px; color: var(--muted); display: block; margin-top: 4px;">
+              Etsy applies a $100 USD maximum fee cap per order.
+            </span>
+          </div>
+
+          <div>
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
+              <input type="checkbox" id="setting-etsy-plus">
+              <span><strong>Etsy Plus Subscription</strong> ($10/month amortized across 30 sales)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="button button-primary" data-close-modal>Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Column Chooser Modal -->
+  <div class="modal-overlay" id="column-chooser-modal" role="dialog" aria-modal="true" aria-labelledby="columns-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 class="modal-title" id="columns-modal-title">Customize Grid Columns</h2>
+        <button type="button" class="modal-close-btn" data-close-modal aria-label="Close modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--muted); margin-bottom: 14px;">
+          Select which metrics and data points are visible in your spreadsheet view.
+        </p>
+        <div class="column-checkbox-grid" id="column-checkbox-list">
+          <!-- Populated dynamically by src/bulk-page.js -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="button button-primary" data-close-modal>Save View</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Itemized Fee Receipt Modal -->
+  <div class="modal-overlay" id="fee-receipt-modal" role="dialog" aria-modal="true" aria-labelledby="receipt-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 class="modal-title" id="receipt-modal-title">Itemized Fee &amp; Profit Receipt</h2>
+        <button type="button" class="modal-close-btn" data-close-modal aria-label="Close modal">✕</button>
+      </div>
+      <div class="modal-body" id="receipt-content">
+        <!-- Populated dynamically by src/bulk-page.js -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="button button-secondary" data-close-modal>Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer" style="margin-top: 60px;">
+    <div class="footer-inner page-width">
+      <div class="footer-brand">
+        <a class="brand" href="/"><span class="brand-mark"><img src="/logo-mark.svg" alt="" aria-hidden="true"></span><span>ShopProfit</span></a>
+        <p>Know exactly what you keep.</p>
+      </div>
+      <div class="footer-column">
+        <strong>Tools</strong>
+        <a href="/#calculator">Etsy profit calculator</a>
+        <a href="/bulk/">Bulk Sourcing Analyzer</a>
+        <a href="/fees/">Etsy fee calculator</a>
+        <a href="/etsy-pricing-calculator/">Etsy pricing calculator</a>
+        <a href="/etsy-break-even-calculator/">Etsy break-even calculator</a>
+        <a href="/etsy-offsite-ads-calculator/">Etsy Offsite Ads calculator</a>
+        <a href="/etsy-digital-download-fee-calculator">Etsy digital product calculator</a>
+        <a href="/etsy-print-on-demand-calculator/">Etsy print on demand calculator</a>
+      </div>
+      <div class="footer-column">
+        <strong>Resources</strong>
+        <a href="/fees/">Etsy fees guide</a>
+        <a href="/methodology/">Methodology</a>
+        <a href="/faq/">FAQ</a>
+      </div>
+      <div class="footer-column">
+        <strong>Legal</strong>
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
+        <a href="/contact">Contact</a>
+        <a href="mailto:info@shopprofitcalculator.com">info@shopprofitcalculator.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom page-width">
+      <span>© <span id="copyright-year">2026</span> ShopProfit</span>
+      <span>Independent calculator. Not affiliated with Etsy.</span>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/bulk-page.js"></script>
+</body>
+</html>
