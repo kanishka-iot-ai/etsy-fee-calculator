@@ -20,3 +20,8 @@ crons = ["0 8 * * *"]
 [ai]
 binding = "AI"
 
+[vars]
+ENABLE_AI_ADVISOR = true
+ENABLE_CONVERSATIONAL_PROTOTYPE = true
+ALLOW_PUBLIC_WEB_SEARCH_FALLBACK = true
+

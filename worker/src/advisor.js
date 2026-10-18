@@ -1081,14 +1081,15 @@ export async function generateAdvisorReport(rawInput, env = {}) {
   const analysis = computeDeterministicAnalysis(validation.data);
   const deterministic = buildDeterministicExplanation(analysis);
 
-  const isAiEnabled = Boolean(env?.ENABLE_AI_ADVISOR === true && env?.AI && typeof env.AI.run === "function");
+  const isAiFlagOn = env?.ENABLE_AI_ADVISOR === true || env?.ENABLE_AI_ADVISOR === "true";
+  const isAiEnabled = Boolean(isAiFlagOn && env?.AI && typeof env.AI.run === "function");
   if (!isAiEnabled) {
     return {
       ok: true,
       status: 200,
       body: {
         source: "deterministic",
-        fallbackReason: env?.ENABLE_AI_ADVISOR === true ? "ai_binding_unavailable" : "ai_disabled",
+        fallbackReason: isAiFlagOn ? "ai_binding_unavailable" : "ai_disabled",
         profitStatus: deterministic.profitStatus,
         summary: deterministic.summary,
         recommendations: deterministic.recommendations,

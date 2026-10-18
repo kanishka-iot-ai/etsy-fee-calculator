@@ -822,8 +822,11 @@ function resolveWebSearchProviders(env = {}) {
 
   const searchEnabled =
     env?.ENABLE_WEB_RESEARCH === true ||
+    env?.ENABLE_WEB_RESEARCH === "true" ||
     env?.ENABLE_CONVERSATIONAL_PROTOTYPE === true ||
-    env?.ENABLE_AI_ADVISOR === true;
+    env?.ENABLE_CONVERSATIONAL_PROTOTYPE === "true" ||
+    env?.ENABLE_AI_ADVISOR === true ||
+    env?.ENABLE_AI_ADVISOR === "true";
 
   if (!searchEnabled) {
     return { searchProvider: null, fallbackSearchProvider: null };
@@ -942,7 +945,9 @@ const OUT_OF_SCOPE_RE = /\b(?:write\s+(?:me\s+)?a\s+(?:python|javascript|scraper
 export function isConversationalAiEnabled(env) {
   const flagEnabled =
     env?.ENABLE_CONVERSATIONAL_PROTOTYPE === true ||
-    env?.ENABLE_AI_ADVISOR === true;
+    env?.ENABLE_CONVERSATIONAL_PROTOTYPE === "true" ||
+    env?.ENABLE_AI_ADVISOR === true ||
+    env?.ENABLE_AI_ADVISOR === "true";
   return Boolean(flagEnabled && env?.AI && typeof env.AI.run === "function");
 }
 
@@ -1666,7 +1671,11 @@ export async function handleAdvisorConversationTurn(rawPayload, env = {}) {
         body: Object.freeze({
           state: CONVERSATION_STATES.TEMPORARILY_UNAVAILABLE,
           conversationId,
-          reason: env?.ENABLE_CONVERSATIONAL_PROTOTYPE === true || env?.ENABLE_AI_ADVISOR === true
+          reason:
+            env?.ENABLE_CONVERSATIONAL_PROTOTYPE === true ||
+            env?.ENABLE_CONVERSATIONAL_PROTOTYPE === "true" ||
+            env?.ENABLE_AI_ADVISOR === true ||
+            env?.ENABLE_AI_ADVISOR === "true"
             ? "ai_binding_unavailable"
             : "ai_disabled",
           deterministicAvailable: true,
