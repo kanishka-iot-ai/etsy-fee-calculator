@@ -3183,12 +3183,18 @@ body.dark .view-mode-btn.is-active {
   background: var(--surface-soft);
   border: 1px solid var(--border);
   border-radius: 6px;
-  padding: 16px 18px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  min-height: 330px;
+  min-height: 280px;
+  max-height: 310px;
+}
+
+body.dark .chart-card {
+  background: #0d121c;
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .chart-card__header {
@@ -3196,14 +3202,15 @@ body.dark .view-mode-btn.is-active {
   justify-content: space-between;
   align-items: flex-start;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .chart-card__title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  margin: 0 0 4px;
+  margin: 0 0 3px;
   color: var(--fg);
+  letter-spacing: -0.01em;
 }
 
 .chart-card__desc {
@@ -3236,8 +3243,8 @@ body.dark .view-mode-btn.is-active {
 }
 
 .legend-pill.is-gem {
-  background: rgba(139, 92, 246, 0.15);
-  color: #8b5cf6;
+  background: rgba(14, 165, 233, 0.15);
+  color: #0ea5e9;
 }
 
 .legend-pill.is-trap {
@@ -3255,7 +3262,7 @@ body.dark .view-mode-btn.is-active {
   font-size: 9px;
   font-weight: 700;
   font-family: var(--mono);
-  padding: 3px 8px;
+  padding: 2px 7px;
   border-radius: 4px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -3266,7 +3273,7 @@ body.dark .view-mode-btn.is-active {
 .chart-canvas-wrap {
   width: 100%;
   flex: 1;
-  min-height: 250px;
+  min-height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3275,7 +3282,7 @@ body.dark .view-mode-btn.is-active {
 .chart-svg {
   width: 100%;
   height: 100%;
-  max-height: 270px;
+  max-height: 240px;
   overflow: visible;
 }
 
@@ -3285,14 +3292,96 @@ body.dark .view-mode-btn.is-active {
   font-family: var(--mono);
 }
 
-/* Scatter plot dot animations */
+/* Scatter plot dot animations & trend line */
+.chart-scatter-dot {
+  cursor: pointer;
+  transition: r 0.15s ease, stroke-width 0.15s ease, filter 0.15s ease;
+}
+
 .chart-scatter-dot:hover,
 .chart-scatter-dot:focus {
+  filter: drop-shadow(0 0 8px currentColor);
+  outline: none;
+}
+
+.chart-trend-line {
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  transition: opacity 0.2s ease;
+}
+
+/* Pillared Bar Chart (Capsule bars in rounded tracks) */
+.chart-pill-track {
+  fill: rgba(0, 0, 0, 0.04);
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+body.dark .chart-pill-track {
+  fill: rgba(255, 255, 255, 0.03);
+  stroke: rgba(255, 255, 255, 0.08);
+}
+
+.chart-pill-bar {
+  cursor: pointer;
+  transform-origin: bottom;
+  transition: opacity 0.15s ease, filter 0.15s ease;
+}
+
+.chart-pill-bar:hover,
+.chart-pill-bar:focus {
+  filter: brightness(1.2);
+  outline: none;
+}
+
+.chart-pill-bar.is-active {
+  stroke: var(--ink, #ffffff);
+  stroke-width: 2;
+  stroke-dasharray: 4,3;
+}
+
+/* Donut segment hover & callout styling */
+.chart-donut-segment {
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.chart-donut-segment:hover,
+.chart-donut-segment:focus {
+  opacity: 0.85;
   filter: drop-shadow(0 0 6px currentColor);
   outline: none;
 }
 
-/* Histogram bar hover */
+.chart-callout-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.85;
+}
+
+.chart-callout-text {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+/* Radial Gauge Rings */
+.chart-radial-ring-track {
+  fill: none;
+  stroke: rgba(0, 0, 0, 0.06);
+}
+
+body.dark .chart-radial-ring-track {
+  stroke: rgba(255, 255, 255, 0.08);
+}
+
+.chart-radial-ring-fill {
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s ease;
+}
+
 .chart-hist-bar {
   transform-origin: bottom;
   transition: opacity 0.15s ease, filter 0.15s ease;

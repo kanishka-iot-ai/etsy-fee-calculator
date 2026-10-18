@@ -144,14 +144,14 @@
         <div class="bulk-toolbar__group">
           <label for="supplier-preset-select" class="sr-only">Supplier Catalog Presets</label>
           <select class="bulk-select" id="supplier-preset-select" aria-label="Select Supplier Catalog Preset">
-            <option value="demo">⚡ 10-Item Mixed Catalog</option>
-            <option value="printify">⚡ Printify (POD)</option>
-            <option value="printful">⚡ Printful (POD)</option>
-            <option value="gelato">⚡ Gelato (POD Art)</option>
-            <option value="aliexpress">⚡ AliExpress (Wholesale)</option>
-            <option value="cjdropshipping">⚡ CJ Dropshipping</option>
+            <option value="demo">10-Item Mixed Catalog</option>
+            <option value="printify">Printify (POD)</option>
+            <option value="printful">Printful (POD)</option>
+            <option value="gelato">Gelato (POD Art)</option>
+            <option value="aliexpress">AliExpress (Wholesale)</option>
+            <option value="cjdropshipping">CJ Dropshipping</option>
           </select>
-          <button type="button" class="button button-quiet" id="load-demo-btn" title="Reload demo products">⚡ Reset Demo</button>
+          <button type="button" class="button button-quiet" id="load-demo-btn" title="Reload demo products">Reset Demo</button>
           <button type="button" class="button button-primary" id="open-upload-btn">+ Ingest Supplier CSV</button>
         </div>
       </div>
@@ -166,84 +166,84 @@
     <section class="visual-analytics-panel" id="visual-analytics-panel" aria-label="Visual Catalog Profit Intelligence">
       <div class="visual-panel-header">
         <div class="visual-panel-title-wrap">
-          <span class="visual-panel-badge">VISUAL INTELLIGENCE</span>
-          <h2 class="visual-panel-title">Interactive Catalog Profit Analytics</h2>
-          <p class="visual-panel-subtitle">Diagnose catalog health, identify high-margin stars, and inspect cost deduction waterfalls in real time.</p>
+          <span class="visual-panel-badge">EXECUTIVE VISUAL INTELLIGENCE</span>
+          <h2 class="visual-panel-title">Portfolio Profitability &amp; Margin Architecture</h2>
+          <p class="visual-panel-subtitle">Real-time vector infographic analysis of margin tiers, capital allocation, and price positioning.</p>
         </div>
         <div class="visual-panel-controls">
           <div class="view-mode-toggle" role="group" aria-label="Catalog View Mode">
-            <button type="button" class="view-mode-btn is-active" id="view-split-btn" data-mode="split" title="Split View: Charts &amp; Spreadsheet Grid">
-              ◫ Split View
+            <button type="button" class="view-mode-btn is-active" id="view-split-btn" data-mode="split" title="Split View: Infographics &amp; Spreadsheet Grid">
+              Split View
             </button>
             <button type="button" class="view-mode-btn" id="view-grid-btn" data-mode="grid" title="Grid Only: Fullscreen Spreadsheet">
-              📋 Grid Only
+              Grid Only
             </button>
-            <button type="button" class="view-mode-btn" id="view-charts-btn" data-mode="charts" title="Charts Only: Visual Analytics">
-              📊 Charts Only
+            <button type="button" class="view-mode-btn" id="view-charts-btn" data-mode="charts" title="Visuals Only: Executive Infographics">
+              Visuals Only
             </button>
           </div>
-          <button type="button" class="button button-quiet" id="toggle-charts-collapse-btn" aria-expanded="true" title="Collapse or expand visual charts">
-            <span id="charts-collapse-label">▲ Hide Charts</span>
+          <button type="button" class="button button-quiet" id="toggle-charts-collapse-btn" aria-expanded="true" title="Collapse or expand visual analytics">
+            <span id="charts-collapse-label">Hide Visuals</span>
           </button>
         </div>
       </div>
 
       <div class="visual-charts-grid" id="visual-charts-container">
-        <!-- Chart 1: Profitability Quadrant Matrix (Scatter Plot) -->
-        <article class="chart-card chart-card--scatter" aria-label="Profitability Quadrant Matrix">
+        <!-- Chart 1: Pricing vs. Margin Positioning Matrix -->
+        <article class="chart-card chart-card--scatter" aria-label="Pricing and Margin Positioning Matrix">
           <div class="chart-card__header">
             <div>
-              <h3 class="chart-card__title">⭐ Profitability Quadrant Matrix</h3>
-              <p class="chart-card__desc">Price vs. Margin % (Hover for breakdown • Click dot to jump to row)</p>
+              <h3 class="chart-card__title">Pricing vs. Margin Positioning Matrix</h3>
+              <p class="chart-card__desc">Unit price plotted against net profit margin. Hover for metrics • Select node to inspect catalog record.</p>
             </div>
             <div class="chart-legend" aria-hidden="true">
-              <span class="legend-pill is-star">Stars (≥30%)</span>
-              <span class="legend-pill is-gem">Impulse Gems</span>
-              <span class="legend-pill is-trap">Traps (&lt;15%)</span>
-              <span class="legend-pill is-loss">Losses (&lt;$0)</span>
+              <span class="legend-pill is-star">Optimal Margin (≥30%)</span>
+              <span class="legend-pill is-gem">Target Margin (15–30%)</span>
+              <span class="legend-pill is-trap">Compressed (0–15%)</span>
+              <span class="legend-pill is-loss">Deficit (&lt;0%)</span>
             </div>
           </div>
-          <div class="chart-canvas-wrap" id="scatter-chart-wrap" tabindex="0" role="img" aria-label="Scatter plot showing product prices plotted against profit margins">
+          <div class="chart-canvas-wrap" id="scatter-chart-wrap" tabindex="0" role="img" aria-label="Scatter and trajectory plot showing product prices plotted against profit margins">
             <!-- SVG rendered dynamically -->
           </div>
         </article>
 
-        <!-- Chart 2: Margin Health Distribution (Histogram) -->
-        <article class="chart-card chart-card--histogram" aria-label="Margin Health Distribution Histogram">
+        <!-- Chart 2: Margin Tier Distribution (Pillared Capsule Bars) -->
+        <article class="chart-card chart-card--histogram" aria-label="Margin Tier Distribution">
           <div class="chart-card__header">
             <div>
-              <h3 class="chart-card__title">📊 Margin Health Distribution</h3>
-              <p class="chart-card__desc">Catalog distribution by profit margin tier (Click any bar to filter)</p>
+              <h3 class="chart-card__title">Margin Tier Distribution</h3>
+              <p class="chart-card__desc">Catalog volume segmented by margin bracket. Click any pillar to cross-filter the catalog.</p>
             </div>
-            <span class="chart-hint-pill">⚡ 1-Click Filter</span>
+            <span class="chart-hint-pill">Click Pillar to Filter</span>
           </div>
-          <div class="chart-canvas-wrap" id="histogram-chart-wrap" tabindex="0" role="img" aria-label="Histogram showing product distribution by profit margin tier">
+          <div class="chart-canvas-wrap" id="histogram-chart-wrap" tabindex="0" role="img" aria-label="Pillared capsule bar chart showing product volume by margin tier">
             <!-- SVG rendered dynamically -->
           </div>
         </article>
 
-        <!-- Chart 3: Deductive P&L Waterfall Bridge -->
-        <article class="chart-card chart-card--waterfall" aria-label="P&L Cost Deduction Waterfall">
+        <!-- Chart 3: Cost Structure & Margin Decomposition (Concentric Donut & Radial Gauges) -->
+        <article class="chart-card chart-card--waterfall" aria-label="Cost Structure and Margin Decomposition">
           <div class="chart-card__header">
             <div>
-              <h3 class="chart-card__title">💸 "Where Does Every Dollar Go?" (P&amp;L Bridge)</h3>
-              <p class="chart-card__desc">Sequential deductions from Gross Revenue to Net Seller Take-Home</p>
+              <h3 class="chart-card__title">Cost Structure &amp; Margin Decomposition</h3>
+              <p class="chart-card__desc">Revenue allocation across COGS, shipping, platform fees, payment processing, and net profit.</p>
             </div>
           </div>
-          <div class="chart-canvas-wrap" id="waterfall-chart-wrap" tabindex="0" role="img" aria-label="Waterfall chart showing sequential deductions from gross revenue to net profit">
+          <div class="chart-canvas-wrap" id="waterfall-chart-wrap" tabindex="0" role="img" aria-label="Concentric donut and radial gauge chart showing cost decomposition and portfolio ratios">
             <!-- SVG rendered dynamically -->
           </div>
         </article>
 
-        <!-- Chart 4: Advertising Sensitivity Stress-Test -->
-        <article class="chart-card chart-card--ads" aria-label="Advertising Sensitivity Stress-Test">
+        <!-- Chart 4: Advertising Attribution & Sensitivity Analysis -->
+        <article class="chart-card chart-card--ads" aria-label="Advertising Attribution and Sensitivity Analysis">
           <div class="chart-card__header">
             <div>
-              <h3 class="chart-card__title">⚡ 15% Offsite Ads Stress-Test</h3>
-              <p class="chart-card__desc">Organic Net Profit vs. Net Profit with mandatory 15% Ads attribution</p>
+              <h3 class="chart-card__title">Advertising Attribution &amp; Sensitivity Analysis</h3>
+              <p class="chart-card__desc">Baseline organic net take-home evaluated against mandatory 15% Offsite Advertising attribution.</p>
             </div>
           </div>
-          <div class="chart-canvas-wrap" id="ads-sensitivity-chart-wrap" tabindex="0" role="img" aria-label="Comparative chart showing organic profit versus 15% ad attributed profit">
+          <div class="chart-canvas-wrap" id="ads-sensitivity-chart-wrap" tabindex="0" role="img" aria-label="Comparative sensitivity chart showing organic profit versus 15% ad attributed profit">
             <!-- SVG rendered dynamically -->
           </div>
         </article>
@@ -271,22 +271,22 @@
 
       <div class="bulk-toolbar__group">
         <button type="button" class="button button-secondary" id="toggle-adjustments-btn" aria-label="Open expense adjustments drawer">
-          ⚙ Additional Expenses
+          Additional Expenses
         </button>
         <button type="button" class="button button-secondary" id="toggle-columns-btn" aria-label="Open column chooser">
-          ⊞ Column Chooser
+          Column Chooser
         </button>
         <button type="button" class="button button-secondary" id="export-favs-btn" title="Export shortlisted items to CSV">
-          ★ Export Shortlist
+          Export Shortlist
         </button>
         <button type="button" class="button button-secondary" id="export-all-btn" title="Export all catalog products to CSV">
-          ⬇ Export CSV
+          Export CSV
         </button>
         <button type="button" class="button button-secondary" id="export-xlsx-btn" title="Export formatted spreadsheet to Excel (.xlsx)">
-          📊 Export Excel (.xlsx)
+          Export Excel (.xlsx)
         </button>
         <button type="button" class="button button-primary" id="export-pdf-btn" title="Generate printable executive profit summary">
-          📄 Export PDF Report
+          Export PDF Report
         </button>
       </div>
     </section>
@@ -353,7 +353,7 @@
 
           <input type="file" id="catalog-file-input" accept=".csv,text/csv" class="sr-only">
           <div class="drop-zone" id="catalog-drop-zone">
-            <div class="drop-zone-icon">📄</div>
+            <div class="drop-zone-icon">CSV</div>
             <strong>Click to select CSV or drag and drop file here</strong>
             <p style="font-size: 12px; color: var(--muted); margin: 6px 0 0;">Supported format: UTF-8 CSV (up to 500 products)</p>
           </div>
@@ -362,15 +362,15 @@
           <!-- One-Click Supplier Presets & Templates Section -->
           <div class="supplier-templates-section" style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);">
             <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; flex-wrap: wrap; gap: 6px;">
-              <strong style="font-size: 13px;">⚡ One-Click Supplier Presets &amp; Templates</strong>
+              <strong style="font-size: 13px;">Supplier Presets &amp; Templates</strong>
               <span style="font-size: 11px; color: var(--muted);">Click to load instant catalog or download template</span>
             </div>
             <div class="supplier-template-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px;">
-              <button type="button" class="button button-quiet btn-supplier-preset" data-supplier="printify">⚡ Printify (POD)</button>
-              <button type="button" class="button button-quiet btn-supplier-preset" data-supplier="printful">⚡ Printful (POD)</button>
-              <button type="button" class="button button-quiet btn-supplier-preset" data-supplier="gelato">⚡ Gelato (POD)</button>
-              <button type="button" class="button button-quiet btn-supplier-preset" data-supplier="aliexpress">⚡ AliExpress</button>
-              <button type="button" class="button button-quiet btn-supplier-preset" data-supplier="cjdropshipping">⚡ CJ Dropship</button>
+              <button type="button" class="button button-quiet btn-supplier-preset" data-supplier="printify">Printify (POD)</button>
+              <button type="button" class="button button-quiet btn-supplier-preset" data-supplier="printful">Printful (POD)</button>
+              <button type="button" class="button button-quiet btn-supplier-preset" data-supplier="gelato">Gelato (POD)</button>
+              <button type="button" class="button button-quiet btn-supplier-preset" data-supplier="aliexpress">AliExpress</button>
+              <button type="button" class="button button-quiet btn-supplier-preset" data-supplier="cjdropshipping">CJ Dropship</button>
             </div>
             <div style="margin-top: 12px; font-size: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
               <span style="color: var(--muted); font-size: 11px;">Download Pre-Formatted CSV Templates:</span>
@@ -482,7 +482,7 @@
       <div class="modal-header">
         <h2 class="modal-title" id="executive-report-title">Executive Profit &amp; Sourcing Report</h2>
         <div style="display: flex; gap: 8px; align-items: center;">
-          <button type="button" class="button button-primary" id="btn-print-executive-report">🖨️ Print / Save as PDF</button>
+          <button type="button" class="button button-primary" id="btn-print-executive-report">Print / Save as PDF</button>
           <button type="button" class="modal-close-btn" data-close-modal aria-label="Close modal">✕</button>
         </div>
       </div>
@@ -491,7 +491,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="button button-secondary" data-close-modal>Close</button>
-        <button type="button" class="button button-primary" id="btn-print-executive-report-footer">🖨️ Print / Save as PDF</button>
+        <button type="button" class="button button-primary" id="btn-print-executive-report-footer">Print / Save as PDF</button>
       </div>
     </div>
   </div>

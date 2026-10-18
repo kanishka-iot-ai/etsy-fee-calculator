@@ -47,7 +47,7 @@ export {
  * Enhanced Column definitions for the interactive Analyzer.Tools-style grid.
  */
 export const GRID_COLUMNS = Object.freeze([
-  { id: "favorite", label: "★ Fav", category: "meta", align: "center", minWidth: 48, defaultVisible: true },
+  { id: "favorite", label: "Fav", category: "meta", align: "center", minWidth: 48, defaultVisible: true },
   { id: "rowNumber", label: "#", category: "meta", align: "center", minWidth: 44, defaultVisible: true },
   { id: "productName", label: "Product Title & SKU", category: "product", align: "left", minWidth: 220, defaultVisible: true },
   { id: "category", label: "Category", category: "product", align: "left", minWidth: 110, defaultVisible: true },
@@ -319,7 +319,7 @@ export function calculateCatalogBatch(validRows = [], options = {}) {
       statusLabel = "15% Ads Vulnerable";
     } else if (margin >= 0.25 && roi >= 40) {
       status = "winner";
-      statusLabel = "Top Winner (★)";
+      statusLabel = "Optimal Margin (≥30%)";
     }
 
     return Object.freeze({

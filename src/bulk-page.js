@@ -183,9 +183,9 @@ function renderKpiCards() {
       tone: s.averageRoiPct >= 50 ? "positive" : "neutral"
     },
     {
-      label: "Top Winners (★)",
+      label: "Optimal Margin SKUs",
       value: String(s.winnerCount),
-      badge: "High Margin & ROI",
+      badge: "Margin ≥ 30%",
       tone: "gold"
     }
   ];
@@ -299,7 +299,7 @@ function hideChartTooltip() {
 }
 
 /**
- * Renders the Profitability Quadrant Matrix (Scatter Plot).
+ * Renders the Pricing vs. Margin Positioning Matrix with connected trajectory contour.
  */
 function renderScatterChart(items, containerEl) {
   if (!containerEl) return;
@@ -317,7 +317,7 @@ function renderScatterChart(items, containerEl) {
 
   const W = 520;
   const H = 260;
-  const pad = { top: 25, right: 30, bottom: 35, left: 50 };
+  const pad = { top: 22, right: 30, bottom: 35, left: 45 };
   const pw = W - pad.left - pad.right;
   const ph = H - pad.top - pad.bottom;
 
@@ -325,7 +325,7 @@ function renderScatterChart(items, containerEl) {
     viewBox: `0 0 ${W} ${H}`,
     class: "chart-svg chart-svg--scatter",
     role: "img",
-    "aria-label": "Price vs Profit Margin Quadrant Scatter Matrix"
+    "aria-label": "Pricing and Margin Positioning Matrix"
   });
 
   const getX = (price) => pad.left + Math.max(0, Math.min(1, (price - minPrice) / (maxPrice - minPrice))) * pw;
@@ -335,13 +335,13 @@ function renderScatterChart(items, containerEl) {
   const yZero = getY(0);
   const yTarget = getY(targetMargin);
 
-  // Quadrant backgrounds
+  // Quadrant background fills (subtle executive tint)
   svg.appendChild(createSvgEl("rect", {
     x: xMedian,
     y: pad.top,
     width: Math.max(0, pad.left + pw - xMedian),
     height: Math.max(0, yTarget - pad.top),
-    fill: "rgba(16, 185, 129, 0.06)",
+    fill: "rgba(16, 185, 129, 0.05)",
     rx: "2"
   }));
 
@@ -350,7 +350,7 @@ function renderScatterChart(items, containerEl) {
     y: pad.top,
     width: Math.max(0, xMedian - pad.left),
     height: Math.max(0, yTarget - pad.top),
-    fill: "rgba(139, 92, 246, 0.05)",
+    fill: "rgba(14, 165, 233, 0.04)",
     rx: "2"
   }));
 
@@ -360,17 +360,17 @@ function renderScatterChart(items, containerEl) {
       y: yZero,
       width: pw,
       height: Math.max(0, pad.top + ph - yZero),
-      fill: "rgba(239, 68, 68, 0.06)",
+      fill: "rgba(239, 68, 68, 0.05)",
       rx: "2"
     }));
   }
 
-  // Watermarks
+  // Corner quadrant watermark indicators (professional, no emojis)
   const watermarks = [
-    { text: "⭐ STARS", x: pad.left + pw - 10, y: pad.top + 16, anchor: "end", color: "#10B981" },
-    { text: "🎯 GEMS", x: pad.left + 10, y: pad.top + 16, anchor: "start", color: "#8B5CF6" },
-    { text: "⚠️ TRAPS", x: pad.left + pw - 10, y: Math.min(yZero - 6, pad.top + ph - 8), anchor: "end", color: "#F59E0B" },
-    { text: "💤 LOSSES", x: pad.left + 10, y: pad.top + ph - 8, anchor: "start", color: "#EF4444" }
+    { text: "OPTIMAL (≥30%)", x: pad.left + pw - 8, y: pad.top + 14, anchor: "end", color: "#10B981" },
+    { text: "TARGET (15–30%)", x: pad.left + 8, y: pad.top + 14, anchor: "start", color: "#0EA5E9" },
+    { text: "COMPRESSED (<15%)", x: pad.left + pw - 8, y: Math.min(yZero - 6, pad.top + ph - 8), anchor: "end", color: "#F59E0B" },
+    { text: "DEFICIT (<0%)", x: pad.left + 8, y: pad.top + ph - 8, anchor: "start", color: "#EF4444" }
   ];
 
   for (const wm of watermarks) {
@@ -380,15 +380,16 @@ function renderScatterChart(items, containerEl) {
       "text-anchor": wm.anchor,
       fill: wm.color,
       "font-size": "9",
-      "font-weight": "800",
-      opacity: "0.55",
-      "letter-spacing": "0.05em"
+      "font-weight": "700",
+      opacity: "0.5",
+      "letter-spacing": "0.06em",
+      "font-family": "var(--mono)"
     });
     t.textContent = wm.text;
     svg.appendChild(t);
   }
 
-  // Reference lines
+  // Reference lines & axes
   const priceTicks = [minPrice, Math.round(medianPrice), Math.round(maxPrice)];
   for (const pt of priceTicks) {
     const x = getX(pt);
@@ -396,13 +397,14 @@ function renderScatterChart(items, containerEl) {
       x1: x, y1: pad.top, x2: x, y2: pad.top + ph,
       stroke: "var(--border, #E2E8F0)",
       "stroke-dasharray": "3,3",
-      opacity: "0.5"
+      opacity: "0.4"
     }));
     const lbl = createSvgEl("text", {
-      x: x, y: pad.top + ph + 16,
+      x: x, y: pad.top + ph + 15,
       "text-anchor": "middle",
-      "font-size": "10",
-      fill: "var(--muted, #64748B)"
+      "font-size": "9",
+      fill: "var(--muted, #64748B)",
+      "font-family": "var(--mono)"
     });
     lbl.textContent = `$${pt}`;
     svg.appendChild(lbl);
@@ -416,14 +418,15 @@ function renderScatterChart(items, containerEl) {
       stroke: mt === 0 ? "#EF4444" : mt === targetMargin ? "#10B981" : "var(--border, #E2E8F0)",
       "stroke-dasharray": mt === 0 ? "none" : "3,3",
       "stroke-width": mt === 0 ? "1.5" : "1",
-      opacity: mt === 0 ? "0.8" : "0.5"
+      opacity: mt === 0 ? "0.7" : "0.4"
     }));
     const lbl = createSvgEl("text", {
       x: pad.left - 6, y: y + 3,
       "text-anchor": "end",
-      "font-size": "10",
+      "font-size": "9",
       fill: mt === 0 ? "#EF4444" : mt === targetMargin ? "#10B981" : "var(--muted, #64748B)",
-      "font-weight": mt === 0 || mt === targetMargin ? "700" : "400"
+      "font-weight": mt === 0 || mt === targetMargin ? "700" : "400",
+      "font-family": "var(--mono)"
     });
     lbl.textContent = `${mt}%`;
     svg.appendChild(lbl);
@@ -432,31 +435,60 @@ function renderScatterChart(items, containerEl) {
   const xLabel = createSvgEl("text", {
     x: pad.left + pw / 2, y: H - 4,
     "text-anchor": "middle",
-    "font-size": "10",
+    "font-size": "9",
     "font-weight": "600",
     fill: "var(--muted, #64748B)"
   });
   xLabel.textContent = "Retail Price ($)";
   svg.appendChild(xLabel);
 
-  // Dots
+  // Connected Trajectory Contour (Multi-line area slope inspired by reference image)
+  const sortedPoints = [...points].sort((a, b) => a.price - b.price);
+  if (sortedPoints.length > 1) {
+    let dArea = `M ${getX(sortedPoints[0].price)} ${pad.top + ph}`;
+    let dLine = `M ${getX(sortedPoints[0].price)} ${getY(sortedPoints[0].margin)}`;
+
+    for (const pt of sortedPoints) {
+      const cx = getX(pt.price);
+      const cy = getY(pt.margin);
+      dArea += ` L ${cx} ${cy}`;
+      dLine += ` L ${cx} ${cy}`;
+    }
+    dArea += ` L ${getX(sortedPoints[sortedPoints.length - 1].price)} ${pad.top + ph} Z`;
+
+    svg.appendChild(createSvgEl("path", {
+      d: dArea,
+      fill: "rgba(14, 165, 233, 0.05)",
+      class: "chart-trend-area"
+    }));
+
+    svg.appendChild(createSvgEl("path", {
+      d: dLine,
+      fill: "none",
+      stroke: "rgba(14, 165, 233, 0.4)",
+      "stroke-width": "1.5",
+      "stroke-dasharray": "3,3",
+      class: "chart-trend-line"
+    }));
+  }
+
+  // Glowing Vector Nodes
   for (const pt of points) {
     const cx = getX(pt.price);
     const cy = getY(pt.margin);
 
     const circle = createSvgEl("circle", {
-      cx, cy, r: "6",
+      cx, cy, r: "5.5",
       fill: pt.color,
-      stroke: "var(--surface, #FFFFFF)",
+      stroke: "var(--surface, #0A0F1D)",
       "stroke-width": "1.5",
       class: "chart-scatter-dot",
       tabindex: "0",
-      "data-product-id": pt.id,
-      style: "cursor: pointer; transition: transform 0.15s ease, r 0.15s ease;"
+      "data-product-id": pt.id
     });
 
     circle.addEventListener("mouseenter", (e) => {
-      circle.setAttribute("r", "9");
+      circle.setAttribute("r", "8.5");
       circle.setAttribute("stroke-width", "2.5");
       const node = createTooltipNode(pt.productName, [
         { label: `SKU: ${pt.id} • ${pt.category}`, val: "", sub: true },
@@ -464,12 +496,12 @@ function renderScatterChart(items, containerEl) {
         { label: "Net Profit:", val: `$${pt.profit.toFixed(2)}`, color: pt.profit >= 0 ? "#4ADE80" : "#F87171" },
         { label: "Profit Margin:", val: `${pt.margin.toFixed(1)}%`, color: pt.margin >= 30 ? "#4ADE80" : pt.margin >= 15 ? "#FBBF24" : "#F87171" },
         { label: "Total Etsy Fees:", val: `$${pt.totalFees.toFixed(2)}` }
-      ], "⚡ Click dot to jump to row");
+      ], "Click node to inspect table record");
       showChartTooltip(e, node);
     });
 
     circle.addEventListener("mouseleave", () => {
-      circle.setAttribute("r", "6");
+      circle.setAttribute("r", "5.5");
       circle.setAttribute("stroke-width", "1.5");
       hideChartTooltip();
     });
@@ -490,7 +522,7 @@ function renderScatterChart(items, containerEl) {
 }
 
 /**
- * Renders the Margin Health Distribution Histogram with 1-click filtering.
+ * Renders the Margin Tier Distribution using pillared capsule bars inside rounded tracks.
  */
 function renderHistogramChart(items, containerEl) {
   if (!containerEl) return;
@@ -499,7 +531,7 @@ function renderHistogramChart(items, containerEl) {
   if (!items.length) {
     const empty = document.createElement("p");
     empty.className = "chart-empty-state";
-    empty.textContent = "No catalog data for histogram.";
+    empty.textContent = "No catalog data for distribution.";
     containerEl.appendChild(empty);
     return;
   }
@@ -509,7 +541,7 @@ function renderHistogramChart(items, containerEl) {
 
   const W = 520;
   const H = 260;
-  const pad = { top: 30, right: 25, bottom: 50, left: 45 };
+  const pad = { top: 32, right: 25, bottom: 42, left: 25 };
   const pw = W - pad.left - pad.right;
   const ph = H - pad.top - pad.bottom;
 
@@ -517,118 +549,115 @@ function renderHistogramChart(items, containerEl) {
     viewBox: `0 0 ${W} ${H}`,
     class: "chart-svg chart-svg--histogram",
     role: "img",
-    "aria-label": "Margin Health Distribution Histogram"
+    "aria-label": "Margin Tier Distribution Pillared Capsule Chart"
   });
 
   const barCount = bucketList.length;
   const gap = 14;
-  const barW = Math.max(16, (pw - gap * (barCount - 1)) / barCount);
+  const barW = Math.max(18, (pw - gap * (barCount - 1)) / barCount);
 
-  // Grid lines
-  const gridTicks = [0, Math.ceil(hist.maxCount / 2), hist.maxCount];
-  for (const gt of gridTicks) {
-    const y = pad.top + ph - (gt / hist.maxCount) * ph;
-    svg.appendChild(createSvgEl("line", {
-      x1: pad.left, y1: y, x2: pad.left + pw, y2: y,
-      stroke: "var(--border, #E2E8F0)",
-      "stroke-dasharray": "3,3",
-      opacity: "0.5"
-    }));
-    const lbl = createSvgEl("text", {
-      x: pad.left - 6, y: y + 3,
-      "text-anchor": "end",
-      "font-size": "10",
-      fill: "var(--muted, #64748B)"
-    });
-    lbl.textContent = String(gt);
-    svg.appendChild(lbl);
-  }
-
-  // Bars
   bucketList.forEach((b, idx) => {
     const x = pad.left + idx * (barW + gap);
-    const barH = Math.max(b.count > 0 ? 6 : 0, (b.count / hist.maxCount) * ph);
+    const barH = Math.max(b.count > 0 ? 12 : 0, (b.count / hist.maxCount) * ph);
     const y = pad.top + ph - barH;
 
     const isActive = state.activeFilterTab === b.tabId;
 
-    const rect = createSvgEl("rect", {
-      x, y, width: barW, height: barH,
-      rx: "4",
-      fill: b.color,
-      class: `chart-hist-bar ${isActive ? "is-active" : ""}`,
-      style: "cursor: pointer; transition: opacity 0.2s ease, filter 0.2s ease;",
-      tabindex: "0",
-      "data-tab-id": b.tabId
+    // Track Slot (Full height pill slot background like the reference image)
+    const track = createSvgEl("rect", {
+      x, y: pad.top, width: barW, height: ph,
+      rx: "9",
+      class: "chart-pill-track"
     });
+    svg.appendChild(track);
 
-    if (isActive) {
-      rect.setAttribute("stroke", "var(--ink, #000000)");
-      rect.setAttribute("stroke-width", "2.5");
-    }
-
-    rect.addEventListener("mouseenter", (e) => {
-      rect.style.opacity = "0.8";
-      const node = createTooltipNode(b.label, [
-        { label: "Product Count:", val: `${b.count} SKUs (${b.pct.toFixed(1)}%)`, color: b.color }
-      ], "⚡ Click bar to filter table");
-      showChartTooltip(e, node);
-    });
-
-    rect.addEventListener("mouseleave", () => {
-      rect.style.opacity = "1";
-      hideChartTooltip();
-    });
-
-    rect.addEventListener("click", () => {
-      state.activeFilterTab = b.tabId;
-      renderFilterTabs();
-      renderGrid();
-      renderVisualAnalytics();
-    });
-
-    svg.appendChild(rect);
-
+    // Filled Capsule Bar
     if (b.count > 0) {
-      const countText = createSvgEl("text", {
-        x: x + barW / 2,
-        y: y - 6,
-        "text-anchor": "middle",
-        "font-size": "11",
-        "font-weight": "700",
-        fill: "var(--fg, #0F172A)"
+      const pill = createSvgEl("rect", {
+        x, y, width: barW, height: barH,
+        rx: "9",
+        fill: b.color,
+        class: `chart-pill-bar ${isActive ? "is-active" : ""}`,
+        tabindex: "0",
+        "data-tab-id": b.tabId
       });
-      countText.textContent = `${b.count}`;
-      svg.appendChild(countText);
+
+      pill.addEventListener("mouseenter", (e) => {
+        const node = createTooltipNode(b.label, [
+          { label: "Product Volume:", val: `${b.count} SKUs (${b.pct.toFixed(1)}%)`, color: b.color }
+        ], "Click pillar to filter catalog");
+        showChartTooltip(e, node);
+      });
+
+      pill.addEventListener("mouseleave", () => hideChartTooltip());
+
+      pill.addEventListener("click", () => {
+        state.activeFilterTab = b.tabId;
+        renderFilterTabs();
+        renderGrid();
+        renderVisualAnalytics();
+      });
+
+      svg.appendChild(pill);
+
+      // Percentage label inside capsule (like reference image: 15%, 20%, 35%, 100%)
+      const pctText = createSvgEl("text", {
+        x: x + barW / 2,
+        y: barH >= 28 ? y + barH / 2 + 4 : y - 6,
+        "text-anchor": "middle",
+        "font-size": "10",
+        "font-weight": "800",
+        "font-family": "var(--mono)",
+        fill: barH >= 28 ? "#FFFFFF" : "var(--fg, #0F172A)"
+      });
+      pctText.textContent = `${b.pct.toFixed(0)}%`;
+      svg.appendChild(pctText);
     }
 
+    // SKU Count above track
+    const countText = createSvgEl("text", {
+      x: x + barW / 2,
+      y: pad.top - 10,
+      "text-anchor": "middle",
+      "font-size": "10",
+      "font-weight": "700",
+      "font-family": "var(--mono)",
+      fill: b.count > 0 ? "var(--fg, #0F172A)" : "var(--muted, #64748B)"
+    });
+    countText.textContent = `${b.count}`;
+    svg.appendChild(countText);
+
+    // Tier Label below track
     const labelText = createSvgEl("text", {
       x: x + barW / 2,
       y: pad.top + ph + 16,
       "text-anchor": "middle",
       "font-size": "10",
-      "font-weight": "600",
-      fill: "var(--muted, #64748B)"
+      "font-weight": "700",
+      fill: "var(--fg, #0F172A)"
     });
     labelText.textContent = b.label.split(" ")[0];
     svg.appendChild(labelText);
 
-    const pctText = createSvgEl("text", {
+    // Margin range subtext below
+    const subText = createSvgEl("text", {
       x: x + barW / 2,
       y: pad.top + ph + 28,
       "text-anchor": "middle",
-      "font-size": "9",
+      "font-size": "8",
+      "font-family": "var(--mono)",
       fill: "var(--muted, #64748B)"
     });
-    pctText.textContent = `${b.pct.toFixed(0)}%`;
-    svg.appendChild(pctText);
+    const ranges = ["<0%", "0–15%", "15–30%", "30–50%", "≥50%"];
+    subText.textContent = ranges[idx] || "";
+    svg.appendChild(subText);
   });
 
   containerEl.appendChild(svg);
 }
 
 /**
- * Renders the P&L Deductive Waterfall Bridge ("Where Does Every Dollar Go?").
+ * Renders the Cost Structure & Margin Decomposition using a concentric donut with pointer callout lines and radial gauge rings.
  */
 function renderWaterfallChart(items, containerEl) {
   if (!containerEl) return;
@@ -637,7 +666,7 @@ function renderWaterfallChart(items, containerEl) {
   if (!items.length) {
     const empty = document.createElement("p");
     empty.className = "chart-empty-state";
-    empty.textContent = "No catalog data for waterfall bridge.";
+    empty.textContent = "No catalog data for cost decomposition.";
     containerEl.appendChild(empty);
     return;
   }
@@ -647,101 +676,247 @@ function renderWaterfallChart(items, containerEl) {
 
   const W = 520;
   const H = 260;
-  const pad = { top: 30, right: 25, bottom: 45, left: 50 };
-  const pw = W - pad.left - pad.right;
-  const ph = H - pad.top - pad.bottom;
 
   const svg = createSvgEl("svg", {
     viewBox: `0 0 ${W} ${H}`,
-    class: "chart-svg chart-svg--waterfall",
+    class: "chart-svg chart-svg--donut",
     role: "img",
-    "aria-label": "P&L Cost Deduction Waterfall Bridge"
+    "aria-label": "Cost Structure and Margin Decomposition Infographic"
   });
 
-  const maxVal = Math.max(10, waterfall.grossRevenue * 1.15);
-  const getY = (val) => pad.top + ph - Math.max(0, Math.min(1, val / maxVal)) * ph;
+  // Left Donut Center & Radii
+  const cx = 150;
+  const cy = 130;
+  const R = 78;
+  const r = 48;
 
-  const stepCount = steps.length;
-  const gap = 12;
-  const barW = Math.max(16, (pw - gap * (stepCount - 1)) / stepCount);
+  // Map 5 components: net profit, cogs, shipping, platform fees, payment fees
+  const grossRev = Math.max(1, waterfall.grossRevenue);
+  const slices = steps.filter((s) => s.id !== "revenue");
 
-  const yZero = getY(0);
-  svg.appendChild(createSvgEl("line", {
-    x1: pad.left, y1: yZero, x2: pad.left + pw, y2: yZero,
-    stroke: "var(--border, #E2E8F0)",
-    "stroke-width": "1.5"
-  }));
+  let currentAngle = -Math.PI / 2; // start from 12 o'clock
 
-  steps.forEach((s, idx) => {
-    const x = pad.left + idx * (barW + gap);
-    const yTop = getY(Math.max(s.start, s.end));
-    const yBottom = getY(Math.min(s.start, s.end));
-    const barH = Math.max(3, yBottom - yTop);
+  slices.forEach((s) => {
+    const sliceAngle = (Math.max(0, s.amount) / grossRev) * (2 * Math.PI);
+    if (sliceAngle <= 0.001) return;
 
-    if (idx < stepCount - 1) {
-      const nextX = pad.left + (idx + 1) * (barW + gap);
-      const connY = getY(s.end);
-      svg.appendChild(createSvgEl("line", {
-        x1: x + barW, y1: connY, x2: nextX, y2: connY,
-        stroke: "var(--border, #CBD5E1)",
-        "stroke-dasharray": "2,2",
-        "stroke-width": "1"
-      }));
-    }
+    const startAngle = currentAngle;
+    const endAngle = currentAngle + sliceAngle;
+    currentAngle = endAngle;
 
-    const rect = createSvgEl("rect", {
-      x, y: yTop, width: barW, height: barH,
-      rx: "3",
+    // Outer & inner arc coordinates
+    const x1 = cx + R * Math.cos(startAngle);
+    const y1 = cy + R * Math.sin(startAngle);
+    const x2 = cx + R * Math.cos(endAngle);
+    const y2 = cy + R * Math.sin(endAngle);
+    const x3 = cx + r * Math.cos(endAngle);
+    const y3 = cy + r * Math.sin(endAngle);
+    const x4 = cx + r * Math.cos(startAngle);
+    const y4 = cy + r * Math.sin(startAngle);
+
+    const largeArc = sliceAngle > Math.PI ? 1 : 0;
+    const d = `M ${x1} ${y1} A ${R} ${R} 0 ${largeArc} 1 ${x2} ${y2} L ${x3} ${y3} A ${r} ${r} 0 ${largeArc} 0 ${x4} ${y4} Z`;
+
+    const path = createSvgEl("path", {
+      d,
       fill: s.color,
-      class: "chart-waterfall-bar",
-      tabindex: "0",
-      style: "cursor: pointer;"
+      stroke: "var(--surface, #0A0F1D)",
+      "stroke-width": "2",
+      class: "chart-donut-segment",
+      tabindex: "0"
     });
 
-    rect.addEventListener("mouseenter", (e) => {
-      const node = createTooltipNode(s.label, [
-        { label: "Deduction Amount:", val: `${s.type === 'deduction' ? '-' : ''}$${Math.abs(s.amount).toFixed(2)}`, color: s.color },
+    path.addEventListener("mouseenter", (e) => {
+      const node = createTooltipNode(s.label.replace(/^[−=]\s*/, ""), [
+        { label: "Amount:", val: `$${s.amount.toFixed(2)}`, color: s.color },
         { label: "Share of Revenue:", val: `${s.pct.toFixed(1)}%` }
       ]);
       showChartTooltip(e, node);
     });
 
-    rect.addEventListener("mouseleave", () => hideChartTooltip());
+    path.addEventListener("mouseleave", () => hideChartTooltip());
 
-    svg.appendChild(rect);
+    svg.appendChild(path);
 
+    // Vector Callout Pointer Lines (for slices >= 4%)
+    if (s.pct >= 4) {
+      const midAngle = (startAngle + endAngle) / 2;
+      const isRight = Math.cos(midAngle) >= 0;
+
+      const px1 = cx + R * Math.cos(midAngle);
+      const py1 = cy + R * Math.sin(midAngle);
+      const px2 = cx + (R + 14) * Math.cos(midAngle);
+      const py2 = cy + (R + 14) * Math.sin(midAngle);
+      const px3 = isRight ? px2 + 18 : px2 - 18;
+
+      const polyline = createSvgEl("polyline", {
+        points: `${px1},${py1} ${px2},${py2} ${px3},${py2}`,
+        stroke: s.color,
+        "stroke-width": "1.2",
+        fill: "none",
+        class: "chart-callout-line"
+      });
+      svg.appendChild(polyline);
+
+      const dot = createSvgEl("circle", {
+        cx: px1, cy: py1, r: "2.2",
+        fill: s.color
+      });
+      svg.appendChild(dot);
+
+      const calloutText = createSvgEl("text", {
+        x: isRight ? px3 + 4 : px3 - 4,
+        y: py2 + 3,
+        "text-anchor": isRight ? "start" : "end",
+        "font-size": "9",
+        "font-weight": "700",
+        "font-family": "var(--mono)",
+        fill: s.color
+      });
+      calloutText.textContent = `${s.pct.toFixed(0)}%`;
+      svg.appendChild(calloutText);
+    }
+  });
+
+  // Center Cutout Circle & Metric
+  const centerCircle = createSvgEl("circle", {
+    cx, cy, r: r - 2,
+    fill: "var(--surface, #0A0F1D)",
+    stroke: "var(--border, #1E293B)",
+    "stroke-width": "1"
+  });
+  svg.appendChild(centerCircle);
+
+  const netStep = steps.find((s) => s.id === "net_profit") || { pct: 0, amount: 0 };
+  const centerPct = createSvgEl("text", {
+    x: cx, y: cy - 4,
+    "text-anchor": "middle",
+    "font-size": "18",
+    "font-weight": "800",
+    "font-family": "var(--mono)",
+    fill: netStep.amount >= 0 ? "#10B981" : "#EF4444"
+  });
+  centerPct.textContent = `${netStep.pct.toFixed(0)}%`;
+  svg.appendChild(centerPct);
+
+  const centerLabel = createSvgEl("text", {
+    x: cx, y: cy + 10,
+    "text-anchor": "middle",
+    "font-size": "8",
+    "font-weight": "700",
+    "letter-spacing": "0.08em",
+    fill: "var(--muted, #64748B)"
+  });
+  centerLabel.textContent = "NET MARGIN";
+  svg.appendChild(centerLabel);
+
+  const centerDollar = createSvgEl("text", {
+    x: cx, y: cy + 22,
+    "text-anchor": "middle",
+    "font-size": "9",
+    "font-weight": "600",
+    "font-family": "var(--mono)",
+    fill: "var(--fg, #0F172A)"
+  });
+  centerDollar.textContent = `$${Math.round(netStep.amount)}`;
+  svg.appendChild(centerDollar);
+
+  // Right Side: 3 Circular Radial Gauge Rings (like the 75%, 50%, 25% rings in reference image)
+  const totalItems = Math.max(1, items.length);
+  const profitableCount = items.filter((i) => (Number(i.netProfit) || 0) > 0).length;
+  const profitablePct = (profitableCount / totalItems) * 100;
+  const targetCount = items.filter((i) => {
+    const m = typeof i.marginPct === "number" ? i.marginPct : (i.margin <= 1 ? i.margin * 100 : i.margin);
+    return m >= 30;
+  }).length;
+  const targetPct = (targetCount / totalItems) * 100;
+
+  const rings = [
+    {
+      title: "Portfolio Net Margin",
+      valText: `${netStep.pct.toFixed(1)}%`,
+      pct: Math.max(0, Math.min(100, netStep.pct)),
+      color: "#10B981",
+      cy: 52,
+      sub: `$${waterfall.netProfit.toFixed(2)} Take-Home`
+    },
+    {
+      title: "Profitable Catalog Rate",
+      valText: `${profitablePct.toFixed(0)}%`,
+      pct: profitablePct,
+      color: "#0EA5E9",
+      cy: 130,
+      sub: `${profitableCount} of ${totalItems} SKUs Profitable`
+    },
+    {
+      title: "Target Margin Compliance",
+      valText: `${targetPct.toFixed(0)}%`,
+      pct: targetPct,
+      color: "#8B5CF6",
+      cy: 208,
+      sub: `${targetCount} of ${totalItems} SKUs ≥ 30%`
+    }
+  ];
+
+  const ringRadius = 22;
+  const circumference = 2 * Math.PI * ringRadius;
+
+  rings.forEach((rg) => {
+    const rx = 350;
+
+    // Track circle
+    svg.appendChild(createSvgEl("circle", {
+      cx: rx, cy: rg.cy, r: ringRadius,
+      class: "chart-radial-ring-track",
+      "stroke-width": "4.5"
+    }));
+
+    // Filled progress arc
+    const offset = circumference - (rg.pct / 100) * circumference;
+    const arc = createSvgEl("circle", {
+      cx: rx, cy: rg.cy, r: ringRadius,
+      stroke: rg.color,
+      "stroke-width": "4.5",
+      "stroke-dasharray": `${circumference}`,
+      "stroke-dashoffset": `${offset}`,
+      class: "chart-radial-ring-fill",
+      transform: `rotate(-90 ${rx} ${rg.cy})`
+    });
+    svg.appendChild(arc);
+
+    // Value inside ring
     const valText = createSvgEl("text", {
-      x: x + barW / 2,
-      y: yTop - 5,
+      x: rx, y: rg.cy + 4,
       "text-anchor": "middle",
       "font-size": "9",
+      "font-weight": "800",
+      "font-family": "var(--mono)",
+      fill: "var(--fg, #0F172A)"
+    });
+    valText.textContent = `${Math.round(rg.pct)}%`;
+    svg.appendChild(valText);
+
+    // Title label to right
+    const titleText = createSvgEl("text", {
+      x: rx + 34, y: rg.cy - 2,
+      "text-anchor": "start",
+      "font-size": "10",
       "font-weight": "700",
       fill: "var(--fg, #0F172A)"
     });
-    valText.textContent = `${s.type === 'deduction' ? '-' : ''}$${Math.round(s.amount)}`;
-    svg.appendChild(valText);
+    titleText.textContent = rg.title;
+    svg.appendChild(titleText);
 
-    const lbl = createSvgEl("text", {
-      x: x + barW / 2,
-      y: yZero + 14,
-      "text-anchor": "middle",
+    // Subtitle label to right
+    const subText = createSvgEl("text", {
+      x: rx + 34, y: rg.cy + 12,
+      "text-anchor": "start",
       "font-size": "9",
-      "font-weight": "600",
+      "font-family": "var(--mono)",
       fill: "var(--muted, #64748B)"
     });
-    const shortNames = ["Revenue", "COGS", "Shipping", "Etsy Fee", "Proc/Ads", "Net Profit"];
-    lbl.textContent = shortNames[idx] || s.label;
-    svg.appendChild(lbl);
-
-    const pctLbl = createSvgEl("text", {
-      x: x + barW / 2,
-      y: yZero + 25,
-      "text-anchor": "middle",
-      "font-size": "8",
-      fill: "var(--muted, #64748B)"
-    });
-    pctLbl.textContent = `${s.pct.toFixed(0)}%`;
-    svg.appendChild(pctLbl);
+    subText.textContent = rg.sub;
+    svg.appendChild(subText);
   });
 
   containerEl.appendChild(svg);
@@ -837,14 +1012,14 @@ function renderAdsSensitivityChart(items, containerEl) {
   if (ads.atRiskCount > 0) {
     alertBox.className = "ads-risk-alert ads-risk-alert--danger";
     const textSpan = document.createElement("span");
-    textSpan.textContent = `⚠️ ${ads.atRiskCount} of ${ads.totalItems} products turn into a LOSS under 15% Ads.`;
+    textSpan.textContent = `Catalog Risk: ${ads.atRiskCount} of ${ads.totalItems} products operate at an deficit under 15% ad attribution.`;
     const filterBtn = document.createElement("button");
     filterBtn.type = "button";
     filterBtn.className = "button button-quiet btn-filter-ads-risk";
     filterBtn.style.padding = "2px 8px";
     filterBtn.style.fontSize = "11px";
     filterBtn.style.marginLeft = "8px";
-    filterBtn.textContent = "Filter These SKUs";
+    filterBtn.textContent = "Filter At-Risk Records";
     filterBtn.addEventListener("click", () => {
       state.activeFilterTab = "ads_risk";
       renderFilterTabs();
@@ -855,7 +1030,7 @@ function renderAdsSensitivityChart(items, containerEl) {
   } else {
     alertBox.className = "ads-risk-alert ads-risk-alert--safe";
     const textSpan = document.createElement("span");
-    textSpan.textContent = "✓ High Cushion: 100% of products in this catalog remain profitable even under 15% Offsite Ads.";
+    textSpan.textContent = "Catalog Resilient: 100% of products in this catalog maintain positive net margin under 15% Offsite Ads attribution.";
     alertBox.appendChild(textSpan);
   }
   wrapper.appendChild(alertBox);
@@ -882,7 +1057,7 @@ function renderVisualAnalytics() {
 }
 
 /**
- * Wires View Mode Switcher controls: Split View, Grid Only, Charts Only, and Collapse.
+ * Wires View Mode Switcher controls: Split View, Grid Only, Visuals Only, and Collapse.
  */
 function setupViewModeHandlers() {
   const splitBtn = document.getElementById("view-split-btn");
@@ -930,7 +1105,7 @@ function setupViewModeHandlers() {
       chartsContainer.style.display = state.chartsCollapsed ? "none" : "grid";
     }
     if (collapseLabel) {
-      collapseLabel.textContent = state.chartsCollapsed ? "▼ Show Charts" : "▲ Hide Charts";
+      collapseLabel.textContent = state.chartsCollapsed ? "Show Visuals" : "Hide Visuals";
     }
   });
 }
@@ -955,11 +1130,11 @@ function renderFilterTabs() {
 
   const tabs = [
     { id: "all", label: "All Products", count: allCount },
-    { id: "favorites", label: "★ Shortlist", count: favCount, highlight: true },
-    { id: "winners", label: "Top Winners (★)", count: winCount },
+    { id: "favorites", label: "Shortlist", count: favCount, highlight: true },
+    { id: "winners", label: "Optimal Margin (≥30%)", count: winCount },
     { id: "high_roi", label: "High ROI (≥50%)", count: roiCount },
-    { id: "thin_margin", label: "Thin Margin (<15%)", count: thinCount },
-    { id: "losses", label: "Losses (<$0)", count: lossCount },
+    { id: "thin_margin", label: "Compressed Margin (<15%)", count: thinCount },
+    { id: "losses", label: "Operating Deficit (<0%)", count: lossCount },
     { id: "ads_risk", label: "15% Ads Vulnerable", count: adsCount }
   ];
 
@@ -1033,7 +1208,7 @@ function renderGrid() {
       const demoBtn = document.createElement("button");
       demoBtn.type = "button";
       demoBtn.className = "btn-primary";
-      demoBtn.textContent = "⚡ Load 10-Item High-Fidelity Demo Catalog";
+      demoBtn.textContent = "Load 10-Item Demo Catalog";
       demoBtn.addEventListener("click", handleLoadDemo);
       emptyState.appendChild(demoBtn);
     } else {
@@ -1668,7 +1843,7 @@ function openFeeReceiptModal(item) {
       { label: "— Packaging Cost", amount: -item.packagingCost, type: "cost" },
       { label: "— Postage / Shipping Cost", amount: -item.shippingCost, type: "cost" },
       { label: "— Total Seller Out-of-Pocket Costs", amount: -item.totalSellerCosts, type: "cost-subtotal" },
-      { label: "★ Net Take-Home Profit", amount: item.netProfit, type: "total" }
+      { label: "= Net Take-Home Profit", amount: item.netProfit, type: "total" }
     ];
 
     for (const r of rows) {
