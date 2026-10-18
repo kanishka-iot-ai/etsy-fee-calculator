@@ -47,6 +47,29 @@ export const APPROVED_AI_MODELS = Object.freeze(new Set([
   "@cf/meta/llama-3.1-8b-instruct-fp8"
 ]));
 
+export const ADVISOR_JSON_SCHEMA = Object.freeze({
+  type: "object",
+  properties: {
+    summary: {
+      type: "string",
+      minLength: 20,
+      maxLength: 360
+    },
+    recommendations: {
+      type: "array",
+      minItems: 2,
+      maxItems: 4,
+      items: {
+        type: "string",
+        minLength: 10,
+        maxLength: 220
+      }
+    }
+  },
+  required: ["summary", "recommendations"],
+  additionalProperties: false
+});
+
 export const ADVISOR_RESPONSE_HEADERS = Object.freeze({
   "Content-Type": "application/json",
   "Cache-Control": "no-store",
@@ -502,8 +525,6 @@ function buildAllowedNumberSet(validInput, metrics, scenarios, rule) {
     if (typeof val === "number" && Number.isFinite(val)) {
       allowed.add(Number(val.toFixed(4)));
       allowed.add(Number(val.toFixed(2)));
-      allowed.add(Number(val.toFixed(1)));
-      allowed.add(Math.round(val));
     }
   }
   return allowed;
@@ -511,7 +532,7 @@ function buildAllowedNumberSet(validInput, metrics, scenarios, rule) {
 
 /**
  * Extracts all numeric literals from a text string and checks that every single number
- * matches a verified value in allowedNumbers.
+ * matches a verified value in allowedNumbers without lossy decimal rounding.
  *
  * @param {string} text
  * @param {Set<number>} allowedNumbers
@@ -551,14 +572,149 @@ function matchesAnyMetricValue(num, expectedValues) {
     if (typeof exp !== "number" || !Number.isFinite(exp)) continue;
     const e = Math.abs(exp);
     if (
-      Math.abs(n - e) < 0.015 ||
-      Math.abs(n - Number(e.toFixed(1))) < 0.015 ||
-      Math.abs(n - Math.round(e)) < 0.015
+      Math.abs(n - e) < 0.005 ||
+      Math.abs(n - Number(e.toFixed(2))) < 0.005
     ) {
       return true;
     }
   }
   return false;
+}
+
+const KNOWN_ISO_CURRENCIES = new Set([
+  "USD", "EUR", "GBP", "CAD", "AUD", "NZD", "JPY", "INR", "TRY", "IDR", "VND",
+  "PLN", "SEK", "NOK", "DKK", "CHF", "SGD", "HKD", "MXN", "BRL", "ZAR", "PHP",
+  "MYR", "THB", "ILS", "MAD", "HUF", "CZK", "RON", "BGN", "CNY", "KRW", "TWD",
+  "ARS", "CLP", "COP", "PEN", "AED", "SAR"
+]);
+
+const DOLLAR_CURRENCIES = new Set([
+  "USD", "CAD", "AUD", "NZD", "SGD", "HKD", "MXN", "ARS", "CLP", "COP", "TWD"
+]);
+
+/**
+ * Verifies that any ISO currency codes or currency symbols in text match the
+ * order's authoritative listing/payout/deposit currencies.
+ *
+ * @param {string} text
+ * @param {Object} analysis - Result from computeDeterministicAnalysis()
+ * @returns {{ valid: boolean, reason?: string }}
+ */
+export function verifyCurrencyConsistency(text, analysis) {
+  if (typeof text !== "string") {
+    return { valid: false, reason: "invalid_text" };
+  }
+  const { metrics } = analysis;
+  const allowedCurrencies = new Set([
+    metrics.currency,
+    metrics.payoutCurrency
+  ].filter(Boolean));
+
+  if (metrics.depositSchedule?.mode === "listed") {
+    if (metrics.depositSchedule.feeThreshold?.currency) {
+      allowedCurrencies.add(metrics.depositSchedule.feeThreshold.currency);
+    }
+    if (metrics.depositSchedule.fee?.currency) {
+      allowedCurrencies.add(metrics.depositSchedule.fee.currency);
+    }
+  }
+
+  // 1. Check 3-letter uppercase currency tokens
+  const upperWords = text.match(/\b[A-Z]{3}\b/g) || [];
+  for (const word of upperWords) {
+    if (KNOWN_ISO_CURRENCIES.has(word) && !allowedCurrencies.has(word)) {
+      return { valid: false, reason: "currency_mismatch" };
+    }
+  }
+
+  // 2. Check prefixed dollar symbols (CA$, A$, NZ$, US$, HK$, S$, MX$)
+  if (/\bCA\$/.test(text) && !allowedCurrencies.has("CAD")) {
+    return { valid: false, reason: "currency_mismatch" };
+  }
+  if (/\bA\$/.test(text) && !allowedCurrencies.has("AUD")) {
+    return { valid: false, reason: "currency_mismatch" };
+  }
+  if (/\bNZ\$/.test(text) && !allowedCurrencies.has("NZD")) {
+    return { valid: false, reason: "currency_mismatch" };
+  }
+  if (/\bUS\$/.test(text) && !allowedCurrencies.has("USD")) {
+    return { valid: false, reason: "currency_mismatch" };
+  }
+
+  // 3. Check standalone currency symbols
+  if (text.includes("£") && !allowedCurrencies.has("GBP")) {
+    return { valid: false, reason: "currency_mismatch" };
+  }
+  if (text.includes("€") && !allowedCurrencies.has("EUR")) {
+    return { valid: false, reason: "currency_mismatch" };
+  }
+  if (text.includes("¥") && !allowedCurrencies.has("JPY") && !allowedCurrencies.has("CNY")) {
+    return { valid: false, reason: "currency_mismatch" };
+  }
+  if (text.includes("₹") && !allowedCurrencies.has("INR")) {
+    return { valid: false, reason: "currency_mismatch" };
+  }
+  if (text.includes("₺") && !allowedCurrencies.has("TRY")) {
+    return { valid: false, reason: "currency_mismatch" };
+  }
+  if (text.includes("₪") && !allowedCurrencies.has("ILS")) {
+    return { valid: false, reason: "currency_mismatch" };
+  }
+  if (text.includes("₫") && !allowedCurrencies.has("VND")) {
+    return { valid: false, reason: "currency_mismatch" };
+  }
+  if (text.includes("₱") && !allowedCurrencies.has("PHP")) {
+    return { valid: false, reason: "currency_mismatch" };
+  }
+  if (text.includes("$")) {
+    const hasAllowedDollar = [...allowedCurrencies].some((c) => DOLLAR_CURRENCIES.has(c));
+    if (!hasAllowedDollar) {
+      return { valid: false, reason: "currency_mismatch" };
+    }
+  }
+
+  return { valid: true };
+}
+
+/**
+ * Verifies that the AI summary states the essential financial facts rather than
+ * returning a generic heading or omitting core figures.
+ *
+ * Requires the summary to include:
+ *   - Net profit (or absolute net loss)
+ *   - Total Etsy fees
+ *   - Profit margin percentage
+ *   - Most significant cost amount or share percentage (when largestDeduction.amount > 0)
+ *
+ * @param {string} summary
+ * @param {Object} analysis - Result from computeDeterministicAnalysis()
+ * @returns {{ valid: boolean, reason?: string }}
+ */
+export function verifySummaryCompleteness(summary, analysis) {
+  if (typeof summary !== "string") {
+    return { valid: false, reason: "invalid_ai_summary" };
+  }
+  const normalized = summary.replace(/(\d),(?=\d{3}\b)/g, "$1");
+  const rawTokens = normalized.match(/-?\d+(?:\.\d+)?/g);
+  if (!rawTokens || rawTokens.length === 0) {
+    return { valid: false, reason: "generic_ai_summary" };
+  }
+
+  const nums = rawTokens.map(Number).filter(Number.isFinite);
+  const { metrics } = analysis;
+
+  const hasNetProfit = nums.some((n) => matchesAnyMetricValue(n, [metrics.netProfit, Math.abs(metrics.netProfit)]));
+  const hasTotalFees = nums.some((n) => matchesAnyMetricValue(n, [metrics.totalEtsyFees]));
+  const hasMargin = nums.some((n) => matchesAnyMetricValue(n, [metrics.marginPct, Math.abs(metrics.marginPct)]));
+  const hasLargestCost = metrics.largestDeduction.amount <= 0 || nums.some((n) =>
+    matchesAnyMetricValue(n, [metrics.largestDeduction.amount, metrics.largestDeduction.sharePct])
+  );
+
+  if (!hasNetProfit || !hasTotalFees || !hasMargin || !hasLargestCost) {
+    return { valid: false, reason: "missing_required_financial_facts" };
+  }
+
+  return { valid: true };
 }
 
 /**
@@ -595,7 +751,8 @@ export function verifyContextualClaims(text, analysis) {
 
   // 2. Check break-even price claims: e.g. "break-even price of 7.65" or "break-even floor is 7.65"
   const breakEvenPatterns = [
-    ...normalized.matchAll(/break-even(?:\s+item)?(?:\s+price|\s+floor)?\s+(?:is|of|at|to(?:\s+at\s+least)?)\s+(?:[A-Z]{2,3}\s*)?(-?\d+(?:\.\d+)?)/gi),
+    ...normalized.matchAll(/break-even(?:\s+item)?(?:\s+price|\s+floor|\s+point)?\s+(?:is|of|at|to(?:\s+at\s+least)?|:)\s*(?:(?:[A-Z]{2,3}|(?:CA|A|NZ|US|HK|S|MX)\$|\$|£|€|¥|₹|₺)\s*)?(-?\d+(?:\.\d+)?)/gi),
+    ...normalized.matchAll(/break\s+even\s+at\s+(?:(?:[A-Z]{2,3}|(?:CA|A|NZ|US|HK|S|MX)\$|\$|£|€|¥|₹|₺)\s*)?(-?\d+(?:\.\d+)?)/gi),
     ...normalized.matchAll(/(-?\d+(?:\.\d+)?)\s+(?:[A-Z]{3}\s+)?break-even/gi)
   ];
   for (const match of breakEvenPatterns) {
@@ -608,7 +765,7 @@ export function verifyContextualClaims(text, analysis) {
   // 3. Check gross revenue claims: e.g. "At 40.00 USD gross revenue" or "gross revenue of 40.00"
   const grossPatterns = [
     ...normalized.matchAll(/(-?\d+(?:\.\d+)?)\s+(?:[A-Z]{3}\s+)?gross\s+revenue/gi),
-    ...normalized.matchAll(/gross\s+revenue\s+(?:is|of|at)\s+(?:[A-Z]{2,3}\s*)?(-?\d+(?:\.\d+)?)/gi)
+    ...normalized.matchAll(/gross\s+revenue\s+(?:is|of|at|:)\s*(?:(?:[A-Z]{2,3}|(?:CA|A|NZ|US|HK|S|MX)\$|\$|£|€|¥|₹|₺)\s*)?(-?\d+(?:\.\d+)?)/gi)
   ];
   for (const match of grossPatterns) {
     const claimedGross = Number(match[1]);
@@ -627,7 +784,7 @@ export function verifyContextualClaims(text, analysis) {
   ];
   const netPatterns = [
     ...normalized.matchAll(/(-?\d+(?:\.\d+)?)\s+(?:[A-Z]{3}\s+)?(?:estimated\s+)?net\s+(?:profit|loss)/gi),
-    ...normalized.matchAll(/net\s+(?:profit|loss)\s+(?:is|of|at|becomes|to)\s+(?:[A-Z]{2,3}\s*)?(-?\d+(?:\.\d+)?)/gi)
+    ...normalized.matchAll(/net\s+(?:profit|loss)\s+(?:is|of|at|becomes|to|:)\s*(?:(?:[A-Z]{2,3}|(?:CA|A|NZ|US|HK|S|MX)\$|\$|£|€|¥|₹|₺)\s*)?(-?\d+(?:\.\d+)?)/gi)
   ];
   for (const match of netPatterns) {
     const claimedNet = Number(match[1]);
@@ -647,12 +804,42 @@ export function verifyContextualClaims(text, analysis) {
   ];
   const feePatterns = [
     ...normalized.matchAll(/(-?\d+(?:\.\d+)?)\s+(?:[A-Z]{3}\s+)?in\s+Etsy\s+fees/gi),
-    ...normalized.matchAll(/(?:total\s+)?Etsy\s+fees\s+(?:are|is|of|rise\s+to)\s+(?:[A-Z]{2,3}\s*)?(-?\d+(?:\.\d+)?)/gi)
+    ...normalized.matchAll(/(?:total\s+)?Etsy\s+fees\s+(?:are|is|of|rise\s+to|become|:)\s*(?:(?:[A-Z]{2,3}|(?:CA|A|NZ|US|HK|S|MX)\$|\$|£|€|¥|₹|₺)\s*)?(-?\d+(?:\.\d+)?)/gi)
   ];
   for (const match of feePatterns) {
     const claimedFee = Number(match[1]);
     if (!matchesAnyMetricValue(claimedFee, validTotalFees)) {
       return { valid: false, reason: "misattributed_etsy_fee_claim" };
+    }
+  }
+
+  // 6. Check target profit claims (prevents confusing netProfit with targetProfit, as in Phase 4 BM-02)
+  const targetProfitPatterns = [
+    ...normalized.matchAll(/target\s+profit\s+(?:of|is|at|to|:)\s*(?:(?:[A-Z]{2,3}|(?:CA|A|NZ|US|HK|S|MX)\$|\$|£|€|¥|₹|₺)\s*)?(-?\d+(?:\.\d+)?)/gi),
+    ...normalized.matchAll(/(-?\d+(?:\.\d+)?)\s+(?:[A-Z]{3}\s+)?(?:in\s+)?(?:estimated\s+)?target\s+profit/gi),
+    ...normalized.matchAll(/to\s+target\s+(?:(?:[A-Z]{2,3}|(?:CA|A|NZ|US|HK|S|MX)\$|\$|£|€|¥|₹|₺)\s*)?(-?\d+(?:\.\d+)?)\s+(?:[A-Z]{3}\s+)?in\s+(?:estimated\s+)?profit/gi)
+  ];
+  for (const match of targetProfitPatterns) {
+    const claimedTargetProfit = Number(match[1]);
+    if (metrics.targetProfit > 0) {
+      if (!matchesAnyMetricValue(claimedTargetProfit, [metrics.targetProfit])) {
+        return { valid: false, reason: "misattributed_target_profit_claim" };
+      }
+    } else if (claimedTargetProfit !== 0) {
+      return { valid: false, reason: "misattributed_target_profit_claim" };
+    }
+  }
+
+  // 7. Check required price / target price claims (prevents substituting itemPrice or breakEvenPrice for requiredPriceForTarget)
+  const targetPricePatterns = [
+    ...normalized.matchAll(/(?:required|target)\s+(?:required\s+)?(?:item\s+)?price(?:\s+for\s+target)?(?:\s+to\s+(?:meet|reach|achieve|hit)(?:\s+(?:desired|target)(?:\s+(?:net\s+)?profit)?)?)?\s*(?:is|of|at|to|:)\s*(?:(?:[A-Z]{2,3}|(?:CA|A|NZ|US|HK|S|MX)\$|\$|£|€|¥|₹|₺)\s*)?(-?\d+(?:\.\d+)?)/gi),
+    ...normalized.matchAll(/set\s+(?:the\s+)?item\s+price\s+to\s+(?:(?:[A-Z]{2,3}|(?:CA|A|NZ|US|HK|S|MX)\$|\$|£|€|¥|₹|₺)\s*)?(-?\d+(?:\.\d+)?)/gi),
+    ...normalized.matchAll(/price\s+the\s+item\s+at\s+(?:(?:[A-Z]{2,3}|(?:CA|A|NZ|US|HK|S|MX)\$|\$|£|€|¥|₹|₺)\s*)?(-?\d+(?:\.\d+)?)/gi)
+  ];
+  for (const match of targetPricePatterns) {
+    const claimedTargetPrice = Number(match[1]);
+    if (!matchesAnyMetricValue(claimedTargetPrice, [metrics.requiredPriceForTarget])) {
+      return { valid: false, reason: "misattributed_target_price_claim" };
     }
   }
 
@@ -752,7 +939,8 @@ const UNSAFE_MARKUP_RE = /[<>]|javascript:|data:text\/html|on\w+\s*=/i;
 
 /**
  * Validates raw output from Workers AI against schema, XSS safety, length bounds,
- * content policy, allowlist numbers, and contextual metric-to-number attribution.
+ * content policy, allowlist numbers, currency consistency, contextual metric-to-number
+ * attribution, and summary completeness.
  *
  * @param {unknown} rawAiResult
  * @param {Set<number>} allowedNumbers
@@ -785,8 +973,16 @@ export function validateAiOutput(rawAiResult, allowedNumbers, analysis = null) {
     return { ok: false, reason: "invalid_ai_schema" };
   }
 
+  // Enforce additionalProperties: false per ADVISOR_JSON_SCHEMA
+  const parsedKeys = Object.keys(parsed);
+  for (const key of parsedKeys) {
+    if (key !== "summary" && key !== "recommendations") {
+      return { ok: false, reason: "invalid_ai_schema" };
+    }
+  }
+
   const { summary, recommendations } = parsed;
-  if (typeof summary !== "string" || summary.trim().length < 10 || summary.length > 400) {
+  if (typeof summary !== "string" || summary.trim().length < 20 || summary.length > 360) {
     return { ok: false, reason: "invalid_ai_summary" };
   }
 
@@ -805,9 +1001,19 @@ export function validateAiOutput(rawAiResult, allowedNumbers, analysis = null) {
   }
 
   if (analysis) {
+    const summaryCurrency = verifyCurrencyConsistency(summary, analysis);
+    if (!summaryCurrency.valid) {
+      return { ok: false, reason: summaryCurrency.reason };
+    }
+
     const summaryContext = verifyContextualClaims(summary, analysis);
     if (!summaryContext.valid) {
       return { ok: false, reason: summaryContext.reason };
+    }
+
+    const summaryCompleteness = verifySummaryCompleteness(summary, analysis);
+    if (!summaryCompleteness.valid) {
+      return { ok: false, reason: summaryCompleteness.reason };
     }
   }
 
@@ -817,7 +1023,7 @@ export function validateAiOutput(rawAiResult, allowedNumbers, analysis = null) {
 
   const cleanRecs = [];
   for (const item of recommendations) {
-    if (typeof item !== "string" || item.trim().length < 5 || item.length > 240) {
+    if (typeof item !== "string" || item.trim().length < 10 || item.length > 220) {
       return { ok: false, reason: "invalid_ai_recommendation_item" };
     }
     if (UNSAFE_MARKUP_RE.test(item)) {
@@ -832,6 +1038,10 @@ export function validateAiOutput(rawAiResult, allowedNumbers, analysis = null) {
       return { ok: false, reason: "unverified_numerical_claim" };
     }
     if (analysis) {
+      const recCurrency = verifyCurrencyConsistency(item, analysis);
+      if (!recCurrency.valid) {
+        return { ok: false, reason: recCurrency.reason };
+      }
       const recContext = verifyContextualClaims(item, analysis);
       if (!recContext.valid) {
         return { ok: false, reason: recContext.reason };
@@ -894,30 +1104,37 @@ export async function generateAdvisorReport(rawInput, env = {}) {
     ? Number(env.AI_TIMEOUT_MS)
     : DEFAULT_AI_TIMEOUT_MS;
 
+  const curr = analysis.metrics.currency;
+  const fmt = (n) => `${Number(n).toFixed(2)} ${curr}`;
+
   const systemPrompt = [
     "You are the ShopProfit Etsy Fee & Profit Advisor.",
     "STRICT RULES:",
-    "1. Do NOT calculate, round, or invent any numbers. Use ONLY the exact numbers provided in the JSON facts and pair each number with its exact metric name.",
-    "2. Identify the largestDeduction driver accurately.",
-    "3. Never make claims about market demand, conversion rates, competitors, or guaranteed profits. Frame figures as estimated per-order outcomes.",
-    "4. Respond ONLY with a valid JSON object matching: {\"summary\": \"string\", \"recommendations\": [\"string\"]}.",
-    "5. Keep 'summary' under 320 characters and provide 2 to 3 concise 'recommendations' under 200 characters each.",
-    "6. Never output HTML tags or markdown code fences."
+    "1. Do NOT calculate, round, or invent any numbers. Copy the exact decimal numbers and ISO currency code from the provided facts.",
+    "2. Your 'summary' MUST be 1-2 sentences (under 320 chars) that explicitly state the exact grossRevenue, estimated netProfit (or net loss), marginPct, totalEtsyFees, totalCosts, and largestDeduction (label, amount, and sharePct) using the exact currency code. Never write a generic heading.",
+    "3. Provide 2 to 3 concise 'recommendations' (under 200 chars each) citing the exact breakEvenPrice, requiredPriceForTarget (only when targetProfit is provided), and Offsite Ads scenario figures. Never confuse targetProfit with netProfit or breakEvenPrice with requiredPriceForTarget.",
+    "4. Never make claims about market demand, conversion rates, competitors, or guaranteed profits. Frame outcomes as estimated per-order figures.",
+    "5. Respond ONLY with a valid JSON object matching the schema: {\"summary\": \"string\", \"recommendations\": [\"string\"]}. Never output HTML tags."
   ].join("\n");
 
   const structuredFacts = JSON.stringify({
     country: analysis.metrics.countryName,
-    currency: analysis.metrics.currency,
-    grossRevenue: analysis.metrics.grossRevenue,
-    totalEtsyFees: analysis.metrics.totalEtsyFees,
-    totalCosts: analysis.metrics.totalCosts,
-    largestDeduction: analysis.metrics.largestDeduction,
-    netProfit: analysis.metrics.netProfit,
-    marginPct: analysis.metrics.marginPct,
-    breakEvenPrice: analysis.metrics.breakEvenPrice,
-    requiredPriceForTarget: analysis.metrics.requiredPriceForTarget,
-    offsiteAds15NetProfit: analysis.scenarios.offsiteAds15.netProfit,
-    offsiteAds15MarginPct: analysis.scenarios.offsiteAds15.marginPct
+    currency: curr,
+    grossRevenue: fmt(analysis.metrics.grossRevenue),
+    totalEtsyFees: `${fmt(analysis.metrics.totalEtsyFees)} (${analysis.metrics.feeSharePct}%)`,
+    totalCosts: `${fmt(analysis.metrics.totalCosts)} (${analysis.metrics.costSharePct}%)`,
+    netProfit: fmt(analysis.metrics.netProfit),
+    marginPct: `${analysis.metrics.marginPct}%`,
+    largestDeduction: `${analysis.metrics.largestDeduction.label} (${fmt(analysis.metrics.largestDeduction.amount)}, ${analysis.metrics.largestDeduction.sharePct}% of revenue)`,
+    breakEvenPrice: fmt(analysis.metrics.breakEvenPrice),
+    targetProfit: analysis.metrics.targetProfit > 0 ? fmt(analysis.metrics.targetProfit) : null,
+    requiredPriceForTarget: analysis.metrics.targetProfit > 0 ? fmt(analysis.metrics.requiredPriceForTarget) : null,
+    offsiteAds15Scenario: `15% Offsite Ads raises Etsy fees to ${fmt(analysis.scenarios.offsiteAds15.totalEtsyFees)} and estimated net profit becomes ${fmt(analysis.scenarios.offsiteAds15.netProfit)} (${analysis.scenarios.offsiteAds15.marginPct}% margin)`,
+    noOffsiteAdsScenario: analysis.metrics.feeBreakdown.offsiteAds > 0
+      ? `Without Offsite Ads, estimated net profit is ${fmt(analysis.scenarios.noOffsiteAds.netProfit)} (${analysis.scenarios.noOffsiteAds.marginPct}% margin)`
+      : null,
+    referenceSummary: deterministic.summary,
+    referenceRecommendations: deterministic.recommendations
   });
 
   try {
@@ -926,7 +1143,11 @@ export async function generateAdvisorReport(rawInput, env = {}) {
         { role: "system", content: systemPrompt },
         { role: "user", content: structuredFacts }
       ],
-      max_tokens: 220,
+      response_format: {
+        type: "json_schema",
+        json_schema: ADVISOR_JSON_SCHEMA
+      },
+      max_tokens: 280,
       temperature: 0.1
     });
 
@@ -984,6 +1205,8 @@ export async function generateAdvisorReport(rawInput, env = {}) {
       fallbackReason = "ai_timeout";
     } else if (msg.includes("quota") || msg.includes("429") || msg.includes("neuron") || msg.includes("rate limit") || msg.includes("exhausted")) {
       fallbackReason = "ai_quota_exhausted";
+    } else if (msg.includes("json mode") || msg.includes("json_schema")) {
+      fallbackReason = "invalid_ai_json";
     }
 
     return {

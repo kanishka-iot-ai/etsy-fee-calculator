@@ -18,11 +18,14 @@ import {
   computeDeterministicAnalysis,
   buildDeterministicExplanation,
   verifyNoInventedNumbers,
+  verifyCurrencyConsistency,
+  verifySummaryCompleteness,
   verifyContextualClaims,
   verifyContentPolicy,
   validateAiOutput,
   generateAdvisorReport,
   handleAdvisorRequest,
+  ADVISOR_JSON_SCHEMA,
   MAX_ADVISOR_BODY_BYTES
 } from "./src/advisor.js";
 import { checkRateLimit, resetRateLimiter } from "./src/rate-limiter.js";
@@ -375,37 +378,37 @@ test("Advisor Contextual Claim Verifier: rejects AI responses that swap valid nu
   const misattributedPayloads = [
     {
       label: "Swapped netProfit (24.75) and totalEtsyFees (4.25)",
-      summary: "At 40.00 USD gross revenue, your estimated net profit is 4.25 USD (61.88% margin) after 24.75 USD in Etsy fees.",
+      summary: "At 40.00 USD gross revenue, your estimated net profit is 4.25 USD (61.88% margin) after 24.75 USD in Etsy fees. Largest deduction: production cost (7.00 USD).",
       recommendations: ["Your unit break-even floor is 7.65 USD."],
       expectedReason: "misattributed_net_profit_claim"
     },
     {
       label: "Swapped marginPct (61.88%) with feeSharePct (10.63%)",
-      summary: "At 40.00 USD gross revenue, your estimated net profit is 24.75 USD (10.63% margin) after 4.25 USD in Etsy fees.",
+      summary: "At 40.00 USD gross revenue, your estimated net profit is 24.75 USD (10.63% margin) after 4.25 USD in Etsy fees. Largest deduction: production cost (7.00 USD).",
       recommendations: ["Your unit break-even floor is 7.65 USD."],
       expectedReason: "misattributed_margin_claim"
     },
     {
       label: "Swapped breakEvenPrice (7.65) with requiredPriceForTarget (35.28)",
-      summary: "At 40.00 USD gross revenue, your estimated net profit is 24.75 USD (61.88% margin) after 4.25 USD in Etsy fees.",
+      summary: "At 40.00 USD gross revenue, your estimated net profit is 24.75 USD (61.88% margin) after 4.25 USD in Etsy fees. Largest deduction: production cost (7.00 USD).",
       recommendations: ["Your unit break-even floor is 35.28 USD to avoid a loss."],
       expectedReason: "misattributed_breakeven_claim"
     },
     {
       label: "Swapped grossRevenue (40.00) with itemPrice (35.00)",
-      summary: "At 35.00 USD gross revenue, your estimated net profit is 24.75 USD (61.88% margin) after 4.25 USD in Etsy fees.",
+      summary: "At 35.00 USD gross revenue, your estimated net profit is 24.75 USD (61.88% margin) after 4.25 USD in Etsy fees. Largest deduction: production cost (7.00 USD).",
       recommendations: ["Your unit break-even floor is 7.65 USD."],
       expectedReason: "misattributed_gross_revenue_claim"
     },
     {
       label: "Swapped Etsy fees (4.25) with totalCosts (11.00)",
-      summary: "At 40.00 USD gross revenue, your estimated net profit is 24.75 USD (61.88% margin) after 11.00 USD in Etsy fees.",
+      summary: "At 40.00 USD gross revenue, your estimated net profit is 24.75 USD (61.88% margin) after 11.00 USD in Etsy fees. Largest deduction: production cost (7.00 USD).",
       recommendations: ["Your unit break-even floor is 7.65 USD."],
       expectedReason: "misattributed_etsy_fee_claim"
     },
     {
       label: "Unsupported claim about conversion rate, competitors, or guaranteed profit",
-      summary: "At 40.00 USD gross revenue, you are guaranteed 24.75 USD net profit and will beat competitors in conversion rate.",
+      summary: "At 40.00 USD gross revenue, you are guaranteed 24.75 USD net profit (61.88% margin) after 4.25 USD in Etsy fees and 7.00 USD cost, beating competitors in conversion rate.",
       recommendations: ["Your unit break-even floor is 7.65 USD."],
       expectedReason: "unsupported_market_or_guarantee_claim"
     }
@@ -431,6 +434,195 @@ test("Advisor Contextual Claim Verifier: rejects AI responses that swap valid nu
     assert.equal(res.body.source, "deterministic_fallback", `Failed to fallback on: ${item.label}`);
     assert.equal(res.body.fallbackReason, item.expectedReason, `Wrong fallbackReason for: ${item.label}`);
   }
+});
+
+test("Phase 5A Regressions: rejects missing closing JSON brace, wrong target-price digit, generic summary, missing financial figures, currency mismatch, and netProfit/targetProfit confusion", async () => {
+  // 1. Missing closing JSON brace (exact Phase 4 BM-01 truncation failure)
+  const truncatedJsonEnv = {
+    ENABLE_AI_ADVISOR: true,
+    AI: {
+      async run() {
+        return {
+          response: "{\"summary\": \"At 40.00 USD gross revenue, your estimated net profit is 24.75 USD (61.88% margin) after 4.25 USD in Etsy fees and 7.00 USD production cost.\", \"recommendations\": [\"Break-even floor is 7.65 USD.\", \"Target price is 35.28 USD.\"]"
+        };
+      }
+    }
+  };
+  const r1 = await generateAdvisorReport(VALID_SAMPLE_INPUT, truncatedJsonEnv);
+  assert.equal(r1.body.source, "deterministic_fallback");
+  assert.equal(r1.body.fallbackReason, "invalid_ai_json");
+
+  // 2. Incorrect target-price digit (exact Phase 4 BM-02 failure: 26.91 instead of 25.91)
+  const bm02Input = { country: "US", itemPrice: 20, shipping: 0, production: 11.5, packaging: 3.5, targetProfit: 8 };
+  const wrongDigitEnv = {
+    ENABLE_AI_ADVISOR: true,
+    AI: {
+      async run() {
+        return {
+          response: JSON.stringify({
+            summary: "At 20.00 USD gross revenue, your estimated net profit is 2.65 USD (13.25% margin) after 2.35 USD in Etsy fees and 11.50 USD production cost.",
+            recommendations: [
+              "Review production cost of 11.50 USD to see if it can be reduced.",
+              "Consider increasing required price to 26.91 USD to meet target profit of 8.00 USD."
+            ]
+          })
+        };
+      }
+    }
+  };
+  const r2 = await generateAdvisorReport(bm02Input, wrongDigitEnv);
+  assert.equal(r2.body.source, "deterministic_fallback");
+  assert.equal(r2.body.fallbackReason, "unverified_numerical_claim");
+
+  // 3. Generic summary without financial figures (exact Phase 4 BM-09 & BM-24 failures)
+  for (const genericSummary of [
+    "Etsy fees and profit analysis for UK shop",
+    "Etsy fees significantly impact profit, consider optimizing listings."
+  ]) {
+    const genericEnv = {
+      ENABLE_AI_ADVISOR: true,
+      AI: {
+        async run() {
+          return {
+            response: JSON.stringify({
+              summary: genericSummary,
+              recommendations: [
+                "Your unit break-even floor is 7.65 USD.",
+                "To target 25.00 USD in estimated profit per sale, set the item price to 35.28 USD."
+              ]
+            })
+          };
+        }
+      }
+    };
+    const r3 = await generateAdvisorReport(VALID_SAMPLE_INPUT, genericEnv);
+    assert.equal(r3.body.source, "deterministic_fallback");
+    assert.equal(r3.body.fallbackReason, "generic_ai_summary");
+  }
+
+  // 4. Missing required financial figures in summary (mentions netProfit 24.75 USD, omits totalEtsyFees 4.25 USD & margin 61.88%)
+  const missingFiguresEnv = {
+    ENABLE_AI_ADVISOR: true,
+    AI: {
+      async run() {
+        return {
+          response: JSON.stringify({
+            summary: "At 40.00 USD gross revenue, your estimated net profit is 24.75 USD after production cost of 7.00 USD.",
+            recommendations: [
+              "Your unit break-even floor is 7.65 USD.",
+              "To target 25.00 USD in estimated profit per sale, set the item price to 35.28 USD."
+            ]
+          })
+        };
+      }
+    }
+  };
+  const r4 = await generateAdvisorReport(VALID_SAMPLE_INPUT, missingFiguresEnv);
+  assert.equal(r4.body.source, "deterministic_fallback");
+  assert.equal(r4.body.fallbackReason, "missing_required_financial_facts");
+
+  // 5. Currency mismatch (EUR shop receiving USD/$ symbols, and USD shop receiving GBP/£ symbols)
+  const deInput = { country: "DE", itemPrice: 29.99 };
+  const currencyMismatchDeEnv = {
+    ENABLE_AI_ADVISOR: true,
+    AI: {
+      async run() {
+        return {
+          response: JSON.stringify({
+            summary: "At $29.99 gross revenue, your estimated net profit is $26.36 (87.9% margin) after $3.63 in Etsy fees (12.1%).",
+            recommendations: [
+              "Your unit break-even floor is $0.53.",
+              "With 15% Offsite Ads, estimated net profit becomes $21.86."
+            ]
+          })
+        };
+      }
+    }
+  };
+  const r5a = await generateAdvisorReport(deInput, currencyMismatchDeEnv);
+  assert.equal(r5a.body.source, "deterministic_fallback");
+  assert.equal(r5a.body.fallbackReason, "currency_mismatch");
+
+  const currencyMismatchUsEnv = {
+    ENABLE_AI_ADVISOR: true,
+    AI: {
+      async run() {
+        return {
+          response: JSON.stringify({
+            summary: "At 40.00 GBP gross revenue, your estimated net profit is 24.75 GBP (61.88% margin) after 4.25 GBP in Etsy fees and 7.00 GBP production cost.",
+            recommendations: [
+              "Your unit break-even floor is 7.65 GBP.",
+              "Set the item price to 35.28 GBP."
+            ]
+          })
+        };
+      }
+    }
+  };
+  const r5b = await generateAdvisorReport(VALID_SAMPLE_INPUT, currencyMismatchUsEnv);
+  assert.equal(r5b.body.source, "deterministic_fallback");
+  assert.equal(r5b.body.fallbackReason, "currency_mismatch");
+
+  // 6. Incorrect association between net profit (2.65) and target profit (8.00) (exact Phase 4 BM-02 semantic error)
+  const confusedTargetProfitEnv = {
+    ENABLE_AI_ADVISOR: true,
+    AI: {
+      async run() {
+        return {
+          response: JSON.stringify({
+            summary: "At 20.00 USD gross revenue, your estimated net profit is 2.65 USD (13.25% margin) after 2.35 USD in Etsy fees and 11.50 USD production cost.",
+            recommendations: [
+              "Review production cost of 11.50 USD to see if it can be reduced.",
+              "Consider increasing required price to 25.91 USD to meet target profit of 2.65 USD."
+            ]
+          })
+        };
+      }
+    }
+  };
+  const r6 = await generateAdvisorReport(bm02Input, confusedTargetProfitEnv);
+  assert.equal(r6.body.source, "deterministic_fallback");
+  assert.equal(r6.body.fallbackReason, "misattributed_target_profit_claim");
+
+  // 7. Substituting breakEvenPrice (7.65) or itemPrice (35.00) for requiredPriceForTarget (35.28)
+  const confusedTargetPriceEnv = {
+    ENABLE_AI_ADVISOR: true,
+    AI: {
+      async run() {
+        return {
+          response: JSON.stringify({
+            summary: "At 40.00 USD gross revenue, your estimated net profit is 24.75 USD (61.88% margin) after 4.25 USD in Etsy fees and 7.00 USD production cost.",
+            recommendations: [
+              "Your unit break-even floor is 7.65 USD.",
+              "To target 25.00 USD in estimated profit per sale, set the item price to 7.65 USD."
+            ]
+          })
+        };
+      }
+    }
+  };
+  const r7 = await generateAdvisorReport(VALID_SAMPLE_INPUT, confusedTargetPriceEnv);
+  assert.equal(r7.body.source, "deterministic_fallback");
+  assert.equal(r7.body.fallbackReason, "misattributed_target_price_claim");
+
+  // 8. Unexpected properties in AI JSON output (additionalProperties: false)
+  const extraPropsEnv = {
+    ENABLE_AI_ADVISOR: true,
+    AI: {
+      async run() {
+        return {
+          response: JSON.stringify({
+            summary: "At 40.00 USD gross revenue, your estimated net profit is 24.75 USD (61.88% margin) after 4.25 USD in Etsy fees and 7.00 USD production cost.",
+            recommendations: ["Your unit break-even floor is 7.65 USD."],
+            extraField: "disallowed"
+          })
+        };
+      }
+    }
+  };
+  const r8 = await generateAdvisorReport(VALID_SAMPLE_INPUT, extraPropsEnv);
+  assert.equal(r8.body.source, "deterministic_fallback");
+  assert.equal(r8.body.fallbackReason, "invalid_ai_schema");
 });
 
 // ─── STEP 4: Adversarial Prompt-Injection Across Every Accepted Field ────────
@@ -646,7 +838,11 @@ test("Advisor AI Success: accepts valid Workers AI JSON output when all numbers 
     AI: {
       async run(model, payload) {
         assert.equal(model, "@cf/meta/llama-3.2-3b-instruct");
-        assert.equal(payload.max_tokens, 220);
+        assert.equal(payload.max_tokens, 280);
+        assert.deepEqual(payload.response_format, {
+          type: "json_schema",
+          json_schema: ADVISOR_JSON_SCHEMA
+        });
         return {
           response: JSON.stringify({
             summary: "At 40.00 USD gross revenue, your estimated net profit is 24.75 USD (61.88% margin) after 4.25 USD in Etsy fees. Largest deduction: production cost (7.00 USD).",
