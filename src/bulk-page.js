@@ -15,6 +15,9 @@ import {
   GRID_COLUMNS,
   VIEW_PRESETS,
   EXPANDED_DEMO_CATALOG,
+  SUPPLIER_PRESETS,
+  generateSupplierCsvTemplate,
+  exportCatalogToXlsx,
   calculateCatalogBatch,
   summarizeCatalog,
   filterAndSortCatalog,
@@ -677,6 +680,222 @@ function handleExport(mode = "all") {
 }
 
 /**
+ * Loads a supplier preset or demo catalog.
+ */
+function handleLoadSupplierPreset(presetKey) {
+  if (presetKey === "demo") {
+    handleLoadDemo();
+    return;
+  }
+  const supplier = SUPPLIER_PRESETS[presetKey];
+  if (!supplier) return;
+
+  state.rawProducts = supplier.items.map((item, idx) => ({
+    ...item,
+    id: `${presetKey.toUpperCase().slice(0, 3)}-${idx + 1}`
+  }));
+
+  const select = document.getElementById("supplier-preset-select");
+  if (select) select.value = presetKey;
+
+  // Dismiss any open modal
+  document.querySelectorAll(".modal--open").forEach((m) => m.classList.remove("modal--open"));
+
+  recalculateAndRender();
+}
+
+/**
+ * Downloads a pre-formatted supplier CSV template.
+ */
+function handleDownloadTemplate(supplierId) {
+  const csvContent = generateSupplierCsvTemplate(supplierId);
+  if (!csvContent) return;
+
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", `${supplierId}-supplier-template.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Handles Excel (.xlsx) Export.
+ */
+function handleExportXlsx() {
+  const dataset = state.analyzedResults;
+  if (dataset.length === 0) {
+    alert("No products to export.");
+    return;
+  }
+
+  const xlsxBlobOrUint8 = exportCatalogToXlsx(dataset, state.favorites, state.settings.country);
+  const blob = xlsxBlobOrUint8 instanceof Blob
+    ? xlsxBlobOrUint8
+    : new Blob([xlsxBlobOrUint8], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", "shopprofit-etsy-sourcing-analysis.xlsx");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Opens the Executive PDF Profit Summary Modal with formatted C-level metrics.
+ */
+function openExecutiveReportModal() {
+  const modal = document.getElementById("executive-report-modal");
+  const content = document.getElementById("executive-report-content");
+  if (!modal || !content) return;
+
+  content.replaceChildren();
+
+  const dataset = state.analyzedResults;
+  const summary = state.summary || summarizeCatalog(dataset);
+  const countryRule = resolveCountryFeeRule(state.settings.country);
+  const now = new Date();
+  const dateStr = now.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+  const timeStr = now.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+
+  // 1. Report Header
+  const headerEl = document.createElement("div");
+  headerEl.className = "exec-report-header";
+
+  const brandEl = document.createElement("div");
+  brandEl.className = "exec-report-brand";
+  brandEl.textContent = "SHOPPROFIT / EXECUTIVE CATALOG & SOURCING AUDIT";
+
+  const metaRow = document.createElement("div");
+  metaRow.className = "exec-report-meta-row";
+
+  const col1 = document.createElement("span");
+  col1.textContent = `Generated: ${dateStr} at ${timeStr}`;
+  const col2 = document.createElement("span");
+  col2.textContent = `Market: ${countryRule.name} (${countryRule.currency})`;
+  const col3 = document.createElement("span");
+  col3.textContent = `Total Catalog SKUs: ${summary.totalCount}`;
+  const col4 = document.createElement("span");
+  col4.textContent = `Offsite Ads Setting: ${state.settings.offsiteRate > 0 ? (state.settings.offsiteRate * 100).toFixed(0) + "%" : "0% (Direct/Organic)"}`;
+
+  metaRow.append(col1, col2, col3, col4);
+  headerEl.append(brandEl, metaRow);
+  content.appendChild(headerEl);
+
+  // 2. Executive KPI Cards
+  const kpiSection = document.createElement("div");
+  kpiSection.className = "exec-kpi-grid";
+
+  const cards = [
+    { label: "Total SKUs", value: String(summary.totalCount), sub: "Analyzed catalog items" },
+    { label: "Projected Gross Revenue", value: formatCurrency(summary.totalRevenue), sub: "Combined list price + shipping" },
+    { label: "Estimated Net Profit", value: formatCurrency(summary.totalProfit), sub: summary.totalProfit >= 0 ? "Net seller proceeds" : "Net negative loss" },
+    { label: "Average Profit Margin", value: formatPct(summary.averageMarginPct), sub: "Portfolio-wide margin" },
+    { label: "Average ROI", value: formatPct(summary.averageRoiPct), sub: "Return on out-of-pocket costs" },
+    { label: "Top Margin Winners", value: String(summary.winnerCount), sub: "SKUs with healthy margin & ROI" }
+  ];
+
+  for (const c of cards) {
+    const card = document.createElement("div");
+    card.className = "exec-kpi-card";
+    const lbl = document.createElement("div");
+    lbl.className = "exec-kpi-label";
+    lbl.textContent = c.label;
+    const val = document.createElement("div");
+    val.className = "exec-kpi-value";
+    val.textContent = c.value;
+    const sub = document.createElement("div");
+    sub.className = "exec-kpi-sub";
+    sub.textContent = c.sub;
+    card.append(lbl, val, sub);
+    kpiSection.appendChild(card);
+  }
+  content.appendChild(kpiSection);
+
+  // 3. Top Winners Table (Top 5 SKUs by Net Profit)
+  const winnersTitle = document.createElement("h3");
+  winnersTitle.className = "exec-section-title";
+  winnersTitle.textContent = "Top Sourcing Winners (Highest Projected Return)";
+  content.appendChild(winnersTitle);
+
+  const sortedByProfit = [...dataset].sort((a, b) => b.netProfit - a.netProfit);
+  const topWinners = sortedByProfit.slice(0, 5);
+
+  const table = document.createElement("table");
+  table.className = "exec-data-table";
+
+  const thead = document.createElement("thead");
+  const trH = document.createElement("tr");
+  ["#", "Product & SKU", "Category", "Retail Price", "Unit COGS", "Total Costs", "Etsy Fees", "Net Profit", "Margin %", "ROI %", "Break-Even"].forEach((txt) => {
+    const th = document.createElement("th");
+    th.textContent = txt;
+    trH.appendChild(th);
+  });
+  thead.appendChild(trH);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  topWinners.forEach((item, idx) => {
+    const tr = document.createElement("tr");
+    const cells = [
+      String(idx + 1),
+      item.productName,
+      item.category || "General",
+      formatCurrency(item.itemPrice, item.countryCode),
+      formatCurrency(item.productionCost, item.countryCode),
+      formatCurrency(item.totalSellerCosts, item.countryCode),
+      formatCurrency(item.totalEtsyFees, item.countryCode),
+      formatCurrency(item.netProfit, item.countryCode),
+      formatPct(item.marginPct),
+      formatPct(item.roi),
+      formatCurrency(item.breakEvenPrice, item.countryCode)
+    ];
+    cells.forEach((cTxt, cIdx) => {
+      const td = document.createElement("td");
+      td.textContent = cTxt;
+      if (cIdx >= 3 && cIdx !== 7) td.style.textAlign = "right";
+      if (cIdx === 7) {
+        td.style.textAlign = "right";
+        td.style.fontWeight = "700";
+        td.style.color = item.netProfit >= 0 ? "#16a34a" : "#dc2626";
+      }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  content.appendChild(table);
+
+  // 4. Advertising Sensitivity & Vulnerability Analysis
+  const adsSection = document.createElement("div");
+  adsSection.className = "exec-ads-section";
+
+  const adsTitle = document.createElement("h4");
+  adsTitle.textContent = "15% Offsite Ads Vulnerability Assessment";
+  adsSection.appendChild(adsTitle);
+
+  const vulnerableCount = dataset.filter((d) => d.becomesUnprofitableAt15Pct).length;
+  const adsP = document.createElement("p");
+  adsP.textContent = `${vulnerableCount} out of ${dataset.length} products in this catalog become unprofitable (negative net take-home) if sold via an Etsy Offsite Ad (15% platform attribution). Sellers should maintain buffer margins above 25% or adjust retail listing prices upward to offset ad deductions.`;
+  adsSection.appendChild(adsP);
+  content.appendChild(adsSection);
+
+  // 5. Verification Notice
+  const notice = document.createElement("div");
+  notice.className = "exec-report-notice";
+  notice.textContent = "ShopProfit Audit Standards: 100% Client-side deterministic calculation based on official 2026 Etsy Seller Policy & Payments Fee Schedules. Listing fees, transaction deductions, domestic and international processing, and statutory regulatory operating fees are modeled to exact currency precision.";
+  content.appendChild(notice);
+
+  modal.classList.add("modal--open");
+}
+
+/**
  * Opens the Itemized Etsy Fee Receipt Modal (matching Analyzer.Tools profit popover).
  */
 function openFeeReceiptModal(item) {
@@ -1068,6 +1287,60 @@ export function initBulkPage() {
   const exportFavsBtn = document.getElementById("export-favs-btn");
   if (exportFavsBtn) {
     exportFavsBtn.addEventListener("click", () => handleExport("favorites"));
+  }
+
+  const exportXlsxBtn = document.getElementById("export-xlsx-btn");
+  if (exportXlsxBtn) {
+    exportXlsxBtn.addEventListener("click", handleExportXlsx);
+  }
+
+  const exportPdfBtn = document.getElementById("export-pdf-btn");
+  if (exportPdfBtn) {
+    exportPdfBtn.addEventListener("click", openExecutiveReportModal);
+  }
+
+  // Print Executive Report Buttons
+  document.getElementById("btn-print-executive-report")?.addEventListener("click", () => {
+    window.print();
+  });
+  document.getElementById("btn-print-executive-report-footer")?.addEventListener("click", () => {
+    window.print();
+  });
+
+  // Supplier Catalog Preset Dropdown
+  const supplierSelect = document.getElementById("supplier-preset-select");
+  if (supplierSelect) {
+    supplierSelect.addEventListener("change", (e) => {
+      handleLoadSupplierPreset(e.target.value);
+    });
+  }
+
+  // One-Click Supplier Preset Buttons in Upload Modal
+  document.querySelectorAll(".btn-supplier-preset").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const supplier = btn.getAttribute("data-supplier");
+      if (supplier) handleLoadSupplierPreset(supplier);
+    });
+  });
+
+  // Downloadable Blank CSV Templates
+  document.querySelectorAll(".link-download-template").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const template = btn.getAttribute("data-template");
+      if (template) handleDownloadTemplate(template);
+    });
+  });
+
+  // Mobile menu toggle
+  const menuToggle = document.getElementById("menu-toggle");
+  const mobileMenu = document.getElementById("mobile-menu");
+  if (menuToggle && mobileMenu) {
+    menuToggle.addEventListener("click", () => {
+      const isHidden = mobileMenu.hidden;
+      mobileMenu.hidden = !isHidden;
+      menuToggle.setAttribute("aria-expanded", String(isHidden));
+    });
   }
 
   // Add Row Button

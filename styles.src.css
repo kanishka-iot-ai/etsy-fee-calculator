@@ -2811,5 +2811,267 @@ body.dark .benchmark-table .take-rate-pill.rate-opt {
   color: #4ade80;
 }
 
+/* ==========================================================================
+   Executive PDF Profit Summary & Sourcing Audit Modal
+   ========================================================================== */
+.modal-dialog--wide {
+  max-width: 960px;
+  width: 95vw;
+}
+
+.exec-report-header {
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+}
+
+.exec-report-brand {
+  font: 700 13px/1 var(--font-display, "Silkscreen", monospace);
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+.exec-report-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+
+.exec-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.exec-kpi-card {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  background: var(--bg, #f2f1ec);
+}
+
+.exec-kpi-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.exec-kpi-value {
+  font: 700 18px/1.2 var(--font-display, "Silkscreen", monospace);
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.exec-kpi-sub {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.exec-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 20px 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.exec-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+
+.exec-data-table th,
+.exec-data-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+.exec-data-table th {
+  background: var(--bg, #f2f1ec);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.exec-ads-section {
+  padding: 12px 16px;
+  border: 1px solid #d97706;
+  background: rgba(245, 158, 11, 0.08);
+  margin-bottom: 20px;
+}
+
+.exec-ads-section h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #b45309;
+  margin: 0 0 6px;
+}
+
+.exec-ads-section p {
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0;
+  color: var(--ink);
+}
+
+.exec-report-notice {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.5;
+  border-top: 1px dashed var(--border);
+  padding-top: 12px;
+  margin-top: 20px;
+}
+
+/* Dark mode overrides for Executive Report */
+body.dark .executive-report-dialog {
+  background: #0d0d0d;
+  border-color: #4a4a45;
+  color: #f5f5f0;
+}
+
+body.dark .exec-kpi-card {
+  background: #151515;
+  border-color: #262624;
+}
+
+body.dark .exec-kpi-value {
+  color: #f5f5f0;
+}
+
+body.dark .exec-data-table th {
+  background: #151515;
+  color: #bebeb5;
+  border-bottom-color: #4a4a45;
+}
+
+body.dark .exec-data-table td {
+  border-bottom-color: #262624;
+  color: #f5f5f0;
+}
+
+body.dark .exec-ads-section {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: #ca8a04;
+}
+
+body.dark .exec-ads-section h4 {
+  color: #fbbf24;
+}
+
+body.dark .exec-ads-section p {
+  color: #f5f5f0;
+}
+
+/* ==========================================================================
+   Print Styles for Executive PDF Report
+   ========================================================================== */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .skip-link,
+  .site-header,
+  .site-footer,
+  .bulk-hero,
+  .kpi-dashboard,
+  .bulk-toolbar,
+  .filter-tabs,
+  .bulk-grid-card,
+  .content-section,
+  #upload-wizard-modal,
+  #adjustments-drawer-modal,
+  #column-chooser-modal,
+  #fee-receipt-modal,
+  .modal-header .modal-close-btn,
+  .modal-header .button,
+  .modal-footer {
+    display: none !important;
+  }
+
+  #executive-report-modal.modal--open {
+    position: static !important;
+    background: transparent !important;
+    display: block !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  #executive-report-modal.modal--open .modal-dialog {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+  }
+
+  #executive-report-modal.modal--open .modal-header {
+    border-bottom: 2px solid #000000 !important;
+    padding-bottom: 10px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .exec-report-header {
+    border-bottom: 2px solid #000000 !important;
+    margin-bottom: 16px !important;
+    padding-bottom: 8px !important;
+  }
+
+  .exec-kpi-card {
+    border: 1px solid #333333 !important;
+    background: #f9f9f9 !important;
+    color: #000000 !important;
+    break-inside: avoid;
+  }
+
+  .exec-kpi-value {
+    color: #000000 !important;
+  }
+
+  .exec-data-table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    font-size: 11px !important;
+  }
+
+  .exec-data-table th,
+  .exec-data-table td {
+    border: 1px solid #cccccc !important;
+    padding: 6px 8px !important;
+    color: #000000 !important;
+  }
+
+  .exec-data-table th {
+    background: #eeeeee !important;
+  }
+
+  .exec-ads-section {
+    border: 1px solid #d97706 !important;
+    background: #fffbeb !important;
+    color: #000000 !important;
+    break-inside: avoid;
+  }
+
+  .exec-report-notice {
+    color: #555555 !important;
+    font-size: 10px !important;
+    margin-top: 20px !important;
+  }
+}
+
 
 

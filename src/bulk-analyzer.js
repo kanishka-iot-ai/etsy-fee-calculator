@@ -38,12 +38,12 @@ export const BULK_LIMITS = Object.freeze({
  * Normalization strips spaces, hyphens, and underscores and lowercases headers.
  */
 export const CSV_HEADER_ALIASES = Object.freeze({
-  product_name: ["productname", "product", "name", "title", "sku", "itemname", "listingtitle", "productorsku"],
-  item_price: ["itemprice", "price", "sellingprice", "saleprice", "listingprice", "unitprice"],
+  product_name: ["productname", "product", "name", "title", "sku", "itemname", "listingtitle", "productorsku", "variantname", "itemtitle", "description", "item"],
+  item_price: ["itemprice", "price", "sellingprice", "saleprice", "listingprice", "unitprice", "retailprice", "etsyprice", "targetprice", "recommendedretailprice", "rrp", "etsysellingprice", "etsytargetprice"],
   shipping_charged: ["shippingcharged", "shipping", "buyershipping", "shippingprice", "postagecharged", "postage"],
-  production_cost: ["productioncost", "production", "itemcost", "cogs", "materialcost", "cost", "materials"],
-  packaging_cost: ["packagingcost", "packaging", "fulfillmentcost", "packcost", "packagingandshippingcost"],
-  shipping_cost: ["shippingcost", "sellershippingcost", "labelcost", "postagecost", "carrierlabelcost"],
+  production_cost: ["productioncost", "production", "itemcost", "cogs", "materialcost", "cost", "materials", "printifybasecost", "printfulitemcost", "printfulcost", "gelatobaseprice", "gelatocost", "aliexpresscostprice", "aliexpresscost", "dropshippingprice", "cjdropshippingprice", "costprice", "baseprice", "basecost", "unitcost", "wholesale", "wholesaleprice", "suppliercost", "supplierprice"],
+  packaging_cost: ["packagingcost", "packaging", "fulfillmentcost", "packcost", "packagingandshippingcost", "handling", "handlingfee", "processingcost", "printifyfulfillmentcost", "printfulfulfillment"],
+  shipping_cost: ["shippingcost", "sellershippingcost", "labelcost", "postagecost", "carrierlabelcost", "freightfee", "freight", "cjpacketfreight", "choiceshippingfee", "suppliershipping", "estimatedshipping", "epacket", "cjpacket", "printifyshipping", "printifyshippingcost", "printfulshipping", "printfulshippingcost", "gelatoshipping", "gelatoshippingcost", "aliexpressshipping", "cjshipping"],
   gift_wrap: ["giftwrap", "giftwrapprice", "giftwrapping"],
   buyer_sales_tax: ["buyersalestax", "salestax", "tax", "buyertax"],
   country: ["country", "countrycode", "sellercountry", "market", "location"],
