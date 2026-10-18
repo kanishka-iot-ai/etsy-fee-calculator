@@ -34,7 +34,8 @@ import {
   parseCsvRecords,
   mapCsvHeaders,
   previewBulkCsv,
-  sanitizeCsvTextCell
+  sanitizeCsvTextCell,
+  formatBulkCurrency
 } from "./bulk-analyzer.js";
 
 // Local storage key for starred favorites
@@ -121,7 +122,7 @@ function recalculateAndRender() {
  */
 function formatCurrency(amount, countryCode = state.settings.country) {
   const rule = resolveCountryFeeRule(countryCode);
-  return formatMoney(amount, rule.currency);
+  return formatBulkCurrency(amount, rule);
 }
 
 /**
