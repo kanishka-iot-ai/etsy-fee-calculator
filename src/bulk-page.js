@@ -1109,11 +1109,51 @@ export function initBulkPage() {
     });
   }
 
+  // Theme initialization & Toggle
+  initTheme();
+
   // Ingestion Wizard setup
   setupUploadWizard();
 
   // Load demo catalog initially so page is rich and instantly interactive!
   handleLoadDemo();
+}
+
+/**
+ * Manages theme synchronization between dark and light modes.
+ */
+function initTheme() {
+  function setTheme(theme) {
+    const dark = theme === "dark";
+    document.body.classList.toggle("dark", dark);
+    document.documentElement.classList.toggle("dark", dark);
+    document.documentElement.style.colorScheme = dark ? "dark" : "light";
+    const toggleBtn = document.getElementById("theme-toggle");
+    if (toggleBtn) {
+      toggleBtn.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
+      toggleBtn.title = dark ? "Switch to light mode" : "Switch to dark mode";
+    }
+    const metaTheme = document.querySelector("meta[name=theme-color]");
+    if (metaTheme) {
+      metaTheme.content = dark ? "#050505" : "#F2F1EC";
+    }
+  }
+
+  let preferredTheme = "light";
+  try {
+    preferredTheme = localStorage.getItem("shopprofit-theme") || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  } catch (_e) {
+    preferredTheme = "light";
+  }
+  setTheme(preferredTheme);
+
+  document.getElementById("theme-toggle")?.addEventListener("click", () => {
+    const next = document.body.classList.contains("dark") ? "light" : "dark";
+    setTheme(next);
+    try {
+      localStorage.setItem("shopprofit-theme", next);
+    } catch (_e) {}
+  });
 }
 
 // Auto-run if executed in a browser environment with document ready
