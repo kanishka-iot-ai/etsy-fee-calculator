@@ -1,0 +1,36 @@
+# ShopProfit: Etsy Fee, Profit & Sourcing Intelligence
+
+> ShopProfit (https://shopprofitcalculator.com/) is a 100% client-side, zero-data-collection financial intelligence platform for Etsy sellers. It provides exact fee calculations, break-even price solvers, and bulk catalog sourcing analytics across 62 sovereign Etsy Payments markets.
+
+## Core Calculators & Tools
+
+- [Etsy Profit & Fee Calculator](https://shopprofitcalculator.com/): Real-time interactive calculator computing listing fees, transaction fees, payment processing, regulatory operating fees, and net profit with a binary-search target pricing solver.
+- [Bulk Catalog & Sourcing Analyzer](https://shopprofitcalculator.com/bulk/): Spreadsheet-style bulk analysis tool processing up to 500 supplier SKUs with inline editing, CSV import/export, shortlist filtering, view presets, and itemized fee receipts.
+- [62-Market Etsy Fee Schedule](https://shopprofitcalculator.com/fees/): Complete itemized breakdown of Etsy seller fees across 62 countries, including domestic/international processing rates, regulatory operating fees, statutory deposit thresholds, and Offsite Ads tiers.
+- [Mathematical Methodology & Formulas](https://shopprofitcalculator.com/methodology/): Authoritative specification of the ShopProfit fee engine, binary-search break-even algorithm, and official Etsy documentation citations.
+- [Etsy Fee Calculator UK](https://shopprofitcalculator.com/etsy-fee-calculator-uk): Dedicated UK seller calculator (GBP payout, 0.48% regulatory operating fee, 4.0% + £0.20 processing fee).
+- [Etsy Fee Calculator Canada](https://shopprofitcalculator.com/etsy-fee-calculator-canada): Dedicated Canadian seller calculator (CAD payout, 0.50% regulatory operating fee, 3% domestic / 4% intl + $0.25 CAD).
+- [Etsy Fee Calculator Australia](https://shopprofitcalculator.com/etsy-fee-calculator-australia): Dedicated Australian seller calculator (AUD payout, 3% domestic / 4% intl + $0.25 AUD).
+
+## Core Etsy Fee Structure (2026 Sovereign Schedule)
+
+- **Listing Fee:** $0.20 USD (or local currency equivalent) per listing. Auto-renews every 4 months or upon quantity sale.
+- **Transaction Fee:** 6.5% of the total customer payment (item price + shipping charged + gift wrapping).
+- **Payment Processing Fee:** Country-specific rate applied to the full order amount:
+  - United States: 3.0% + $0.25 USD
+  - United Kingdom: 4.0% + £0.20 GBP (+ 0.48% regulatory operating fee)
+  - Canada: 3.0% (Domestic) / 4.0% (International) + $0.25 CAD (+ 0.50% regulatory operating fee)
+  - Australia: 3.0% (Domestic) / 4.0% (International) + $0.25 AUD
+  - Eurozone (Germany, France, etc.): 4.0% + €0.30 EUR (France includes 0.40% regulatory fee, Spain 0.40%, Italy 0.32%)
+- **Regulatory Operating Fees:** Statutorily assessed in 9 countries (UK 0.48%, Canada 0.50%, France 0.40%, Spain 0.40%, Italy 0.32%, Türkiye 1.67%, Vietnam 1.24%, Hungary 0.11%, India 0.05%).
+- **Offsite Ads:** 15% optional for shops <$10,000 USD revenue in trailing 365 days; 12% mandatory for shops ≥$10,000 USD. Capped at $100 USD-equivalent per order.
+
+## Privacy & Architectural Invariants
+
+- **Zero Data Collection:** 100% of arithmetic, CSV parsing, and catalog evaluation executes strictly within the seller's browser using Web Standards.
+- **No Tracking of Seller Data:** Product names, prices, supplier costs, margins, and sales volumes are never stored or transmitted to external servers.
+- **Deterministic Engine:** Calculations are powered by `fee-engine.js` (Engine v1.1.1) ensuring integer-accurate minor currency units.
+
+## Complete Data & Full Documentation
+
+For the full machine-readable dataset, JSON schemas, and mathematical proofs, refer to [llms-full.txt](https://shopprofitcalculator.com/llms-full.txt).

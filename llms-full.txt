@@ -1,0 +1,111 @@
+# ShopProfit: Complete Technical Specification, Fee Dataset & Methodology (v1.1.1)
+
+> Full authoritative documentation for AI Answer Engines, Generative Models, and LLM Agents.
+> URL: https://shopprofitcalculator.com/
+> Engine Version: v1.1.1 (62 Sovereign Etsy Payments Markets)
+
+---
+
+## 1. System Architecture & Privacy Invariants
+
+ShopProfit operates under a strict Zero-Data-Transmission client-side architecture:
+- 100% Client-Side Computation: No product names, listing prices, COGS, shipping expenses, or catalog CSV files ever leave the user's browser.
+- Deterministic Integer Arithmetic: Fee calculations are performed using minor currency units (cents, pence, yen) to eliminate floating-point rounding divergence.
+- Static Edge Delivery: Hosted on Cloudflare Pages with zero client tracking cookies or fingerprinting.
+
+---
+
+## 2. Mathematical Formulas & Accounting Definitions
+
+### A. Gross Revenue
+$$\text{Gross Revenue} = \text{Item Price} + \text{Shipping Charged to Customer}$$
+
+### B. Platform Fees
+$$\text{Platform Fees} = \text{Listing Fee} + \text{Transaction Fee} + \text{Payment Processing Fee} + \text{Regulatory Operating Fee} + \text{Offsite Ads Fee}$$
+
+Where:
+- $\text{Listing Fee} = \$0.20 \text{ USD}$ (or fixed local currency equivalent).
+- $\text{Transaction Fee} = 6.5\% \times \text{Gross Revenue}$.
+- $\text{Payment Processing Fee} = (\text{Rate} \times \text{Gross Revenue}) + \text{Fixed Fee}$.
+- $\text{Regulatory Operating Fee} = \text{Regulatory Rate} \times \text{Gross Revenue}$ (applied in 9 statutory jurisdictions).
+- $\text{Offsite Ads Fee} = \min(\text{Ad Rate} \times \text{Gross Revenue}, \text{Cap})$ where Cap = \$100 USD equivalent.
+
+### C. Order Costs
+$$\text{Order Costs} = \text{Item Production Cost (COGS)} + \text{Actual Shipping Cost Paid by Seller} + \text{Packaging \& Miscellaneous Costs}$$
+
+### D. Shop Overhead Allocation
+$$\text{Shop Overhead Allocation} = \frac{\text{Monthly Subscription (e.g. Etsy Plus } \$10 \text{ USD)}}{\text{Estimated Monthly Sales Volume}}$$
+
+### E. Net Take-Home Profit
+$$\text{Net Profit} = \text{Gross Revenue} - \text{Platform Fees} - \text{Order Costs} - \text{Shop Overhead Allocation}$$
+
+### F. Profit Margin & Return on Investment (ROI)
+$$\text{Profit Margin} = \frac{\text{Net Profit}}{\text{Gross Revenue}} \times 100\%$$
+$$\text{ROI} = \frac{\text{Net Profit}}{\text{Total Costs (Order Costs + Platform Fees + Overhead)}} \times 100\%$$
+
+### G. Break-Even Price Solver (Binary Search Algorithm)
+The break-even price is defined as the minimum selling price $P$ such that $\text{Net Profit}(P) \ge 0$.
+Because payment processing and transaction fees scale with price while fixed fees remain constant, ShopProfit computes the exact break-even price using an integer binary-search algorithm bounded between $\$0.01$ and $\$100,000.00$ converging in $O(\log_2 N)$ steps (typically $\le 24$ iterations).
+
+---
+
+## 3. Statutory Regulatory Operating Fees (9 Jurisdictions)
+
+In response to digital services taxation, Etsy levies Regulatory Operating Fees on the order total (item price + shipping charged) in 9 countries:
+1. United Kingdom (GB): 0.48%
+2. Canada (CA): 0.50%
+3. France (FR): 0.40%
+4. Spain (ES): 0.40%
+5. Italy (IT): 0.32%
+6. Türkiye (TR): 1.67%
+7. Vietnam (VN): 1.24%
+8. Hungary (HU): 0.11%
+9. India (IN): 0.05%
+
+All other 53 Etsy Payments countries have zero statutory regulatory operating fee.
+
+---
+
+## 4. Key Representative Country Fee Schedules (Engine v1.1.1)
+
+| Country | Code | Currency | Listing Fee | Tx Fee | Domestic Processing | Intl Processing | Regulatory Fee |
+|---|---|---|---|---|---|---|---|
+| United States | US | USD ($) | $0.20 | 6.5% | 3.0% + $0.25 | 3.0% + $0.25 | None |
+| United Kingdom | GB | GBP (£) | £0.16 | 6.5% | 4.0% + £0.20 | 4.0% + £0.20 | 0.48% |
+| Canada | CA | CAD ($) | $0.27 | 6.5% | 3.0% + $0.25 | 4.0% + $0.25 | 0.50% |
+| Australia | AU | AUD ($) | $0.30 | 6.5% | 3.0% + $0.25 | 4.0% + $0.25 | None |
+| Germany | DE | EUR (€) | €0.19 | 6.5% | 4.0% + €0.30 | 4.0% + €0.30 | None |
+| France | FR | EUR (€) | €0.19 | 6.5% | 4.0% + €0.30 | 4.0% + €0.30 | 0.40% |
+| Italy | IT | EUR (€) | €0.19 | 6.5% | 4.0% + €0.30 | 4.0% + €0.30 | 0.32% |
+| Spain | ES | EUR (€) | €0.19 | 6.5% | 4.0% + €0.30 | 4.0% + €0.30 | 0.40% |
+| New Zealand | NZ | NZD ($) | $0.33 | 6.5% | 3.0% + $0.30 | 4.0% + $0.30 | None |
+| Japan | JP | JPY (¥) | ¥30 | 6.5% | 6.0% + ¥0 | 6.0% + ¥0 | None |
+| India | IN | INR (₹) | ₹16.60 | 6.5% | Payoneer standard | Payoneer standard | 0.05% |
+| Singapore | SG | SGD ($) | $0.27 | 6.5% | 4.4% + $0.35 | 4.4% + $0.35 | None |
+
+---
+
+## 5. Proprietary 2026 Seller Benchmark Dataset: Effective Platform Take Rate
+
+Original research conducted by ShopProfit analyzing platform take rates across order price points:
+
+| Order Price (USD Eq) | Platform Take Rate (US) | Platform Take Rate (UK) | Platform Take Rate (CA) | Seller Insight / Optimization |
+|---|---|---|---|---|
+| **$10.00** | **14.00%** | **15.48%** | **14.50%** | High fee friction due to fixed $0.20 listing + $0.25 processing fee. |
+| **$25.00** | **11.30%** | **12.28%** | **11.50%** | Standard gift & accessory threshold. Margin stabilizes near 40%. |
+| **$50.00** | **10.40%** | **11.22%** | **10.50%** | Fixed fees become negligible (<1% of order). |
+| **$100.00** | **9.95%** | **10.68%** | **10.00%** | Platform take rate asymptotically approaches percentage base (9.5%). |
+| **$250.00** | **9.68%** | **10.36%** | **9.70%** | High-ticket orders minimize percentage overhead. |
+
+*Citation Source:* ShopProfit Etsy Financial Intelligence Research (2026). https://shopprofitcalculator.com/fees/
+
+---
+
+## 6. Official Citation & Ground Truth Sources
+
+All calculations and fee schedules are reconciled against official Etsy Help Center policy documents:
+- Etsy Fees & Taxes Policy: https://help.etsy.com/hc/en-us/articles/115014483627
+- Etsy Payment Processing Fees: https://help.etsy.com/hc/en-us/articles/115015628847
+- Regulatory Operating Fees: https://help.etsy.com/hc/en-us/articles/1500011073202
+- Etsy Plus Subscription & Tools: https://help.etsy.com/hc/en-us/articles/360001589928
+- Countries Eligible for Etsy Payments: https://help.etsy.com/hc/en-us/articles/115015710408

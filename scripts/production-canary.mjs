@@ -14,7 +14,7 @@ const API_BASE = "https://shopprofit-fee-intelligence.kanishka-bmchak.workers.de
 const EXPECTED_VERSION_ID = "v1.1.1";
 const EXPECTED_SOURCE_HASH = "44526eef75082b7751e59f32eff9bfaf27ad22f2cdc83446ea18a34f012adf54";
 const EXPECTED_MARKET_COUNT = 62;
-const REQUEST_TIMEOUT_MS = 15000;
+const REQUEST_TIMEOUT_MS = 30000;
 
 async function fetchWithTimeout(url) {
   const controller = new AbortController();

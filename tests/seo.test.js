@@ -450,7 +450,7 @@ test("dedicated /fees/ route satisfies all AEO, GEO, schema, and internal linkin
   }
 });
 
-test("sitemap.xml is valid XML with exactly 15 canonical URLs and explicit application/xml header rule", async () => {
+test("sitemap.xml is valid XML with exactly 16 canonical URLs and explicit application/xml header rule", async () => {
   const [sitemap, headers, redirects] = await Promise.all([
     read("../sitemap.xml"),
     read("../_headers"),
@@ -462,7 +462,7 @@ test("sitemap.xml is valid XML with exactly 15 canonical URLs and explicit appli
   assert.ok(sitemap.trim().endsWith("</urlset>"), "valid closing urlset tag");
 
   const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-  assert.equal(locs.length, 15, "contains exactly 15 URLs");
+  assert.equal(locs.length, 16, "contains exactly 16 URLs");
 
   const expectedUrls = [
     "https://shopprofitcalculator.com/",
@@ -475,18 +475,19 @@ test("sitemap.xml is valid XML with exactly 15 canonical URLs and explicit appli
     "https://shopprofitcalculator.com/etsy-offsite-ads-calculator/",
     "https://shopprofitcalculator.com/etsy-print-on-demand-calculator/",
     "https://shopprofitcalculator.com/fees/",
+    "https://shopprofitcalculator.com/bulk/",
     "https://shopprofitcalculator.com/methodology/",
     "https://shopprofitcalculator.com/faq/",
     "https://shopprofitcalculator.com/privacy",
     "https://shopprofitcalculator.com/terms",
     "https://shopprofitcalculator.com/contact",
   ];
-  assert.deepEqual(locs, expectedUrls, "contains exactly the 15 production URLs in order");
+  assert.deepEqual(locs, expectedUrls, "contains exactly the 16 production URLs in order");
 
   assert.ok(!sitemap.includes("pages.dev"), "no pages.dev URLs in sitemap");
 
   const uniqueLocs = new Set(locs);
-  assert.equal(uniqueLocs.size, 15, "no duplicate URLs");
+  assert.equal(uniqueLocs.size, 16, "no duplicate URLs");
 
   const redirectSources = redirects
     .split("\n")

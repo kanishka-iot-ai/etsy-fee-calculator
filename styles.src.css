@@ -2685,4 +2685,131 @@ body.dark .column-toggle-item:hover {
   background: #151515;
 }
 
+/* Answer Engine Optimization (AEO) & Direct Answer Callouts */
+.aeo-direct-answer {
+  margin: 16px 0 24px;
+  padding: 14px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.04);
+}
+
+.aeo-direct-answer strong {
+  display: block;
+  font-family: var(--font-display, inherit);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+body.dark .aeo-direct-answer {
+  background: #0d0d0d;
+  border-color: #262624;
+  border-left: 4px solid #c8ff00;
+  color: #f5f5f0;
+}
+
+body.dark .aeo-direct-answer strong {
+  color: #c8ff00;
+}
+
+/* Benchmark Dataset Table Styles */
+.benchmark-table-wrap {
+  margin: 20px 0 32px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.benchmark-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+}
+
+.benchmark-table th {
+  padding: 10px 14px;
+  background: var(--surface-soft, #f7f6f2);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--border);
+}
+
+.benchmark-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink);
+  vertical-align: middle;
+}
+
+.benchmark-table tr:hover td {
+  background: rgba(127, 127, 127, 0.04);
+}
+
+.benchmark-table .take-rate-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-weight: 700;
+}
+
+.benchmark-table .take-rate-pill.rate-high {
+  background: rgba(220, 38, 38, 0.12);
+  color: #dc2626;
+}
+
+.benchmark-table .take-rate-pill.rate-mid {
+  background: rgba(217, 119, 6, 0.12);
+  color: #d97706;
+}
+
+.benchmark-table .take-rate-pill.rate-opt {
+  background: rgba(22, 163, 74, 0.12);
+  color: #16a34a;
+}
+
+body.dark .benchmark-table-wrap {
+  background: #0d0d0d;
+  border-color: #262624;
+}
+
+body.dark .benchmark-table th {
+  background: #151515;
+  color: #bebeb5;
+  border-bottom-color: #4a4a45;
+}
+
+body.dark .benchmark-table td {
+  border-bottom-color: #262624;
+  color: #f5f5f0;
+}
+
+body.dark .benchmark-table .take-rate-pill.rate-high {
+  background: rgba(248, 113, 113, 0.16);
+  color: #f87171;
+}
+
+body.dark .benchmark-table .take-rate-pill.rate-mid {
+  background: rgba(251, 191, 36, 0.16);
+  color: #fbbf24;
+}
+
+body.dark .benchmark-table .take-rate-pill.rate-opt {
+  background: rgba(74, 222, 128, 0.16);
+  color: #4ade80;
+}
+
+
 

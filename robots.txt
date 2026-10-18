@@ -1,3 +1,30 @@
+# ShopProfit Robots Directives
+# https://shopprofitcalculator.com/
+
 User-agent: *
 Allow: /
+
+# Dedicated AI Answer Engine & Retrieval Bots
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Sitemap & LLMs Specification
 Sitemap: https://shopprofitcalculator.com/sitemap.xml

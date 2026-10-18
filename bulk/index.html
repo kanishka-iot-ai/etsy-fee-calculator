@@ -50,6 +50,42 @@
           { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://shopprofitcalculator.com/" },
           { "@type": "ListItem", "position": 2, "name": "Bulk Analyzer", "item": "https://shopprofitcalculator.com/bulk/" }
         ]
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://shopprofitcalculator.com/#organization",
+        "name": "ShopProfit",
+        "url": "https://shopprofitcalculator.com/",
+        "logo": "https://shopprofitcalculator.com/logo-mark.svg"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How does bulk catalog profit calculation work on Etsy?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bulk catalog calculation evaluates each SKU individually across Etsy's 62-market fee engine, calculating exact listing fees, 6.5% transaction fees, country payment processing, net take-home profit, margin percentage, and break-even price."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is a good profit margin for wholesale sourcing on Etsy?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For wholesale and supplier sourcing, successful Etsy sellers aim for at least a 40% to 50% net profit margin and 100%+ ROI to comfortably absorb shipping label costs, packaging materials, and optional or mandatory Offsite Ads fees."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is my supplier or catalog data uploaded to external servers?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. ShopProfit runs 100% client-side in your browser. No product names, prices, supplier costs, or CSV records are ever uploaded, logged, or transmitted anywhere."
+            }
+          }
+        ]
       }
     ]
   }
@@ -159,6 +195,32 @@
         <!-- Rendered dynamically by src/bulk-page.js -->
       </div>
     </div>
+
+    <section class="content-section" style="margin-top: 40px;" aria-labelledby="bulk-guide-heading">
+      <div class="section-heading">
+        <div>
+          <h2 id="bulk-guide-heading">How to Analyze Bulk Catalogs &amp; Wholesale Sourcing on Etsy</h2>
+          <p>Strategic framework for filtering winners, mitigating 15% ad risk, and protecting net margins across high-SKU inventories.</p>
+        </div>
+      </div>
+
+      <div class="aeo-direct-answer" role="region" aria-label="Bulk Sourcing Direct Answer">
+        <strong>Direct Sourcing Answer:</strong> When sourcing wholesale products for Etsy, profitable sellers filter for a minimum 40% net profit margin and 100%+ ROI to absorb fixed listing fees ($0.20), payment processing (3% + $0.25), and mandatory 12% to 15% Offsite Ads fees without turning unit economics negative.
+      </div>
+
+      <div class="calculator-grid" style="align-items: stretch; margin: 24px 0;">
+        <article class="panel input-panel">
+          <p class="eyebrow">Portfolio Sourcing</p>
+          <h3 style="font-size: 16px; margin: 0 0 8px;">1. The Thin Margin Trap &amp; Advertising Vulnerability</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">A product with a 15% margin on direct organic traffic looks profitable on paper. However, if that order originates from an Etsy Offsite Ad (15% deduction on total order value including shipping), the net margin drops below 0%, resulting in a net loss on every unit shipped. Use the <em>"15% Ads Vulnerable"</em> filter preset to flag at-risk SKUs immediately.</p>
+        </article>
+        <article class="panel input-panel">
+          <p class="eyebrow">Mathematical Solvers</p>
+          <h3 style="font-size: 16px; margin: 0 0 8px;">2. Unit Break-Even vs. Supplier Minimums</h3>
+          <p style="color: var(--muted); font-size: 13px; line-height: 1.6;">Every SKU row in the ShopProfit grid calculates an exact-cent break-even price using an integer binary-search algorithm. If a supplier's wholesale unit cost plus shipping exceeds the break-even price of your target market retail tier, the SKU cannot achieve sustainable unit profitability regardless of sales volume.</p>
+        </article>
+      </div>
+    </section>
   </main>
 
   <!-- Upload Wizard Modal -->
