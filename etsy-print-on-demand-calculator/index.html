@@ -39,6 +39,41 @@
   <script type="application/ld+json" id="faq-structured-data">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How do I calculate profit for Etsy print on demand?","acceptedAnswer":{"@type":"Answer","text":"To calculate profit for an Etsy print-on-demand item, subtract both Etsy platform fees and your print provider fulfillment costs from total customer revenue. Total customer revenue equals listing price plus shipping charged to the buyer. Deduct Etsy fees ($0.20 listing, 6.5% transaction, payment processing, and any ad fees), then deduct your print provider's base product charge (blank + printing) and provider shipping fee. What remains is your net take-home profit."}},{"@type":"Question","name":"What fees does Etsy charge on print on demand products?","acceptedAnswer":{"@type":"Answer","text":"Etsy does not charge any special fee for print on demand. You pay the exact same platform fees as physical sellers: a $0.20 listing fee, a 6.5% transaction fee on total order revenue (item + buyer shipping), country payment processing (3% + $0.25 in the US), and optional 12% or 15% Offsite Ads fees if applicable."}},{"@type":"Question","name":"What is a realistic profit margin for print on demand on Etsy?","acceptedAnswer":{"@type":"Answer","text":"A healthy net profit margin for Etsy POD is between 20% and 35%. On a standard $28 t-shirt with $4.50 buyer shipping ($32.50 revenue), after ~$3.50 in Etsy fees and ~$14.00 in provider production and shipping, you should expect to take home roughly $7.00 to $9.00 per shirt (22% to 28% margin)."}},{"@type":"Question","name":"Does Etsy charge fees on print-on-demand shipping?","acceptedAnswer":{"@type":"Answer","text":"Yes. Etsy levies its 6.5% transaction fee and payment processing fee on the entire shipping amount charged to the buyer. This means if you charge $4.50 for shipping, Etsy retains roughly $0.43 to $0.45 in platform fees directly from that shipping charge."}},{"@type":"Question","name":"How do Printify and Printful production costs interact with Etsy fees?","acceptedAnswer":{"@type":"Answer","text":"Your print provider operates independently of Etsy. When an order occurs, Etsy deposits customer revenue (minus Etsy platform fees) into your Etsy Payment account, while your print provider automatically charges your credit card or PayPal for fulfillment. ShopProfit models both transactions simultaneously to show your true consolidated take-home."}},{"@type":"Question","name":"How should I price a POD t-shirt or hoodie on Etsy?","acceptedAnswer":{"@type":"Answer","text":"Start with your total print provider cost (item blank + print fee + fulfillment postage), add your desired profit in dollars (e.g., $8.00 per shirt), and use ShopProfit's target pricing tool to calculate backward. For apparel, retail prices between $26.00 and $32.00 for t-shirts and $42.00 to $52.00 for hoodies generally balance competitive conversion rates with solid margins."}}]}
   </script>
+  <script type="application/ld+json" id="howto-structured-data">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Calculate Etsy Net Profit & Break-Even Selling Price",
+    "description": "Step-by-step mathematical calculation guide to computing exact Etsy seller fees, determining real profit margins, and finding break-even price floors.",
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "Calculate Gross Order Revenue",
+        "text": "Add your item listing price to the shipping fee charged to the buyer: Gross Revenue = Item Price + Buyer Shipping."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Compute Total Platform Fees",
+        "text": "Add the $0.20 listing fee, 6.5% transaction fee on gross revenue, country payment processing fee, any statutory regulatory operating fee, and attributed Offsite Ads fees."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Calculate Total Business Costs",
+        "text": "Sum your physical materials/production expenses (COGS), actual seller packaging and postage expenses, and amortized monthly shop overhead."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Determine Net Take-Home Profit and Margin",
+        "text": "Subtract platform fees and business costs from gross revenue: Net Profit = Gross Revenue - Platform Fees - Order Costs. Divide net profit by gross revenue to calculate profit margin percentage."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Solve for Break-Even Price",
+        "text": "Use ShopProfit's binary-search solver to determine the lowest listing price where Net Profit equals zero."
+      }
+    ]
+  }
+  </script>
 </head>
 <body data-route-country="US">
   <a class="skip-link" href="#calculator">Skip to calculator</a>
@@ -46,7 +81,7 @@
     <div class="nav-wrap">
       <a class="brand" href="#top" aria-label="ShopProfit home"><span class="brand-mark"><img src="/logo-mark.svg" alt="" aria-hidden="true"></span><span>ShopProfit</span></a>
       <nav class="desktop-nav" aria-label="Main navigation">
-        <a class="active" href="#calculator">Calculator</a><a href="#bulk-analyzer">Bulk CSV</a><a href="#seller-advisor">AI Advisor</a><a href="/fees/">Fees</a><a href="/methodology/">Method</a><a href="/faq/">FAQ</a>
+        <a class="active" href="#calculator">Calculator</a><a href="/bulk/">Bulk Sourcing</a><a href="#bulk-analyzer">Bulk CSV</a><a href="#seller-advisor">AI Advisor</a><a href="/fees/">Fees</a><a href="/methodology/">Method</a><a href="/faq/">FAQ</a>
       </nav>
       <div class="nav-actions">
         <label class="sr-only" for="country-nav">Seller location</label>
@@ -184,6 +219,7 @@
           <button class="button button-secondary" id="bulk-load-demo" type="button">Load Demo Products</button>
           <button class="button button-primary" id="bulk-analyze-btn" type="button" disabled>Analyze Products</button>
           <button class="button button-quiet" id="bulk-clear-btn" type="button" hidden>Clear</button>
+          <a class="button button-secondary" href="/bulk/" style="text-decoration: none; margin-left: auto;">🚀 Open Full Sourcing Grid</a>
         </div>
 
         <div class="bulk-dropzone" id="bulk-dropzone" role="button" tabindex="0" aria-describedby="bulk-dropzone-help">
@@ -359,7 +395,6 @@
       <article class="panel answer-panel">
         <p class="eyebrow">Print on Demand Breakdown</p>
         <h2>How much does Etsy take from a print-on-demand sale?</h2>
-        
         <div class="aeo-direct-answer" role="region" aria-label="Etsy print on demand direct answer">
           <strong>Direct POD Answer:</strong> Print on demand (POD) sellers on Etsy typically earn 20% to 35% net profit margins. Because POD provider base costs (Printify, Gelato, Printful) consume 55% to 70% of gross revenue, sellers must mark up items by at least 40% to 50% above provider charges to cover Etsy's 6.5% transaction fee and processing deductions.
         </div>
@@ -436,7 +471,7 @@
   </main>
   <noscript><p class="noscript-note">The fee guide, methodology, country table, and FAQs are available below. Entering and calculating a sale requires JavaScript; your entries are not submitted.</p></noscript>
 
-  <footer class="site-footer"><div class="footer-inner page-width"><div class="footer-brand"><a class="brand" href="#top"><span class="brand-mark"><img src="/logo-mark.svg" alt="" aria-hidden="true"></span><span>ShopProfit</span></a><p>Know exactly what you keep.</p></div><div class="footer-column"><strong>Tools</strong><a href="/#calculator">Etsy profit calculator</a><a href="/bulk/">Bulk catalog analyzer</a><a href="/fees/">Etsy fee calculator</a><a href="/etsy-pricing-calculator/">Etsy pricing calculator</a><a href="/etsy-break-even-calculator/">Etsy break-even calculator</a><a href="/etsy-offsite-ads-calculator/">Etsy Offsite Ads calculator</a><a href="/etsy-digital-download-fee-calculator">Etsy digital product calculator</a><a href="/etsy-print-on-demand-calculator/">Etsy print on demand calculator</a><strong>Regional calculators</strong><a href="/etsy-fee-calculator-uk">United Kingdom</a><a href="/etsy-fee-calculator-canada">Canada</a><a href="/etsy-fee-calculator-australia">Australia</a></div><div class="footer-column"><strong>Resources</strong><a href="/fees/">Etsy fees guide</a><a href="/methodology/">Methodology</a><a href="/faq/">FAQ</a></div><div class="footer-column"><strong>Legal</strong><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/contact">Contact</a><a href="mailto:info@shopprofitcalculator.com">info@shopprofitcalculator.com</a></div></div><div class="footer-bottom page-width"><span>© <span id="copyright-year"></span> ShopProfit</span><span>Independent calculator. Not affiliated with Etsy.</span></div></footer>
+  <footer class="site-footer"><div class="footer-inner page-width"><div class="footer-brand"><a class="brand" href="#top"><span class="brand-mark"><img src="/logo-mark.svg" alt="" aria-hidden="true"></span><span>ShopProfit</span></a><p>Know exactly what you keep.</p></div><div class="footer-column"><strong>Tools</strong><a href="/#calculator">Etsy profit calculator</a><a href="/fees/">Etsy fee calculator</a><a href="/bulk/">Bulk catalog analyzer</a><a href="/etsy-pricing-calculator/">Etsy pricing calculator</a><a href="/etsy-break-even-calculator/">Etsy break-even calculator</a><a href="/etsy-offsite-ads-calculator/">Etsy Offsite Ads calculator</a><a href="/etsy-digital-download-fee-calculator">Etsy digital product calculator</a><a href="/etsy-print-on-demand-calculator/">Etsy print on demand calculator</a><strong>Regional calculators</strong><a href="/etsy-fee-calculator-uk">United Kingdom</a><a href="/etsy-fee-calculator-canada">Canada</a><a href="/etsy-fee-calculator-australia">Australia</a></div><div class="footer-column"><strong>Resources</strong><a href="/fees/">Etsy fees guide</a><a href="/methodology/">Methodology</a><a href="/faq/">FAQ</a></div><div class="footer-column"><strong>Legal</strong><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/contact">Contact</a><a href="mailto:info@shopprofitcalculator.com">info@shopprofitcalculator.com</a></div></div><div class="footer-bottom page-width"><span>© <span id="copyright-year"></span> ShopProfit</span><span>Independent calculator. Not affiliated with Etsy.</span></div></footer>
   <div class="mobile-action-bar" id="mobile-action-bar"><div class="mobile-profit"><span>PROFIT</span><output id="mobile-profit">$23.30</output></div><a class="button button-secondary" href="#result-heading">View result</a><button type="button" class="button button-primary" id="mobile-copy">Copy</button><button type="button" class="button button-quiet" id="mobile-reset">Reset</button></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div><script type="module" src="/src/app.js"></script>
   </body>

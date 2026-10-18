@@ -45,7 +45,7 @@ const noScriptNote = `<noscript><p class="noscript-note">The fee guide, methodol
 if (/<noscript>[\s\S]*?<\/noscript>/.test(base)) base = base.replace(/<noscript>[\s\S]*?<\/noscript>/, noScriptNote);
 else base = replaceOnce(base, /<\/main>/, `</main>\n  ${noScriptNote}`, "main closing tag");
 base = replaceOnce(base, /<div class="footer-column"><strong>Tools<\/strong>[\s\S]*?<\/div><div class="footer-column"><strong>Resources<\/strong>/,
-  `<div class="footer-column"><strong>Tools</strong><a href="/#calculator">Etsy profit calculator</a><a href="/fees/">Etsy fee calculator</a><a href="/etsy-pricing-calculator/">Etsy pricing calculator</a><a href="/etsy-break-even-calculator/">Etsy break-even calculator</a><a href="/etsy-offsite-ads-calculator/">Etsy Offsite Ads calculator</a><a href="/etsy-digital-download-fee-calculator">Etsy digital product calculator</a><a href="/etsy-print-on-demand-calculator/">Etsy print on demand calculator</a><strong>Regional calculators</strong><a href="/etsy-fee-calculator-uk">United Kingdom</a><a href="/etsy-fee-calculator-canada">Canada</a><a href="/etsy-fee-calculator-australia">Australia</a></div><div class="footer-column"><strong>Resources</strong>`, "footer tool links");
+  `<div class="footer-column"><strong>Tools</strong><a href="/#calculator">Etsy profit calculator</a><a href="/fees/">Etsy fee calculator</a><a href="/bulk/">Bulk catalog analyzer</a><a href="/etsy-pricing-calculator/">Etsy pricing calculator</a><a href="/etsy-break-even-calculator/">Etsy break-even calculator</a><a href="/etsy-offsite-ads-calculator/">Etsy Offsite Ads calculator</a><a href="/etsy-digital-download-fee-calculator">Etsy digital product calculator</a><a href="/etsy-print-on-demand-calculator/">Etsy print on demand calculator</a><strong>Regional calculators</strong><a href="/etsy-fee-calculator-uk">United Kingdom</a><a href="/etsy-fee-calculator-canada">Canada</a><a href="/etsy-fee-calculator-australia">Australia</a></div><div class="footer-column"><strong>Resources</strong>`, "footer tool links");
 base = replaceOnce(base, /<div class="footer-column"><strong>Resources<\/strong>[\s\S]*?<\/div><div class="footer-column"><strong>Legal<\/strong>/,
   `<div class="footer-column"><strong>Resources</strong><a href="/fees/">Etsy fees guide</a><a href="/methodology/">Methodology</a><a href="/faq/">FAQ</a></div><div class="footer-column"><strong>Legal</strong>`, "footer resource links");
 base = replaceOnce(base, /<div class="footer-column"><strong>Legal<\/strong>[\s\S]*?<\/div>/,
@@ -187,12 +187,18 @@ for (const route of routes) {
       <article class="panel answer-panel">
         <p class="eyebrow">UK fee breakdown</p>
         <h2>How much does Etsy take from a UK sale?</h2>
+        <div class="aeo-direct-answer" role="region" aria-label="UK Etsy fees direct answer">
+          <strong>Direct UK Fee Answer:</strong> In 2026, UK Etsy sellers pay a £0.16 GBP listing fee ($0.20 USD eq), a 6.5% transaction fee on the full order amount, a 4.0% + £0.20 payment processing fee, and a statutory 0.48% UK regulatory operating fee. Total platform deductions average 11.2% to 15.5% depending on order size.
+        </div>
         <p>For UK sellers, Etsy takes an estimated £0.16 listing fee, a 6.5% transaction fee on the full order amount (item price + buyer postage), 4% + £0.20 UK payment processing, and a 0.48% regulatory operating fee. If the order is attributed to an Offsite Ad, an additional 12% or 15% ad fee applies (capped at the $100 USD equivalent).</p>
         <p class="answer-footnote">Your exact deduction depends on sale price, postage charged to the buyer, and advertising attribution.</p>
       </article>
       <article class="panel formula-panel">
         <p class="eyebrow">Transparent methodology</p>
         <h2>How ShopProfit calculates UK profit</h2>
+        <div class="aeo-direct-answer" role="region" aria-label="UK net profit formula">
+          <strong>Direct Formula:</strong> Net Profit (£ GBP) = (Item Price + Buyer Postage) − (£0.16 Listing Fee + 6.5% Transaction Fee + (4% + £0.20) Processing Fee + 0.48% Regulatory Fee + Offsite Ads) − Production Costs − Packaging &amp; Postage.
+        </div>
         <div class="formula-code" aria-label="UK Profit formulas">
           <code>gross revenue = item price + buyer postage (GBP)</code>
           <code>UK platform fees = £0.16 listing + 6.5% transaction + (4% + £0.20) processing + 0.48% regulatory + ads</code>
@@ -282,12 +288,18 @@ for (const route of routes) {
       <article class="panel answer-panel">
         <p class="eyebrow">Canadian fee breakdown</p>
         <h2>How much does Etsy take from a Canadian sale?</h2>
+        <div class="aeo-direct-answer" role="region" aria-label="Canada Etsy fees direct answer">
+          <strong>Direct Canada Fee Answer:</strong> In 2026, Canadian Etsy sellers pay a $0.27 CAD listing fee, a 6.5% transaction fee, a 0.50% Canadian regulatory operating fee, and payment processing of 3.0% + $0.25 CAD for domestic/US orders (or 4.0% + $0.25 CAD for international orders). Platform deductions average 10.5% to 14.5%.
+        </div>
         <p>For Canadian sellers, Etsy takes an estimated $0.27 CAD listing fee, a 6.5% transaction fee on the full order amount (item price + buyer shipping), Canadian payment processing (3% + $0.25 CAD for domestic Canada and US buyer orders, or 4% + $0.25 CAD for international orders), and a 0.50% Canadian regulatory operating fee. If the order is attributed to an Offsite Ad, an additional 12% or 15% ad fee applies (capped at the $100 USD equivalent).</p>
         <p class="answer-footnote">Your exact deduction depends on sale price, shipping charged to the buyer, buyer destination, and advertising attribution.</p>
       </article>
       <article class="panel formula-panel">
         <p class="eyebrow">Transparent methodology</p>
         <h2>How ShopProfit calculates Canadian profit</h2>
+        <div class="aeo-direct-answer" role="region" aria-label="Canada net profit formula">
+          <strong>Direct Formula:</strong> Net Profit ($ CAD) = (Item Price + Buyer Shipping) − ($0.27 Listing Fee + 6.5% Transaction Fee + Processing Fee + 0.50% Regulatory Fee + Offsite Ads) − Production Costs − Packaging &amp; Shipping.
+        </div>
         <div class="formula-code" aria-label="Canadian Profit formulas">
           <code>gross revenue = item price + buyer shipping (CAD)</code>
           <code>Canadian platform fees = $0.27 listing + 6.5% transaction + processing (3% or 4% + $0.25) + 0.50% regulatory + ads</code>
@@ -377,12 +389,18 @@ for (const route of routes) {
       <article class="panel answer-panel">
         <p class="eyebrow">Australian fee breakdown</p>
         <h2>How much does Etsy take from an Australian sale?</h2>
+        <div class="aeo-direct-answer" role="region" aria-label="Australia Etsy fees direct answer">
+          <strong>Direct Australia Fee Answer:</strong> In 2026, Australian Etsy sellers pay a $0.28 AUD listing fee, a 6.5% transaction fee, and payment processing of 3.0% + A$0.25 AUD for domestic orders (or 4.0% + A$0.25 AUD for international orders). Australia does not have a regulatory operating fee. Total deductions average 10.5% to 14.5%.
+        </div>
         <p>For Australian sellers, Etsy takes an estimated $0.28 AUD listing fee, a 6.5% transaction fee on the full order amount (item price + buyer shipping), and Australian payment processing (3% + A$0.25 for domestic Australian buyers, or 4% + A$0.25 for international buyers). Australia has no separate regulatory operating fee. If the order is attributed to an Offsite Ad, an additional 12% or 15% ad fee applies (capped at the $100 USD equivalent).</p>
         <p class="answer-footnote">Your exact deduction depends on item price, shipping charged to the buyer, buyer location (domestic vs international), and advertising attribution.</p>
       </article>
       <article class="panel formula-panel">
         <p class="eyebrow">Transparent methodology</p>
         <h2>How ShopProfit calculates Australian profit</h2>
+        <div class="aeo-direct-answer" role="region" aria-label="Australia net profit formula">
+          <strong>Direct Formula:</strong> Net Profit ($ AUD) = (Item Price + Buyer Shipping) − ($0.28 Listing Fee + 6.5% Transaction Fee + (3% or 4% + A$0.25) Processing Fee + Offsite Ads) − Production Costs − Packaging &amp; Shipping.
+        </div>
         <div class="formula-code" aria-label="Australian Profit formulas">
           <code>gross revenue = item price + buyer shipping (AUD)</code>
           <code>Australian platform fees = $0.28 listing + 6.5% transaction + processing (3% or 4% + A$0.25) + ads</code>
@@ -472,12 +490,18 @@ for (const route of routes) {
       <article class="panel answer-panel">
         <p class="eyebrow">Digital download fee breakdown</p>
         <h2>How much does Etsy take from a digital download sale?</h2>
+        <div class="aeo-direct-answer" role="region" aria-label="Etsy digital product direct answer">
+          <strong>Direct Digital Download Answer:</strong> Digital Etsy items pay standard platform fees ($0.20 listing fee, 6.5% transaction fee, and country payment processing, e.g. 3% + $0.25 in the US). Because digital goods require $0 physical shipping, materials, and packaging, digital sellers retain 80% to 88% of gross customer payments as net take-home profit.
+        </div>
         <p>For Etsy digital downloads, Etsy charges a $0.20 USD listing fee (which renews upon every sale or every 4 months), a 6.5% transaction fee on the download price, and country-specific payment processing (such as 3% + $0.25 in the US, 4% + £0.20 in the UK, 3% + $0.25 CAD in Canada, or 3% + A$0.25 in Australia). If the sale is attributed to an Etsy Offsite Ad, an additional 12% or 15% fee applies (capped at the $100 USD equivalent). Any statutory regulatory operating fees (e.g., 0.48% UK, 0.50% Canada) also apply.</p>
         <p class="answer-footnote">While digital downloads eliminate physical postage and material expenses, Etsy platform fees apply to every sale. Per-unit design software, mockups, or commercial licenses can be entered as production costs.</p>
       </article>
       <article class="panel formula-panel">
         <p class="eyebrow">Transparent methodology</p>
         <h2>How ShopProfit calculates digital download profit</h2>
+        <div class="aeo-direct-answer" role="region" aria-label="Etsy digital download net profit formula">
+          <strong>Direct Formula:</strong> Digital Net Profit = Digital Download Price − ($0.20 Listing Fee + 6.5% Transaction Fee + Payment Processing Fee + Offsite Ads) − Digital Creation &amp; Software Costs.
+        </div>
         <div class="formula-code" aria-label="Digital download profit formulas">
           <code>gross revenue = digital download price (shipping = $0.00)</code>
           <code>platform fees = $0.20 listing + 6.5% transaction + payment processing + ads</code>
@@ -631,6 +655,9 @@ for (const route of routes) {
       <article class="panel answer-panel">
         <p class="eyebrow">Target Pricing Methodology</p>
         <h2>How to price an Etsy item for profit</h2>
+        <div class="aeo-direct-answer" role="region" aria-label="Etsy pricing direct answer">
+          <strong>Direct Pricing Answer:</strong> To price an Etsy item for a specific profit target, solve backward from your desired take-home using ShopProfit's binary search solver: <code>Required Price = (Target Profit + Costs + Fixed Fees) ÷ (1 − Variable Platform Fee Rate)</code>. Simple markups fail because Etsy's 6.5% transaction and payment processing fees apply to the final customer retail price.
+        </div>
         <p>To hit a specific take-home profit, you must solve backward through Etsy's fees. Because the 6.5% transaction fee and payment processing rate apply to the final customer price (including shipping), a simple cost-plus percentage markup will undercut your profit. ShopProfit uses an exact binary search solver to calculate the required listing price backward from your desired dollar profit.</p>
         <p class="answer-footnote">Your required price adjusts in real-time as you enter production costs, buyer shipping, and seller location.</p>
       </article>
@@ -725,6 +752,9 @@ for (const route of routes) {
       <article class="panel answer-panel">
         <p class="eyebrow">Break-Even Methodology</p>
         <h2>What is an Etsy break-even price?</h2>
+        <div class="aeo-direct-answer" role="region" aria-label="Etsy break-even direct answer">
+          <strong>Direct Break-Even Answer:</strong> An Etsy seller's break-even price is the exact retail price where Net Profit equals $0.00: <code>Break-Even Price = (Item Cost + Postage + Fixed Fees) ÷ (1 − (0.065 + Processing Rate + Regulatory Rate))</code>. Charging below this price results in an immediate out-of-pocket loss on the order.
+        </div>
         <p>Your break-even price is the exact minimum item price you must charge so that revenue covers all Etsy platform fees, production materials, and packaging/shipping costs with $0.00 net loss. Selling below your break-even floor loses money on every shipment.</p>
         <p class="answer-footnote">Use your break-even price as an absolute floor when running sales, accepting custom offers, or running promotions.</p>
       </article>
@@ -823,6 +853,9 @@ for (const route of routes) {
       <article class="panel answer-panel">
         <p class="eyebrow">Offsite Ads Breakdown</p>
         <h2>How much does Etsy take on Offsite Ads sales?</h2>
+        <div class="aeo-direct-answer" role="region" aria-label="Etsy Offsite Ads direct answer">
+          <strong>Direct Offsite Ads Answer:</strong> Etsy charges an advertising fee of 15% (for shops under $10,000 USD revenue in trailing 365 days, optional) or 12% (for shops at or above $10,000 USD, mandatory for life). The fee applies to the entire buyer total (price + shipping) but is strictly capped at $100 USD maximum fee per attributed order.
+        </div>
         <p>When an order is attributed to an Etsy Offsite Ad, Etsy deducts an advertising fee of 15% (for shops under $10,000 in trailing 12-month sales) or 12% (for shops at or above $10,000) on the entire order total (item price + buyer shipping). Crucially, Etsy caps the maximum fee at $100 USD per order.</p>
         <p class="answer-footnote">The ad fee is added on top of Etsy's standard listing fee, 6.5% transaction fee, and payment processing charges.</p>
       </article>
@@ -917,6 +950,9 @@ for (const route of routes) {
       <article class="panel answer-panel">
         <p class="eyebrow">Print on Demand Breakdown</p>
         <h2>How much does Etsy take from a print-on-demand sale?</h2>
+        <div class="aeo-direct-answer" role="region" aria-label="Etsy print on demand direct answer">
+          <strong>Direct POD Answer:</strong> Print on demand (POD) sellers on Etsy typically earn 20% to 35% net profit margins. Because POD provider base costs (Printify, Gelato, Printful) consume 55% to 70% of gross revenue, sellers must mark up items by at least 40% to 50% above provider charges to cover Etsy's 6.5% transaction fee and processing deductions.
+        </div>
         <p>For print-on-demand sales, Etsy takes its standard fees: $0.20 listing fee, 6.5% transaction fee on total customer payment, and payment processing (3% + $0.25 in the US). In addition, your print provider (Printify, Printful, Gelato) charges you directly for the product blank, printing, and customer shipping.</p>
         <p class="answer-footnote">Your net profit is the margin remaining after deducting both Etsy's platform cut and your provider's fulfillment invoice.</p>
       </article>

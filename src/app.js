@@ -62,6 +62,24 @@ const isFeesRoute = () => {
   return false;
 };
 const isFeesPage = isFeesRoute();
+const getSpecializedRoute = () => {
+  if (typeof location !== "undefined") {
+    const path = location.pathname.toLowerCase();
+    if (path.includes("etsy-pricing-calculator")) return "pricing";
+    if (path.includes("etsy-break-even-calculator")) return "break-even";
+    if (path.includes("etsy-offsite-ads-calculator")) return "offsite-ads";
+    if (path.includes("etsy-print-on-demand-calculator")) return "pod";
+    if (path.includes("/bulk") || path === "/bulk") return "bulk";
+  }
+  const canonical = typeof document !== "undefined" ? (document.querySelector('link[rel="canonical"]')?.getAttribute("href") || "") : "";
+  if (canonical.includes("etsy-pricing-calculator")) return "pricing";
+  if (canonical.includes("etsy-break-even-calculator")) return "break-even";
+  if (canonical.includes("etsy-offsite-ads-calculator")) return "offsite-ads";
+  if (canonical.includes("etsy-print-on-demand-calculator")) return "pod";
+  if (canonical.includes("/bulk")) return "bulk";
+  return null;
+};
+const specializedRoute = getSpecializedRoute();
 const store = {
   get(key) { try { return typeof localStorage !== "undefined" ? localStorage.getItem(key) : null; } catch { return null; } },
   set(key, value) { try { if (typeof localStorage !== "undefined") localStorage.setItem(key, value); } catch { /* Private browsing can disable storage. */ } },
@@ -199,8 +217,62 @@ function applyLanguage() {
     "ja-JP": "Etsy 手数料計算機 — ShopProfit",
     ar: "حاسبة رسوم Etsy — ShopProfit"
   };
+  const specializedTitles = {
+    pricing: {
+      en: "Etsy Pricing Calculator — Calculate Item Price for Profit | ShopProfit",
+      "zh-CN": "Etsy 定价计算器 — 计算商品利润价格 | ShopProfit",
+      "hi-IN": "Etsy मूल्य निर्धारण कैलकुलेटर — लाभ के लिए मूल्य गणना | ShopProfit",
+      "fr-FR": "Calculateur de prix Etsy — Calculer le prix de vente pour être rentable | ShopProfit",
+      "de-DE": "Etsy-Preiskalkulator — Artikelpreis für Gewinn berechnen | ShopProfit",
+      "es-ES": "Calculadora de precios Etsy — Calcular precio de venta para obtener beneficios | ShopProfit",
+      "ja-JP": "Etsy 価格計算機 — 利益のための販売価格計算 | ShopProfit",
+      ar: "حاسبة تسعير Etsy — حساب سعر السلعة لتحقيق الربح | ShopProfit"
+    },
+    "break-even": {
+      en: "Etsy Break-Even Calculator — Find Minimum Item Price | ShopProfit",
+      "zh-CN": "Etsy 保本价格计算器 — 查找最低商品价格 | ShopProfit",
+      "hi-IN": "Etsy ब्रेक-ईवन कैलकुलेटर — न्यूनतम वस्तु मूल्य ज्ञात करें | ShopProfit",
+      "fr-FR": "Calculateur de seuil de rentabilité Etsy — Trouver le prix minimum | ShopProfit",
+      "de-DE": "Etsy-Break-Even-Rechner — Mindestartikelpreis ermitteln | ShopProfit",
+      "es-ES": "Calculadora de punto de equilibrio Etsy — Encontrar el precio mínimo del artículo | ShopProfit",
+      "ja-JP": "Etsy 損益分岐点計算機 — 最低販売価格計算 | ShopProfit",
+      ar: "حاسبة نقطة التعادل في Etsy — تحديد الحد الأدنى لسعر السلعة | ShopProfit"
+    },
+    "offsite-ads": {
+      en: "Etsy Offsite Ads Calculator — 12% vs 15% Fee Simulator | ShopProfit",
+      "zh-CN": "Etsy 站外广告计算器 — 12% 对比 15% 费用模拟器 | ShopProfit",
+      "hi-IN": "Etsy ऑफसाइट विज्ञापन कैलकुलेटर — 12% बनाम 15% शुल्क सिम्युलेटर | ShopProfit",
+      "fr-FR": "Calculateur de publicité externe Etsy — Simulateur de frais 12% vs 15% | ShopProfit",
+      "de-DE": "Etsy Offsite Ads Rechner — 12% vs. 15% Gebührensimulator | ShopProfit",
+      "es-ES": "Calculadora de anuncios fuera de Etsy — Simulador de tarifas del 12% frente al 15% | ShopProfit",
+      "ja-JP": "Etsy オフサイト広告計算機 — 12%対15%シミュレーター | ShopProfit",
+      ar: "حاسبة إعلانات Etsy الخارجية — محاكي رسوم 12% مقابل 15% | ShopProfit"
+    },
+    pod: {
+      en: "Etsy Print on Demand Calculator — POD Profit & Fee Calculator | ShopProfit",
+      "zh-CN": "Etsy 按需打印计算器 — POD 利润与费用计算器 | ShopProfit",
+      "hi-IN": "Etsy प्रिंट ऑन डिमांड कैलकुलेटर — POD लाभ और शुल्क कैलकुलेटर | ShopProfit",
+      "fr-FR": "Calculateur d'impression à la demande Etsy — Calculateur de profits et frais POD | ShopProfit",
+      "de-DE": "Etsy Print-on-Demand-Rechner — POD Gewinn- und Gebührenrechner | ShopProfit",
+      "es-ES": "Calculadora de impresión bajo demanda Etsy — Calculadora de beneficios y tarifas POD | ShopProfit",
+      "ja-JP": "Etsy オンデマンド印刷計算機 — POD 利益・手数料計算機 | ShopProfit",
+      ar: "حاسبة الطباعة عند الطلب Etsy — حاسبة أرباح ورسوم POD | ShopProfit"
+    },
+    bulk: {
+      en: "Etsy Bulk Profit & Sourcing Analyzer — ShopProfit",
+      "zh-CN": "Etsy 批量利润与采购分析器 — ShopProfit",
+      "hi-IN": "Etsy बल्क लाभ और सोर्सिंग एनालाइज़र — ShopProfit",
+      "fr-FR": "Analyseur de profit et sourcing en masse Etsy — ShopProfit",
+      "de-DE": "Etsy Massen-Gewinn- und Sourcing-Analysator — ShopProfit",
+      "es-ES": "Analizador de abastecimiento y beneficios masivos de Etsy — ShopProfit",
+      "ja-JP": "Etsy 一括利益・仕入れ分析ツール — ShopProfit",
+      ar: "محلل أرباح وتوريد كتالوج Etsy بالجملة — ShopProfit"
+    }
+  };
   if (isFeesPage) {
     document.title = feesTitles[activeLanguage] || feesTitles.en;
+  } else if (specializedRoute && specializedTitles[specializedRoute]) {
+    document.title = specializedTitles[specializedRoute][activeLanguage] || specializedTitles[specializedRoute].en;
   } else {
     document.title = routeTitles[routeCountry]?.[activeLanguage] || routeTitles[routeCountry]?.en || titles[activeLanguage] || titles.en;
   }
