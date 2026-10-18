@@ -438,6 +438,8 @@ function renderGrid() {
         case "itemPrice": {
           const input = document.createElement("input");
           input.type = "number";
+          input.name = `price_${item.id}`;
+          input.id = `input_price_${item.id}`;
           input.step = "0.01";
           input.min = "0.01";
           input.value = item.itemPrice.toFixed(2);
@@ -472,6 +474,8 @@ function renderGrid() {
         case "productionCost": {
           const input = document.createElement("input");
           input.type = "number";
+          input.name = `cogs_${item.id}`;
+          input.id = `input_cogs_${item.id}`;
           input.step = "0.01";
           input.min = "0";
           input.value = item.productionCost.toFixed(2);
