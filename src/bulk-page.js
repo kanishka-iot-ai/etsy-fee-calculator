@@ -18,6 +18,10 @@ import {
   SUPPLIER_PRESETS,
   generateSupplierCsvTemplate,
   exportCatalogToXlsx,
+  computeMarginHistogram,
+  computeCostWaterfall,
+  computeScatterBounds,
+  computeAdsSensitivityComparison,
   calculateCatalogBatch,
   summarizeCatalog,
   filterAndSortCatalog,
@@ -56,6 +60,8 @@ const state = {
   searchQuery: "",
   sortBy: "netProfit",
   sortDir: "desc",
+  viewMode: "split", // "split", "grid", "charts"
+  chartsCollapsed: false,
   settings: {
     country: "US",
     offsiteRate: 0,
@@ -116,6 +122,7 @@ function recalculateAndRender() {
   state.summary = summary;
 
   renderKpiCards();
+  renderVisualAnalytics();
   renderFilterTabs();
   renderGrid();
 }
@@ -205,6 +212,729 @@ function renderKpiCards() {
     kpiContainer.appendChild(cardEl);
   }
 }
+
+/**
+ * Safely creates an SVG element with given attributes.
+ */
+function createSvgEl(tag, attrs = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    el.setAttribute(k, String(v));
+  }
+  return el;
+}
+
+/**
+ * Creates safe DOM elements for floating chart tooltip (safe DOM nodes only).
+ */
+function createTooltipNode(title, lines = [], note = null) {
+  const root = document.createElement("div");
+  const titleEl = document.createElement("div");
+  titleEl.style.fontWeight = "700";
+  titleEl.style.marginBottom = "4px";
+  titleEl.style.color = "#F8FAFC";
+  titleEl.textContent = title;
+  root.appendChild(titleEl);
+
+  for (const item of lines) {
+    const row = document.createElement("div");
+    row.style.display = "flex";
+    row.style.justifyContent = "space-between";
+    row.style.marginBottom = "2px";
+
+    const lbl = document.createElement("span");
+    lbl.textContent = item.label;
+    if (item.sub) {
+      lbl.style.fontSize = "10px";
+      lbl.style.color = "#94A3B8";
+    }
+
+    const val = document.createElement("strong");
+    val.textContent = item.val;
+    if (item.color) val.style.color = item.color;
+
+    row.appendChild(lbl);
+    row.appendChild(val);
+    root.appendChild(row);
+  }
+
+  if (note) {
+    const noteEl = document.createElement("div");
+    noteEl.style.fontSize = "10px";
+    noteEl.style.color = "#38BDF8";
+    noteEl.style.fontWeight = "600";
+    noteEl.style.marginTop = "6px";
+    noteEl.style.textAlign = "right";
+    noteEl.textContent = note;
+    root.appendChild(noteEl);
+  }
+
+  return root;
+}
+
+/**
+ * Displays floating tooltip near cursor using safe DOM nodes.
+ */
+function showChartTooltip(e, contentNode) {
+  const tip = document.getElementById("chart-tooltip");
+  if (!tip) return;
+  tip.replaceChildren(contentNode);
+  tip.hidden = false;
+  tip.setAttribute("aria-hidden", "false");
+
+  const x = e.clientX + 14;
+  const y = e.clientY + 14;
+  tip.style.left = `${Math.min(window.innerWidth - 290, Math.max(10, x))}px`;
+  tip.style.top = `${Math.min(window.innerHeight - 200, Math.max(10, y))}px`;
+}
+
+/**
+ * Hides floating tooltip.
+ */
+function hideChartTooltip() {
+  const tip = document.getElementById("chart-tooltip");
+  if (!tip) return;
+  tip.hidden = true;
+  tip.setAttribute("aria-hidden", "true");
+}
+
+/**
+ * Renders the Profitability Quadrant Matrix (Scatter Plot).
+ */
+function renderScatterChart(items, containerEl) {
+  if (!containerEl) return;
+  containerEl.replaceChildren();
+
+  if (!items.length) {
+    const empty = document.createElement("p");
+    empty.className = "chart-empty-state";
+    empty.textContent = "No catalog data to plot.";
+    containerEl.appendChild(empty);
+    return;
+  }
+
+  const { minPrice, maxPrice, minMargin, maxMargin, medianPrice, targetMargin, points } = computeScatterBounds(items);
+
+  const W = 520;
+  const H = 260;
+  const pad = { top: 25, right: 30, bottom: 35, left: 50 };
+  const pw = W - pad.left - pad.right;
+  const ph = H - pad.top - pad.bottom;
+
+  const svg = createSvgEl("svg", {
+    viewBox: `0 0 ${W} ${H}`,
+    class: "chart-svg chart-svg--scatter",
+    role: "img",
+    "aria-label": "Price vs Profit Margin Quadrant Scatter Matrix"
+  });
+
+  const getX = (price) => pad.left + Math.max(0, Math.min(1, (price - minPrice) / (maxPrice - minPrice))) * pw;
+  const getY = (margin) => pad.top + ph - Math.max(0, Math.min(1, (margin - minMargin) / (maxMargin - minMargin))) * ph;
+
+  const xMedian = getX(medianPrice);
+  const yZero = getY(0);
+  const yTarget = getY(targetMargin);
+
+  // Quadrant backgrounds
+  svg.appendChild(createSvgEl("rect", {
+    x: xMedian,
+    y: pad.top,
+    width: Math.max(0, pad.left + pw - xMedian),
+    height: Math.max(0, yTarget - pad.top),
+    fill: "rgba(16, 185, 129, 0.06)",
+    rx: "2"
+  }));
+
+  svg.appendChild(createSvgEl("rect", {
+    x: pad.left,
+    y: pad.top,
+    width: Math.max(0, xMedian - pad.left),
+    height: Math.max(0, yTarget - pad.top),
+    fill: "rgba(139, 92, 246, 0.05)",
+    rx: "2"
+  }));
+
+  if (yZero < pad.top + ph) {
+    svg.appendChild(createSvgEl("rect", {
+      x: pad.left,
+      y: yZero,
+      width: pw,
+      height: Math.max(0, pad.top + ph - yZero),
+      fill: "rgba(239, 68, 68, 0.06)",
+      rx: "2"
+    }));
+  }
+
+  // Watermarks
+  const watermarks = [
+    { text: "⭐ STARS", x: pad.left + pw - 10, y: pad.top + 16, anchor: "end", color: "#10B981" },
+    { text: "🎯 GEMS", x: pad.left + 10, y: pad.top + 16, anchor: "start", color: "#8B5CF6" },
+    { text: "⚠️ TRAPS", x: pad.left + pw - 10, y: Math.min(yZero - 6, pad.top + ph - 8), anchor: "end", color: "#F59E0B" },
+    { text: "💤 LOSSES", x: pad.left + 10, y: pad.top + ph - 8, anchor: "start", color: "#EF4444" }
+  ];
+
+  for (const wm of watermarks) {
+    const t = createSvgEl("text", {
+      x: wm.x,
+      y: wm.y,
+      "text-anchor": wm.anchor,
+      fill: wm.color,
+      "font-size": "9",
+      "font-weight": "800",
+      opacity: "0.55",
+      "letter-spacing": "0.05em"
+    });
+    t.textContent = wm.text;
+    svg.appendChild(t);
+  }
+
+  // Reference lines
+  const priceTicks = [minPrice, Math.round(medianPrice), Math.round(maxPrice)];
+  for (const pt of priceTicks) {
+    const x = getX(pt);
+    svg.appendChild(createSvgEl("line", {
+      x1: x, y1: pad.top, x2: x, y2: pad.top + ph,
+      stroke: "var(--border, #E2E8F0)",
+      "stroke-dasharray": "3,3",
+      opacity: "0.5"
+    }));
+    const lbl = createSvgEl("text", {
+      x: x, y: pad.top + ph + 16,
+      "text-anchor": "middle",
+      "font-size": "10",
+      fill: "var(--muted, #64748B)"
+    });
+    lbl.textContent = `$${pt}`;
+    svg.appendChild(lbl);
+  }
+
+  const marginTicks = [0, targetMargin, Math.round(maxMargin)];
+  for (const mt of marginTicks) {
+    const y = getY(mt);
+    svg.appendChild(createSvgEl("line", {
+      x1: pad.left, y1: y, x2: pad.left + pw, y2: y,
+      stroke: mt === 0 ? "#EF4444" : mt === targetMargin ? "#10B981" : "var(--border, #E2E8F0)",
+      "stroke-dasharray": mt === 0 ? "none" : "3,3",
+      "stroke-width": mt === 0 ? "1.5" : "1",
+      opacity: mt === 0 ? "0.8" : "0.5"
+    }));
+    const lbl = createSvgEl("text", {
+      x: pad.left - 6, y: y + 3,
+      "text-anchor": "end",
+      "font-size": "10",
+      fill: mt === 0 ? "#EF4444" : mt === targetMargin ? "#10B981" : "var(--muted, #64748B)",
+      "font-weight": mt === 0 || mt === targetMargin ? "700" : "400"
+    });
+    lbl.textContent = `${mt}%`;
+    svg.appendChild(lbl);
+  }
+
+  const xLabel = createSvgEl("text", {
+    x: pad.left + pw / 2, y: H - 4,
+    "text-anchor": "middle",
+    "font-size": "10",
+    "font-weight": "600",
+    fill: "var(--muted, #64748B)"
+  });
+  xLabel.textContent = "Retail Price ($)";
+  svg.appendChild(xLabel);
+
+  // Dots
+  for (const pt of points) {
+    const cx = getX(pt.price);
+    const cy = getY(pt.margin);
+
+    const circle = createSvgEl("circle", {
+      cx, cy, r: "6",
+      fill: pt.color,
+      stroke: "var(--surface, #FFFFFF)",
+      "stroke-width": "1.5",
+      class: "chart-scatter-dot",
+      tabindex: "0",
+      "data-product-id": pt.id,
+      style: "cursor: pointer; transition: transform 0.15s ease, r 0.15s ease;"
+    });
+
+    circle.addEventListener("mouseenter", (e) => {
+      circle.setAttribute("r", "9");
+      circle.setAttribute("stroke-width", "2.5");
+      const node = createTooltipNode(pt.productName, [
+        { label: `SKU: ${pt.id} • ${pt.category}`, val: "", sub: true },
+        { label: "Listing Price:", val: `$${pt.price.toFixed(2)}` },
+        { label: "Net Profit:", val: `$${pt.profit.toFixed(2)}`, color: pt.profit >= 0 ? "#4ADE80" : "#F87171" },
+        { label: "Profit Margin:", val: `${pt.margin.toFixed(1)}%`, color: pt.margin >= 30 ? "#4ADE80" : pt.margin >= 15 ? "#FBBF24" : "#F87171" },
+        { label: "Total Etsy Fees:", val: `$${pt.totalFees.toFixed(2)}` }
+      ], "⚡ Click dot to jump to row");
+      showChartTooltip(e, node);
+    });
+
+    circle.addEventListener("mouseleave", () => {
+      circle.setAttribute("r", "6");
+      circle.setAttribute("stroke-width", "1.5");
+      hideChartTooltip();
+    });
+
+    circle.addEventListener("click", () => {
+      const row = document.querySelector(`[data-product-id="${pt.id}"]`);
+      if (row) {
+        document.querySelectorAll(".grid-row--highlighted").forEach((r) => r.classList.remove("grid-row--highlighted"));
+        row.classList.add("grid-row--highlighted");
+        row.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    });
+
+    svg.appendChild(circle);
+  }
+
+  containerEl.appendChild(svg);
+}
+
+/**
+ * Renders the Margin Health Distribution Histogram with 1-click filtering.
+ */
+function renderHistogramChart(items, containerEl) {
+  if (!containerEl) return;
+  containerEl.replaceChildren();
+
+  if (!items.length) {
+    const empty = document.createElement("p");
+    empty.className = "chart-empty-state";
+    empty.textContent = "No catalog data for histogram.";
+    containerEl.appendChild(empty);
+    return;
+  }
+
+  const hist = computeMarginHistogram(items);
+  const bucketList = Object.values(hist.buckets);
+
+  const W = 520;
+  const H = 260;
+  const pad = { top: 30, right: 25, bottom: 50, left: 45 };
+  const pw = W - pad.left - pad.right;
+  const ph = H - pad.top - pad.bottom;
+
+  const svg = createSvgEl("svg", {
+    viewBox: `0 0 ${W} ${H}`,
+    class: "chart-svg chart-svg--histogram",
+    role: "img",
+    "aria-label": "Margin Health Distribution Histogram"
+  });
+
+  const barCount = bucketList.length;
+  const gap = 14;
+  const barW = Math.max(16, (pw - gap * (barCount - 1)) / barCount);
+
+  // Grid lines
+  const gridTicks = [0, Math.ceil(hist.maxCount / 2), hist.maxCount];
+  for (const gt of gridTicks) {
+    const y = pad.top + ph - (gt / hist.maxCount) * ph;
+    svg.appendChild(createSvgEl("line", {
+      x1: pad.left, y1: y, x2: pad.left + pw, y2: y,
+      stroke: "var(--border, #E2E8F0)",
+      "stroke-dasharray": "3,3",
+      opacity: "0.5"
+    }));
+    const lbl = createSvgEl("text", {
+      x: pad.left - 6, y: y + 3,
+      "text-anchor": "end",
+      "font-size": "10",
+      fill: "var(--muted, #64748B)"
+    });
+    lbl.textContent = String(gt);
+    svg.appendChild(lbl);
+  }
+
+  // Bars
+  bucketList.forEach((b, idx) => {
+    const x = pad.left + idx * (barW + gap);
+    const barH = Math.max(b.count > 0 ? 6 : 0, (b.count / hist.maxCount) * ph);
+    const y = pad.top + ph - barH;
+
+    const isActive = state.activeFilterTab === b.tabId;
+
+    const rect = createSvgEl("rect", {
+      x, y, width: barW, height: barH,
+      rx: "4",
+      fill: b.color,
+      class: `chart-hist-bar ${isActive ? "is-active" : ""}`,
+      style: "cursor: pointer; transition: opacity 0.2s ease, filter 0.2s ease;",
+      tabindex: "0",
+      "data-tab-id": b.tabId
+    });
+
+    if (isActive) {
+      rect.setAttribute("stroke", "var(--ink, #000000)");
+      rect.setAttribute("stroke-width", "2.5");
+    }
+
+    rect.addEventListener("mouseenter", (e) => {
+      rect.style.opacity = "0.8";
+      const node = createTooltipNode(b.label, [
+        { label: "Product Count:", val: `${b.count} SKUs (${b.pct.toFixed(1)}%)`, color: b.color }
+      ], "⚡ Click bar to filter table");
+      showChartTooltip(e, node);
+    });
+
+    rect.addEventListener("mouseleave", () => {
+      rect.style.opacity = "1";
+      hideChartTooltip();
+    });
+
+    rect.addEventListener("click", () => {
+      state.activeFilterTab = b.tabId;
+      renderFilterTabs();
+      renderGrid();
+      renderVisualAnalytics();
+    });
+
+    svg.appendChild(rect);
+
+    if (b.count > 0) {
+      const countText = createSvgEl("text", {
+        x: x + barW / 2,
+        y: y - 6,
+        "text-anchor": "middle",
+        "font-size": "11",
+        "font-weight": "700",
+        fill: "var(--fg, #0F172A)"
+      });
+      countText.textContent = `${b.count}`;
+      svg.appendChild(countText);
+    }
+
+    const labelText = createSvgEl("text", {
+      x: x + barW / 2,
+      y: pad.top + ph + 16,
+      "text-anchor": "middle",
+      "font-size": "10",
+      "font-weight": "600",
+      fill: "var(--muted, #64748B)"
+    });
+    labelText.textContent = b.label.split(" ")[0];
+    svg.appendChild(labelText);
+
+    const pctText = createSvgEl("text", {
+      x: x + barW / 2,
+      y: pad.top + ph + 28,
+      "text-anchor": "middle",
+      "font-size": "9",
+      fill: "var(--muted, #64748B)"
+    });
+    pctText.textContent = `${b.pct.toFixed(0)}%`;
+    svg.appendChild(pctText);
+  });
+
+  containerEl.appendChild(svg);
+}
+
+/**
+ * Renders the P&L Deductive Waterfall Bridge ("Where Does Every Dollar Go?").
+ */
+function renderWaterfallChart(items, containerEl) {
+  if (!containerEl) return;
+  containerEl.replaceChildren();
+
+  if (!items.length) {
+    const empty = document.createElement("p");
+    empty.className = "chart-empty-state";
+    empty.textContent = "No catalog data for waterfall bridge.";
+    containerEl.appendChild(empty);
+    return;
+  }
+
+  const waterfall = computeCostWaterfall(items);
+  const steps = waterfall.steps;
+
+  const W = 520;
+  const H = 260;
+  const pad = { top: 30, right: 25, bottom: 45, left: 50 };
+  const pw = W - pad.left - pad.right;
+  const ph = H - pad.top - pad.bottom;
+
+  const svg = createSvgEl("svg", {
+    viewBox: `0 0 ${W} ${H}`,
+    class: "chart-svg chart-svg--waterfall",
+    role: "img",
+    "aria-label": "P&L Cost Deduction Waterfall Bridge"
+  });
+
+  const maxVal = Math.max(10, waterfall.grossRevenue * 1.15);
+  const getY = (val) => pad.top + ph - Math.max(0, Math.min(1, val / maxVal)) * ph;
+
+  const stepCount = steps.length;
+  const gap = 12;
+  const barW = Math.max(16, (pw - gap * (stepCount - 1)) / stepCount);
+
+  const yZero = getY(0);
+  svg.appendChild(createSvgEl("line", {
+    x1: pad.left, y1: yZero, x2: pad.left + pw, y2: yZero,
+    stroke: "var(--border, #E2E8F0)",
+    "stroke-width": "1.5"
+  }));
+
+  steps.forEach((s, idx) => {
+    const x = pad.left + idx * (barW + gap);
+    const yTop = getY(Math.max(s.start, s.end));
+    const yBottom = getY(Math.min(s.start, s.end));
+    const barH = Math.max(3, yBottom - yTop);
+
+    if (idx < stepCount - 1) {
+      const nextX = pad.left + (idx + 1) * (barW + gap);
+      const connY = getY(s.end);
+      svg.appendChild(createSvgEl("line", {
+        x1: x + barW, y1: connY, x2: nextX, y2: connY,
+        stroke: "var(--border, #CBD5E1)",
+        "stroke-dasharray": "2,2",
+        "stroke-width": "1"
+      }));
+    }
+
+    const rect = createSvgEl("rect", {
+      x, y: yTop, width: barW, height: barH,
+      rx: "3",
+      fill: s.color,
+      class: "chart-waterfall-bar",
+      tabindex: "0",
+      style: "cursor: pointer;"
+    });
+
+    rect.addEventListener("mouseenter", (e) => {
+      const node = createTooltipNode(s.label, [
+        { label: "Deduction Amount:", val: `${s.type === 'deduction' ? '-' : ''}$${Math.abs(s.amount).toFixed(2)}`, color: s.color },
+        { label: "Share of Revenue:", val: `${s.pct.toFixed(1)}%` }
+      ]);
+      showChartTooltip(e, node);
+    });
+
+    rect.addEventListener("mouseleave", () => hideChartTooltip());
+
+    svg.appendChild(rect);
+
+    const valText = createSvgEl("text", {
+      x: x + barW / 2,
+      y: yTop - 5,
+      "text-anchor": "middle",
+      "font-size": "9",
+      "font-weight": "700",
+      fill: "var(--fg, #0F172A)"
+    });
+    valText.textContent = `${s.type === 'deduction' ? '-' : ''}$${Math.round(s.amount)}`;
+    svg.appendChild(valText);
+
+    const lbl = createSvgEl("text", {
+      x: x + barW / 2,
+      y: yZero + 14,
+      "text-anchor": "middle",
+      "font-size": "9",
+      "font-weight": "600",
+      fill: "var(--muted, #64748B)"
+    });
+    const shortNames = ["Revenue", "COGS", "Shipping", "Etsy Fee", "Proc/Ads", "Net Profit"];
+    lbl.textContent = shortNames[idx] || s.label;
+    svg.appendChild(lbl);
+
+    const pctLbl = createSvgEl("text", {
+      x: x + barW / 2,
+      y: yZero + 25,
+      "text-anchor": "middle",
+      "font-size": "8",
+      fill: "var(--muted, #64748B)"
+    });
+    pctLbl.textContent = `${s.pct.toFixed(0)}%`;
+    svg.appendChild(pctLbl);
+  });
+
+  containerEl.appendChild(svg);
+}
+
+/**
+ * Renders the 15% Offsite Ads Sensitivity & Stress-Test chart.
+ */
+function renderAdsSensitivityChart(items, containerEl) {
+  if (!containerEl) return;
+  containerEl.replaceChildren();
+
+  if (!items.length) {
+    const empty = document.createElement("p");
+    empty.className = "chart-empty-state";
+    empty.textContent = "No catalog data for ad sensitivity.";
+    containerEl.appendChild(empty);
+    return;
+  }
+
+  const ads = computeAdsSensitivityComparison(items);
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "ads-sensitivity-content";
+
+  // 1. Mini KPI cards
+  const metricsGrid = document.createElement("div");
+  metricsGrid.className = "ads-mini-kpis";
+
+  function createAdsMiniCard(label, valText, valColor, subText) {
+    const card = document.createElement("div");
+    card.className = "ads-mini-card";
+    const lbl = document.createElement("span");
+    lbl.className = "ads-mini-card__label";
+    lbl.textContent = label;
+    const val = document.createElement("span");
+    val.className = "ads-mini-card__val";
+    val.style.color = valColor;
+    val.textContent = valText;
+    const sub = document.createElement("span");
+    sub.className = "ads-mini-card__sub";
+    sub.textContent = subText;
+    card.appendChild(lbl);
+    card.appendChild(val);
+    card.appendChild(sub);
+    return card;
+  }
+
+  metricsGrid.appendChild(createAdsMiniCard("Organic Profit", `$${ads.organicProfit.toFixed(2)}`, "#10B981", `${ads.organicMargin.toFixed(1)}% margin`));
+  metricsGrid.appendChild(createAdsMiniCard("With 15% Ads", `$${ads.adsProfit.toFixed(2)}`, ads.adsProfit >= 0 ? "#F59E0B" : "#EF4444", `${ads.adsMargin.toFixed(1)}% margin`));
+  metricsGrid.appendChild(createAdsMiniCard("Profit Erosion", `-$${ads.erosionDollar.toFixed(2)}`, "#EF4444", `-${ads.erosionPct.toFixed(1)}% drop`));
+  wrapper.appendChild(metricsGrid);
+
+  // 2. Comparative Horizontal Bars
+  const barsWrap = document.createElement("div");
+  barsWrap.className = "ads-comparison-bars";
+
+  const maxProfit = Math.max(1, ads.organicProfit, Math.abs(ads.adsProfit));
+  const orgWidthPct = Math.max(4, Math.min(100, (Math.max(0, ads.organicProfit) / maxProfit) * 100));
+  const adsWidthPct = Math.max(4, Math.min(100, (Math.max(0, ads.adsProfit) / maxProfit) * 100));
+
+  function createAdsBarRow(label, valText, widthPct, barColor) {
+    const row = document.createElement("div");
+    row.className = "ads-bar-row";
+    const lblRow = document.createElement("div");
+    lblRow.className = "ads-bar-label";
+    const nameSpan = document.createElement("span");
+    nameSpan.textContent = label;
+    const amtStrong = document.createElement("strong");
+    amtStrong.textContent = valText;
+    lblRow.appendChild(nameSpan);
+    lblRow.appendChild(amtStrong);
+
+    const track = document.createElement("div");
+    track.className = "ads-bar-track";
+    const fill = document.createElement("div");
+    fill.className = "ads-bar-fill";
+    fill.style.width = `${widthPct}%`;
+    fill.style.background = barColor;
+    track.appendChild(fill);
+
+    row.appendChild(lblRow);
+    row.appendChild(track);
+    return row;
+  }
+
+  barsWrap.appendChild(createAdsBarRow("Organic (0% Ads)", `$${ads.organicProfit.toFixed(2)}`, orgWidthPct, "#10B981"));
+  barsWrap.appendChild(createAdsBarRow("Attributed (15% Ads)", `$${ads.adsProfit.toFixed(2)}`, adsWidthPct, ads.adsProfit >= 0 ? "#F59E0B" : "#EF4444"));
+  wrapper.appendChild(barsWrap);
+
+  // 3. At-Risk Alert Pill
+  const alertBox = document.createElement("div");
+  if (ads.atRiskCount > 0) {
+    alertBox.className = "ads-risk-alert ads-risk-alert--danger";
+    const textSpan = document.createElement("span");
+    textSpan.textContent = `⚠️ ${ads.atRiskCount} of ${ads.totalItems} products turn into a LOSS under 15% Ads.`;
+    const filterBtn = document.createElement("button");
+    filterBtn.type = "button";
+    filterBtn.className = "button button-quiet btn-filter-ads-risk";
+    filterBtn.style.padding = "2px 8px";
+    filterBtn.style.fontSize = "11px";
+    filterBtn.style.marginLeft = "8px";
+    filterBtn.textContent = "Filter These SKUs";
+    filterBtn.addEventListener("click", () => {
+      state.activeFilterTab = "ads_risk";
+      renderFilterTabs();
+      renderGrid();
+    });
+    alertBox.appendChild(textSpan);
+    alertBox.appendChild(filterBtn);
+  } else {
+    alertBox.className = "ads-risk-alert ads-risk-alert--safe";
+    const textSpan = document.createElement("span");
+    textSpan.textContent = "✓ High Cushion: 100% of products in this catalog remain profitable even under 15% Offsite Ads.";
+    alertBox.appendChild(textSpan);
+  }
+  wrapper.appendChild(alertBox);
+
+  containerEl.appendChild(wrapper);
+}
+
+/**
+ * Master renderer for the full visual analytics dashboard.
+ */
+function renderVisualAnalytics() {
+  const panel = document.getElementById("visual-analytics-panel");
+  if (!panel) return;
+
+  const scatterContainer = document.getElementById("scatter-chart-wrap");
+  const histContainer = document.getElementById("histogram-chart-wrap");
+  const waterfallContainer = document.getElementById("waterfall-chart-wrap");
+  const adsContainer = document.getElementById("ads-sensitivity-chart-wrap");
+
+  renderScatterChart(state.analyzedResults, scatterContainer);
+  renderHistogramChart(state.analyzedResults, histContainer);
+  renderWaterfallChart(state.analyzedResults, waterfallContainer);
+  renderAdsSensitivityChart(state.analyzedResults, adsContainer);
+}
+
+/**
+ * Wires View Mode Switcher controls: Split View, Grid Only, Charts Only, and Collapse.
+ */
+function setupViewModeHandlers() {
+  const splitBtn = document.getElementById("view-split-btn");
+  const gridBtn = document.getElementById("view-grid-btn");
+  const chartsBtn = document.getElementById("view-charts-btn");
+  const collapseBtn = document.getElementById("toggle-charts-collapse-btn");
+
+  const panel = document.getElementById("visual-analytics-panel");
+  const chartsContainer = document.getElementById("visual-charts-container");
+  const gridCard = document.getElementById("bulk-grid-card");
+  const filterTabs = document.getElementById("filter-tabs");
+  const collapseLabel = document.getElementById("charts-collapse-label");
+
+  function applyViewMode(mode) {
+    state.viewMode = mode;
+    splitBtn?.classList.toggle("is-active", mode === "split");
+    gridBtn?.classList.toggle("is-active", mode === "grid");
+    chartsBtn?.classList.toggle("is-active", mode === "charts");
+
+    if (mode === "grid") {
+      if (panel) panel.style.display = "none";
+      if (gridCard) gridCard.style.display = "block";
+      if (filterTabs) filterTabs.style.display = "flex";
+    } else if (mode === "charts") {
+      if (panel) panel.style.display = "block";
+      if (chartsContainer) chartsContainer.style.display = "grid";
+      if (gridCard) gridCard.style.display = "none";
+      if (filterTabs) filterTabs.style.display = "none";
+    } else { // "split"
+      if (panel) panel.style.display = "block";
+      if (chartsContainer) chartsContainer.style.display = state.chartsCollapsed ? "none" : "grid";
+      if (gridCard) gridCard.style.display = "block";
+      if (filterTabs) filterTabs.style.display = "flex";
+    }
+  }
+
+  splitBtn?.addEventListener("click", () => applyViewMode("split"));
+  gridBtn?.addEventListener("click", () => applyViewMode("grid"));
+  chartsBtn?.addEventListener("click", () => applyViewMode("charts"));
+
+  collapseBtn?.addEventListener("click", () => {
+    state.chartsCollapsed = !state.chartsCollapsed;
+    collapseBtn.setAttribute("aria-expanded", String(!state.chartsCollapsed));
+    if (chartsContainer) {
+      chartsContainer.style.display = state.chartsCollapsed ? "none" : "grid";
+    }
+    if (collapseLabel) {
+      collapseLabel.textContent = state.chartsCollapsed ? "▼ Show Charts" : "▲ Hide Charts";
+    }
+  });
+}
+
 
 /**
  * Renders quick filter chips bar with dynamic count badges.
@@ -377,6 +1107,7 @@ function renderGrid() {
   filtered.forEach((item) => {
     const tr = document.createElement("tr");
     tr.className = `grid-row status-row--${item.status}`;
+    tr.dataset.productId = item.id;
     if (state.favorites.has(item.id)) tr.classList.add("grid-row--favorite");
 
     for (const col of columnsToRender) {
@@ -1391,6 +2122,9 @@ export function initBulkPage() {
 
   // Ingestion Wizard setup
   setupUploadWizard();
+
+  // Setup View Mode Switcher (Split, Grid, Charts)
+  setupViewModeHandlers();
 
   // Load demo catalog initially so page is rich and instantly interactive!
   handleLoadDemo();

@@ -3073,5 +3073,444 @@ body.dark .exec-ads-section p {
   }
 }
 
+/* ─────────────────────────────────────────────────────────────
+   SHOPPROFIT BULK CATALOG VISUAL ANALYTICS & GRAPH VIEW
+   ───────────────────────────────────────────────────────────── */
+
+.visual-analytics-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  transition: all 0.2s ease;
+}
+
+.visual-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.visual-panel-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-family: var(--mono);
+  font-weight: 700;
+  border-radius: 4px;
+  background: #c8ff00;
+  color: #080808;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.visual-panel-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0 0 6px;
+  color: var(--fg);
+  letter-spacing: -0.01em;
+}
+
+.visual-panel-subtitle {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.visual-panel-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.view-mode-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--surface-soft);
+}
+
+.view-mode-btn {
+  background: transparent;
+  border: none;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.view-mode-btn:hover {
+  color: var(--fg);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.view-mode-btn.is-active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+body.dark .view-mode-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+body.dark .view-mode-btn.is-active {
+  background: #c8ff00;
+  color: #080808;
+}
+
+.visual-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.chart-card {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  min-height: 330px;
+}
+
+.chart-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.chart-card__title {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--fg);
+}
+
+.chart-card__desc {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.chart-legend {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.legend-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: var(--mono);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.legend-pill.is-star {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.legend-pill.is-gem {
+  background: rgba(139, 92, 246, 0.15);
+  color: #8b5cf6;
+}
+
+.legend-pill.is-trap {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.legend-pill.is-loss {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.chart-hint-pill {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: var(--mono);
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.chart-canvas-wrap {
+  width: 100%;
+  flex: 1;
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-svg {
+  width: 100%;
+  height: 100%;
+  max-height: 270px;
+  overflow: visible;
+}
+
+.chart-empty-state {
+  color: var(--muted);
+  font-size: 12px;
+  font-family: var(--mono);
+}
+
+/* Scatter plot dot animations */
+.chart-scatter-dot:hover,
+.chart-scatter-dot:focus {
+  filter: drop-shadow(0 0 6px currentColor);
+  outline: none;
+}
+
+/* Histogram bar hover */
+.chart-hist-bar {
+  transform-origin: bottom;
+  transition: opacity 0.15s ease, filter 0.15s ease;
+}
+
+.chart-hist-bar:hover,
+.chart-hist-bar:focus {
+  filter: brightness(1.15);
+  outline: none;
+}
+
+.chart-hist-bar.is-active {
+  stroke-dasharray: 4,4;
+}
+
+/* Waterfall bar styling */
+.chart-waterfall-bar:hover,
+.chart-waterfall-bar:focus {
+  filter: brightness(1.15);
+  outline: none;
+}
+
+/* Ads Sensitivity Chart Specifics */
+.ads-sensitivity-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.ads-mini-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ads-mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ads-mini-card__label {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-family: var(--mono);
+  margin-bottom: 4px;
+}
+
+.ads-mini-card__val {
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.ads-mini-card__sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.ads-comparison-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px 14px;
+}
+
+.ads-bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ads-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--fg);
+}
+
+.ads-bar-track {
+  width: 100%;
+  height: 10px;
+  background: var(--border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.ads-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
+.ads-risk-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.ads-risk-alert--danger {
+  background: #fef2f2;
+  border: 1px solid #f87171;
+  color: #991b1b;
+}
+
+.ads-risk-alert--safe {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #166534;
+}
+
+body.dark .ads-risk-alert--danger {
+  background: #450a0a;
+  border-color: #f87171;
+  color: #fca5a5;
+}
+
+body.dark .ads-risk-alert--safe {
+  background: #052e16;
+  border-color: #4ade80;
+  color: #86efac;
+}
+
+/* Floating Chart Tooltip */
+.chart-tooltip {
+  position: fixed;
+  z-index: 10000;
+  pointer-events: none;
+  background: #0f172a;
+  color: #f8fafc;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 11px;
+  line-height: 1.4;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  min-width: 200px;
+  max-width: 280px;
+}
+
+/* Highlighted row flash animation on scatter dot click */
+.grid-row--highlighted {
+  animation: rowFlashPulse 2.5s ease;
+}
+
+@keyframes rowFlashPulse {
+  0% {
+    background-color: #fef08a !important;
+  }
+  30% {
+    background-color: #fef9c3 !important;
+  }
+  100% {
+    background-color: transparent !important;
+  }
+}
+
+body.dark .grid-row--highlighted {
+  animation: rowFlashPulseDark 2.5s ease;
+}
+
+@keyframes rowFlashPulseDark {
+  0% {
+    background-color: #713f12 !important;
+  }
+  30% {
+    background-color: #422006 !important;
+  }
+  100% {
+    background-color: transparent !important;
+  }
+}
+
+/* Responsive Chart layout */
+@media (max-width: 1024px) {
+  .visual-charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .visual-panel-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .visual-panel-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .view-mode-toggle {
+    width: 100%;
+    display: flex;
+  }
+  .view-mode-btn {
+    flex: 1;
+    text-align: center;
+    padding: 8px 4px;
+    font-size: 11px;
+  }
+  .ads-mini-kpis {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 
 

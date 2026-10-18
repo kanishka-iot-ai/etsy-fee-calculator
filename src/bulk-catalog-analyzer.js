@@ -1217,3 +1217,312 @@ export function exportCatalogToXlsx(items = [], favoritesSet = new Set(), countr
 
   return zipUint8;
 }
+
+/**
+ * Computes frequency histogram bins for catalog profit margins.
+ * Tier intervals:
+ * - losses: < 0%
+ * - thin: 0% to 14.99%
+ * - standard: 15% to 29.99%
+ * - healthy: 30% to 49.99%
+ * - stars: >= 50%
+ *
+ * @param {Array<Object>} items Analyzed catalog items
+ * @returns {Object} Histogram bins, item counts, percentages, and max bin height
+ */
+export function computeMarginHistogram(items = []) {
+  const buckets = {
+    losses: { id: "losses", label: "Losses (<0%)", min: -Infinity, max: 0, count: 0, items: [], color: "#EF4444", tabId: "losses" },
+    thin: { id: "thin", label: "Thin (0–15%)", min: 0, max: 15, count: 0, items: [], color: "#F59E0B", tabId: "thin_margin" },
+    standard: { id: "standard", label: "Standard (15–30%)", min: 15, max: 30, count: 0, items: [], color: "#0EA5E9", tabId: "all" },
+    healthy: { id: "healthy", label: "Healthy (30–50%)", min: 30, max: 50, count: 0, items: [], color: "#10B981", tabId: "winners" },
+    stars: { id: "stars", label: "Super Stars (≥50%)", min: 50, max: Infinity, count: 0, items: [], color: "#8B5CF6", tabId: "winners" }
+  };
+
+  const total = items.length;
+
+  for (const item of items) {
+    const m = typeof item.margin === "number" ? item.margin : 0;
+    if (m < 0) {
+      buckets.losses.count++;
+      buckets.losses.items.push(item);
+    } else if (m < 15) {
+      buckets.thin.count++;
+      buckets.thin.items.push(item);
+    } else if (m < 30) {
+      buckets.standard.count++;
+      buckets.standard.items.push(item);
+    } else if (m < 50) {
+      buckets.healthy.count++;
+      buckets.healthy.items.push(item);
+    } else {
+      buckets.stars.count++;
+      buckets.stars.items.push(item);
+    }
+  }
+
+  let maxCount = 0;
+  for (const key of Object.keys(buckets)) {
+    const b = buckets[key];
+    b.pct = total > 0 ? (b.count / total) * 100 : 0;
+    if (b.count > maxCount) maxCount = b.count;
+  }
+
+  return {
+    totalCount: total,
+    maxCount: Math.max(1, maxCount),
+    buckets
+  };
+}
+
+/**
+ * Computes P&L Waterfall bridge data showing sequential deductions from Gross Revenue to Net Profit.
+ *
+ * @param {Array<Object>} items Analyzed catalog items
+ * @returns {Object} Cumulative waterfall segments and breakdown percentages
+ */
+export function computeCostWaterfall(items = []) {
+  let grossRevenue = 0;
+  let cogs = 0;
+  let shippingCost = 0;
+  let packagingCost = 0;
+  let listingFees = 0;
+  let transactionFees = 0;
+  let processingFees = 0;
+  let regulatoryFees = 0;
+  let offsiteAdsFees = 0;
+  let otherCosts = 0;
+  let netProfit = 0;
+
+  for (const item of items) {
+    grossRevenue += Number(item.grossRevenue) || 0;
+    cogs += Number(item.productionCost) || 0;
+    shippingCost += Number(item.shippingCost) || 0;
+    packagingCost += Number(item.packagingCost) || 0;
+    otherCosts += Number(item.totalAccountLevelCosts || item.otherCosts || 0);
+    netProfit += Number(item.netProfit) || 0;
+
+    const fb = item.feeBreakdown || {};
+    listingFees += Number(fb.listing ?? item.listingFee ?? 0);
+    transactionFees += Number(fb.transaction ?? item.transactionFee ?? 0);
+    processingFees += Number(fb.processing ?? item.paymentProcessingFee ?? 0);
+    regulatoryFees += Number(fb.regulatory ?? item.regulatoryFee ?? 0);
+    offsiteAdsFees += Number(fb.offsiteAds ?? item.offsiteAdsFee ?? 0);
+  }
+
+  const postageAndPackaging = shippingCost + packagingCost;
+  const platformFees = listingFees + transactionFees;
+  const paymentAndReg = processingFees + regulatoryFees + offsiteAdsFees + otherCosts;
+
+  const totalDeductions = cogs + postageAndPackaging + platformFees + paymentAndReg;
+
+  // Build sequential steps
+  const steps = [
+    {
+      id: "revenue",
+      label: "Gross Revenue",
+      amount: grossRevenue,
+      type: "total",
+      color: "#0284C7",
+      start: 0,
+      end: grossRevenue
+    },
+    {
+      id: "cogs",
+      label: "− Product COGS",
+      amount: cogs,
+      type: "deduction",
+      color: "#EA580C",
+      start: grossRevenue,
+      end: Math.max(0, grossRevenue - cogs)
+    },
+    {
+      id: "shipping",
+      label: "− Shipping & Pack",
+      amount: postageAndPackaging,
+      type: "deduction",
+      color: "#F59E0B",
+      start: Math.max(0, grossRevenue - cogs),
+      end: Math.max(0, grossRevenue - cogs - postageAndPackaging)
+    },
+    {
+      id: "platform_fees",
+      label: "− Etsy Fees (Tx+List)",
+      amount: platformFees,
+      type: "deduction",
+      color: "#E11D48",
+      start: Math.max(0, grossRevenue - cogs - postageAndPackaging),
+      end: Math.max(0, grossRevenue - cogs - postageAndPackaging - platformFees)
+    },
+    {
+      id: "payment_fees",
+      label: "− Processing & Ads",
+      amount: paymentAndReg,
+      type: "deduction",
+      color: "#9333EA",
+      start: Math.max(0, grossRevenue - cogs - postageAndPackaging - platformFees),
+      end: Math.max(0, grossRevenue - totalDeductions)
+    },
+    {
+      id: "net_profit",
+      label: "= Net Take-Home",
+      amount: netProfit,
+      type: "total",
+      color: netProfit >= 0 ? "#10B981" : "#EF4444",
+      start: 0,
+      end: netProfit
+    }
+  ];
+
+  for (const step of steps) {
+    step.pct = grossRevenue > 0 ? (step.amount / grossRevenue) * 100 : 0;
+  }
+
+  return {
+    grossRevenue,
+    cogs,
+    postageAndPackaging,
+    platformFees,
+    paymentAndReg,
+    totalDeductions,
+    netProfit,
+    steps
+  };
+}
+
+/**
+ * Computes scatter plot bounds, median dividing lines, and quadrant classification for all items.
+ *
+ * @param {Array<Object>} items Analyzed catalog items
+ * @returns {Object} Min/max bounds, median price, and classified plot points
+ */
+export function computeScatterBounds(items = []) {
+  if (!items.length) {
+    return {
+      minPrice: 0,
+      maxPrice: 100,
+      minMargin: -10,
+      maxMargin: 60,
+      medianPrice: 50,
+      targetMargin: 30,
+      points: []
+    };
+  }
+
+  const prices = items.map((i) => Number(i.itemPrice) || 0);
+  const margins = items.map((i) => Number(i.margin) || 0);
+
+  const sortedPrices = [...prices].sort((a, b) => a - b);
+  const medianPrice = sortedPrices[Math.floor(sortedPrices.length / 2)] || 25;
+
+  const rawMinPrice = Math.min(...prices);
+  const rawMaxPrice = Math.max(...prices);
+  const rawMinMargin = Math.min(...margins);
+  const rawMaxMargin = Math.max(...margins);
+
+  const minPrice = 0;
+  const maxPrice = Math.max(20, Math.ceil(rawMaxPrice * 1.15));
+  const minMargin = Math.min(-10, Math.floor(rawMinMargin - 5));
+  const maxMargin = Math.max(60, Math.ceil(rawMaxMargin + 10));
+  const targetMargin = 30;
+
+  const points = items.map((item, idx) => {
+    const price = Number(item.itemPrice) || 0;
+    const margin = Number(item.margin) || 0;
+    const profit = Number(item.netProfit) || 0;
+
+    let quadrant = "standard";
+    let color = "#0EA5E9";
+
+    if (margin < 0) {
+      quadrant = "bleeder"; // Loss-making dead weight
+      color = "#EF4444";
+    } else if (margin >= targetMargin && price >= medianPrice) {
+      quadrant = "star"; // High price, high margin
+      color = "#10B981";
+    } else if (margin >= targetMargin && price < medianPrice) {
+      quadrant = "gem"; // Low price impulse, high margin
+      color = "#8B5CF6";
+    } else if (margin < 15 && price >= medianPrice) {
+      quadrant = "trap"; // High price, low margin volume trap
+      color = "#F59E0B";
+    } else if (margin < 15) {
+      quadrant = "thin";
+      color = "#F59E0B";
+    }
+
+    return {
+      id: item.id || `item_${idx}`,
+      productName: item.productName || `Item #${idx + 1}`,
+      category: item.category || "General",
+      price,
+      margin,
+      profit,
+      roi: Number(item.roi) || 0,
+      totalCosts: Number(item.totalCosts) || 0,
+      totalFees: Number(item.totalEtsyFees) || 0,
+      quadrant,
+      color
+    };
+  });
+
+  return {
+    minPrice,
+    maxPrice,
+    minMargin,
+    maxMargin,
+    medianPrice,
+    targetMargin,
+    points
+  };
+}
+
+/**
+ * Computes advertising stress-test sensitivity comparing Organic vs 15% Offsite Ads Attribution.
+ *
+ * @param {Array<Object>} items Analyzed catalog items
+ * @returns {Object} Comparative metrics, profit erosion, and at-risk catalog listings
+ */
+export function computeAdsSensitivityComparison(items = []) {
+  let grossRevenue = 0;
+  let organicProfit = 0;
+  let adsProfit = 0;
+  const atRiskItems = [];
+  const winnersUnderAds = [];
+
+  for (const item of items) {
+    const rev = Number(item.grossRevenue) || 0;
+    const org = Number(item.netProfit) || 0;
+    const adP = Number(item.offsite15Profit) || 0;
+
+    grossRevenue += rev;
+    organicProfit += org;
+    adsProfit += adP;
+
+    if (org > 0 && adP <= 0) {
+      atRiskItems.push(item);
+    } else if (adP > 0) {
+      winnersUnderAds.push(item);
+    }
+  }
+
+  const erosionDollar = organicProfit - adsProfit;
+  const erosionPct = organicProfit > 0 ? (erosionDollar / organicProfit) * 100 : 0;
+  const organicMargin = grossRevenue > 0 ? (organicProfit / grossRevenue) * 100 : 0;
+  const adsMargin = grossRevenue > 0 ? (adsProfit / grossRevenue) * 100 : 0;
+
+  return {
+    grossRevenue,
+    organicProfit,
+    adsProfit,
+    organicMargin,
+    adsMargin,
+    erosionDollar,
+    erosionPct,
+    totalItems: items.length,
+    atRiskCount: atRiskItems.length,
+    atRiskItems,
+    survivingCount: winnersUnderAds.length
+  };
+}
+
