@@ -29,8 +29,10 @@
   <link rel="modulepreload" href="/src/fee-intelligence-client.js">
   <link rel="modulepreload" href="/src/compatibility.js">
   <link rel="modulepreload" href="/src/fee-engine.js">
+  <link rel="modulepreload" href="/src/bulk-analyzer.js">
   <link rel="modulepreload" href="/src/translations.js">
   <link rel="modulepreload" href="/src/i18n.js">
+  <link rel="modulepreload" href="/src/advisor-client.js">
   <script type="application/ld+json" id="structured-data">
 {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://shopprofitcalculator.com/#organization","name":"ShopProfit","url":"https://shopprofitcalculator.com/","logo":"https://shopprofitcalculator.com/logo-mark.svg"},{"@type":"WebSite","@id":"https://shopprofitcalculator.com/#website","name":"ShopProfit","alternateName":"ShopProfit Calculator","url":"https://shopprofitcalculator.com/","publisher":{"@id":"https://shopprofitcalculator.com/#organization"}},{"@type":"WebApplication","name":"Etsy Fee Calculator Canada","url":"https://shopprofitcalculator.com/etsy-fee-calculator-canada","applicationCategory":"FinanceApplication","operatingSystem":"Any","description":"Calculate Etsy seller fees and take-home profit in CAD. Accurate Canadian fee calculator modeling 6.5% transaction, domestic/US 3% + $0.25 processing, and 0.50% regulatory fees.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://shopprofitcalculator.com/"},{"@type":"ListItem","position":2,"name":"Etsy Fee Calculator Canada","item":"https://shopprofitcalculator.com/etsy-fee-calculator-canada"}]}]}
   </script>
@@ -44,7 +46,7 @@
     <div class="nav-wrap">
       <a class="brand" href="#top" aria-label="ShopProfit home"><span class="brand-mark"><img src="/logo-mark.svg" alt="" aria-hidden="true"></span><span>ShopProfit</span></a>
       <nav class="desktop-nav" aria-label="Main navigation">
-        <a class="active" href="#calculator">Calculator</a><a href="/fees/">Fees</a><a href="/methodology/">Method</a><a href="/faq/">FAQ</a>
+        <a class="active" href="#calculator">Calculator</a><a href="#bulk-analyzer">Bulk CSV</a><a href="#seller-advisor">AI Advisor</a><a href="/fees/">Fees</a><a href="/methodology/">Method</a><a href="/faq/">FAQ</a>
       </nav>
       <div class="nav-actions">
         <label class="sr-only" for="country-nav">Seller location</label>
@@ -58,7 +60,7 @@
       </div>
     </div>
     <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile navigation" hidden>
-      <a href="#calculator">Calculator</a><a href="/fees/">Fees</a><a href="/methodology/">Methodology</a><a href="/faq/">FAQ</a>
+      <a href="#calculator">Calculator</a><a href="#bulk-analyzer">Bulk CSV Analyzer</a><a href="#seller-advisor">AI Advisor</a><a href="/fees/">Fees</a><a href="/methodology/">Methodology</a><a href="/faq/">FAQ</a>
     </nav>
   </header>
 
@@ -157,6 +159,181 @@
       <details class="panel scenarios-panel"><summary><span><strong>Compare scenarios</strong><small>See how Offsite Ads change your take-home.</small></span><span class="summary-plus" aria-hidden="true">+</span></summary><div class="table-scroll"><table class="scenario-table"><thead><tr><th>Scenario</th><th>Sale price</th><th>Fees</th><th>Costs</th><th>Net profit</th><th>Margin</th></tr></thead><tbody id="scenario-body"></tbody></table></div></details>
         </div>
       </details>
+    </section>
+
+    <section class="content-section bulk-analyzer-section page-width" id="bulk-analyzer" aria-labelledby="bulk-analyzer-heading">
+      <div class="section-heading">
+        <div>
+          <h2 id="bulk-analyzer-heading">Bulk Etsy Profit Analyzer</h2>
+          <p>Import a CSV of up to 500 products to calculate net profit, margins, break-even prices, and 12% vs 15% Offsite Ads scenarios locally in your browser.</p>
+        </div>
+        <div class="fee-audit-badge"><span class="status-dot"></span><span>100% Local · No Upload</span></div>
+      </div>
+
+      <div class="panel bulk-panel spotlight">
+        <div class="panel-heading">
+          <div>
+            <h3>Catalog CSV Import &amp; Batch Analysis</h3>
+            <p>Uses your selected seller location (<span id="bulk-context-country">United States</span>) and Etsy Plus settings as defaults unless overridden per row.</p>
+          </div>
+          <span class="panel-step">BATCH</span>
+        </div>
+
+        <div class="bulk-toolbar" role="group" aria-label="Bulk analyzer actions">
+          <button class="button button-secondary" id="bulk-download-sample" type="button"><span aria-hidden="true">↓</span> Download Sample CSV</button>
+          <button class="button button-secondary" id="bulk-load-demo" type="button">Load Demo Products</button>
+          <button class="button button-primary" id="bulk-analyze-btn" type="button" disabled>Analyze Products</button>
+          <button class="button button-quiet" id="bulk-clear-btn" type="button" hidden>Clear</button>
+        </div>
+
+        <div class="bulk-dropzone" id="bulk-dropzone" role="button" tabindex="0" aria-describedby="bulk-dropzone-help">
+          <input id="bulk-file-input" type="file" accept=".csv,text/csv" class="sr-only" aria-label="Upload product CSV file">
+          <p class="bulk-dropzone-title" id="bulk-file-name">Drop your product CSV here, or click to browse</p>
+          <small id="bulk-dropzone-help" class="bulk-dropzone-sub">Required columns: <code>product_name</code>, <code>item_price</code>. Optional: <code>shipping_charged</code>, <code>production_cost</code>, <code>packaging_cost</code>, <code>shipping_cost</code>, <code>gift_wrap</code>, <code>offsite_ads</code>, <code>target_profit</code>, <code>country</code>, <code>order_origin</code>. Max 1 MiB / 500 rows.</small>
+        </div>
+
+        <div class="bulk-alert is-error" id="bulk-error-banner" role="alert" hidden></div>
+
+        <div class="bulk-preview" id="bulk-preview-panel" hidden>
+          <div class="bulk-preview-counts" aria-live="polite">
+            <span class="bulk-badge is-valid">Valid rows: <strong id="bulk-valid-count">0</strong></span>
+            <span class="bulk-badge is-invalid" id="bulk-invalid-badge" hidden>Invalid rows: <strong id="bulk-invalid-count">0</strong></span>
+            <span class="bulk-badge is-note" id="bulk-unknown-cols-badge" hidden>Ignored columns: <span id="bulk-unknown-cols"></span></span>
+          </div>
+          <div class="bulk-invalid-box" id="bulk-invalid-box" hidden>
+            <strong>Rows skipped due to validation errors:</strong>
+            <ul class="bulk-invalid-list" id="bulk-invalid-rows-list"></ul>
+          </div>
+        </div>
+
+        <div class="bulk-results-wrap" id="bulk-results-wrap" hidden>
+          <div class="bulk-summary-grid" id="bulk-summary-grid" aria-label="Bulk analysis summary metrics">
+            <div class="bulk-stat-card"><span>Products analyzed</span><output id="bulk-metric-total">0</output></div>
+            <div class="bulk-stat-card"><span>Profitable (&gt; 0)</span><output id="bulk-metric-profitable">0</output></div>
+            <div class="bulk-stat-card is-loss-card"><span>Loss-making (&lt; 0)</span><output id="bulk-metric-losses">0</output></div>
+            <div class="bulk-stat-card is-warn-card"><span>Thin margin (&lt; 15%)</span><output id="bulk-metric-thin">0</output></div>
+            <div class="bulk-stat-card"><span>Average margin</span><output id="bulk-metric-avg-margin">0.0%</output></div>
+            <div class="bulk-stat-card is-warn-card"><span>Unprofitable at 15% Ads</span><output id="bulk-metric-offsite-risk">0</output></div>
+          </div>
+
+          <p class="bulk-threshold-note">Thresholds: <strong>Loss-making</strong> = net profit below 0; <strong>Thin margin</strong> = positive net profit with margin under 15.0% of gross revenue; <strong>15% Offsite Ads risk</strong> = profitable item that drops to 0 or negative profit when attributed to a 15% Offsite Ad. Unit margins do not account for shop-wide overhead, returns, or tax obligations.</p>
+
+          <div class="bulk-controls-bar">
+            <div class="bulk-filter-group" id="bulk-filter-group" role="group" aria-label="Filter analyzed products">
+              <button type="button" class="bulk-filter-btn is-active" data-bulk-filter="all" aria-pressed="true">All (<span id="bulk-filter-count-all">0</span>)</button>
+              <button type="button" class="bulk-filter-btn" data-bulk-filter="losses" aria-pressed="false">Losses (<span id="bulk-filter-count-losses">0</span>)</button>
+              <button type="button" class="bulk-filter-btn" data-bulk-filter="thin_margin" aria-pressed="false">Thin Margin &lt;15% (<span id="bulk-filter-count-thin">0</span>)</button>
+              <button type="button" class="bulk-filter-btn" data-bulk-filter="offsite_risk" aria-pressed="false">15% Offsite Ads Risk (<span id="bulk-filter-count-risk">0</span>)</button>
+            </div>
+            <button class="button button-primary" id="bulk-export-csv" type="button"><span aria-hidden="true">↓</span> Export Enriched CSV</button>
+          </div>
+
+          <div class="table-scroll bulk-table-scroll">
+            <table class="scenario-table bulk-results-table" id="bulk-results-table">
+              <thead>
+                <tr>
+                  <th scope="col" aria-sort="none"><button type="button" class="bulk-sort-btn" data-bulk-sort="productName">Product <span aria-hidden="true">↕</span></button></th>
+                  <th scope="col" aria-sort="none"><button type="button" class="bulk-sort-btn" data-bulk-sort="itemPrice">Price <span aria-hidden="true">↕</span></button></th>
+                  <th scope="col" aria-sort="none"><button type="button" class="bulk-sort-btn" data-bulk-sort="totalEtsyFees">Etsy Fees <span aria-hidden="true">↕</span></button></th>
+                  <th scope="col" aria-sort="none"><button type="button" class="bulk-sort-btn" data-bulk-sort="totalCosts">Costs <span aria-hidden="true">↕</span></button></th>
+                  <th scope="col" aria-sort="none"><button type="button" class="bulk-sort-btn" data-bulk-sort="netProfit">Net Profit <span aria-hidden="true">↕</span></button></th>
+                  <th scope="col" aria-sort="none"><button type="button" class="bulk-sort-btn" data-bulk-sort="margin">Margin <span aria-hidden="true">↕</span></button></th>
+                  <th scope="col" aria-sort="none"><button type="button" class="bulk-sort-btn" data-bulk-sort="breakEvenPrice">Break-Even <span aria-hidden="true">↕</span></button></th>
+                  <th scope="col">Target Price</th>
+                  <th scope="col">12% Ads Profit</th>
+                  <th scope="col" aria-sort="none"><button type="button" class="bulk-sort-btn" data-bulk-sort="offsite15Profit">15% Ads Profit <span aria-hidden="true">↕</span></button></th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody id="bulk-results-body"></tbody>
+            </table>
+          </div>
+          <p class="bulk-empty-filter" id="bulk-empty-filter" hidden>No products match the selected filter.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section advisor-section page-width" id="seller-advisor" aria-labelledby="advisor-heading">
+      <div class="section-heading">
+        <div>
+          <h2 id="advisor-heading">AI Etsy Business Advisor &amp; Market Intelligence</h2>
+          <p>Verified financial intelligence powered by ShopProfit's authoritative fee engine, live Etsy market research, and explicit input confirmation.</p>
+        </div>
+        <div class="fee-audit-badge"><span class="status-dot"></span><span>Deterministic Fee Engine v1.1.1</span></div>
+      </div>
+
+      <div class="advisor-notice-banner" role="note" aria-label="Advisor guidance and data privacy notice">
+        <strong>SELLER TRANSPARENCY NOTICE:</strong> Calculations are verified through ShopProfit's deterministic fee engine. Market observations and competitor benchmarks reflect public search data and do not fabricate sales volume or transaction velocity. Never submit passwords or customer personal data.
+      </div>
+
+      <div class="advisor-grid">
+        <!-- Conversation & Composer Panel -->
+        <div class="panel advisor-main-panel">
+          <div class="panel-heading">
+            <div>
+              <h3 style="font-size: 16px; margin: 0;">Pricing Consultation &amp; Market Questions</h3>
+              <p style="margin: 4px 0 0; font-size: 12px; color: var(--muted);">Ask questions about pricing, margins, Offsite Ads impact, or market positioning.</p>
+            </div>
+            <span id="advisor-session-badge" class="advisor-pill">New Session</span>
+          </div>
+
+          <!-- Quick Test Presets -->
+          <div class="advisor-presets" aria-label="Sample seller questions">
+            <span class="preset-label">Sample Questions:</span>
+            <button type="button" class="advisor-chip" data-advisor-preset="I sell a handmade candle in the US for $32 plus $5 shipping. It costs me $9 to make, $1.50 to package, and $4.50 for postage. What is my net profit?">US Candle Profit</button>
+            <button type="button" class="advisor-chip" data-advisor-preset="What price do I need in the US for a 30% profit margin if production costs $10, free shipping, and postage costs me $4.50?">30% Target Margin</button>
+            <button type="button" class="advisor-chip" data-advisor-preset="Analyze Offsite Ads impact at 15% for a $40 item in the US with free shipping, $12 to make, and $5 postage cost.">Offsite Ads (15%)</button>
+            <button type="button" class="advisor-chip" data-advisor-preset="Research current Etsy market prices for handmade soy candles in the US and compare profit at $24, $28, and $34 with free shipping if my cost is $8 to make and $4.50 postage.">Market Research + 3 Prices</button>
+          </div>
+
+          <!-- Status / Error Banner -->
+          <div id="advisor-status-region" aria-live="polite"></div>
+
+          <!-- Conversation Transcript -->
+          <div id="advisor-transcript" class="advisor-transcript" role="log" aria-live="polite" aria-label="Advisor Conversation History">
+            <div class="advisor-empty-state">
+              Ask a question above or pick a sample scenario to begin. If inputs like buyer shipping or production cost are missing, the advisor asks for confirmation before computing exact results.
+            </div>
+          </div>
+
+          <!-- Clarification / Input Confirmation Box -->
+          <div id="advisor-clarification-container" class="advisor-clarification-wrap" hidden></div>
+
+          <!-- Question Composer Form -->
+          <form id="advisor-question-form" class="advisor-composer" novalidate>
+            <label for="advisor-question-input" class="sr-only">Ask the Etsy Business Advisor</label>
+            <textarea
+              id="advisor-question-input"
+              class="advisor-textarea"
+              rows="3"
+              placeholder="e.g., I sell ceramic mugs in the US for $28 with free shipping. It costs $8 to make and $4.50 postage. What is my profit and break-even?"
+              maxlength="1200"
+              required
+            ></textarea>
+            <div class="advisor-composer-footer">
+              <span class="advisor-composer-hint">Press Enter or click Send Question. Exact-cent fee verification.</span>
+              <button id="advisor-send-btn" type="submit" class="button button-primary">Send Question</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Verified Calculation & Market Opportunity Report Panel -->
+        <aside class="panel advisor-report-panel" aria-labelledby="advisor-report-heading">
+          <div class="panel-heading">
+            <div>
+              <h3 id="advisor-report-heading" style="font-size: 16px; margin: 0;">Verified Calculation &amp; Market Report</h3>
+              <p style="margin: 4px 0 0; font-size: 12px; color: var(--muted);">Authoritative fee engine results and transparent citations.</p>
+            </div>
+            <span id="advisor-tool-badge" class="advisor-pill">Idle</span>
+          </div>
+
+          <div id="advisor-report-content" class="advisor-report-body">
+            <div class="advisor-empty-state">
+              Financial breakdown and market intelligence report will appear here upon calculation.
+            </div>
+          </div>
+        </aside>
+      </div>
     </section>
 
     <section class="content-section page-width" id="fees" aria-labelledby="fees-heading">

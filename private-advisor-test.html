@@ -1,0 +1,1386 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta name="googlebot" content="noindex, nofollow, noarchive" />
+    <meta name="theme-color" content="#080808" />
+    <title>ShopProfit — Private Conversational AI Advisor Test Interface (Phase 7F)</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      .private-banner {
+        background: var(--fg);
+        color: var(--bg);
+        border-bottom: 2px solid var(--border);
+        padding: 10px 24px;
+        font-family: var(--mono);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+      .private-badge {
+        background: var(--accent);
+        color: var(--fg);
+        padding: 3px 8px;
+        font-weight: 700;
+        border: 1px solid var(--fg);
+      }
+      .advisor-shell {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 28px 24px 64px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.85fr);
+        gap: 24px;
+        align-items: start;
+      }
+      .advisor-panel {
+        background: var(--bg-elevated);
+        border: 2px solid var(--border);
+        box-shadow: 6px 6px 0 var(--border);
+      }
+      .advisor-panel-header {
+        background: var(--fg);
+        color: var(--bg);
+        padding: 14px 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        font-family: var(--mono);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .advisor-panel-body {
+        padding: 20px;
+      }
+      .transcript-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        min-height: 240px;
+        max-height: 560px;
+        overflow-y: auto;
+        padding: 16px;
+        background: var(--bg);
+        border: 2px solid var(--border);
+        margin-bottom: 18px;
+      }
+      .transcript-empty {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--fg-muted);
+        padding: 28px 16px;
+        text-align: center;
+        border: 1px dashed var(--border-subtle);
+      }
+      .turn-card {
+        border: 2px solid var(--border);
+        padding: 14px 16px;
+        background: var(--bg-elevated);
+      }
+      .turn-card.turn-seller {
+        background: #ffffff;
+        border-left: 6px solid var(--fg);
+      }
+      .turn-card.turn-assistant {
+        background: var(--bg-elevated);
+        border-left: 6px solid var(--accent-dim);
+      }
+      .turn-card.turn-error {
+        background: #fff5f5;
+        border-color: var(--danger);
+        border-left: 6px solid var(--danger);
+      }
+      .turn-meta {
+        font-family: var(--mono);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--fg-muted);
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .turn-text {
+        font-size: 14px;
+        line-height: 1.5;
+        color: var(--fg);
+        white-space: pre-wrap;
+      }
+      .composer-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .composer-textarea {
+        width: 100%;
+        min-height: 92px;
+        padding: 12px 14px;
+        border: 2px solid var(--border);
+        background: #ffffff;
+        font-family: var(--sans);
+        font-size: 14px;
+        color: var(--fg);
+        resize: vertical;
+      }
+      .composer-textarea:focus-visible,
+      .clarify-input:focus-visible,
+      .clarify-select:focus-visible,
+      .btn-brutal:focus-visible {
+        outline: 3px solid var(--fg);
+        outline-offset: 2px;
+      }
+      .composer-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+      .btn-brutal {
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 11px 18px;
+        border: 2px solid var(--border);
+        background: var(--accent);
+        color: var(--fg);
+        cursor: pointer;
+        box-shadow: 3px 3px 0 var(--border);
+      }
+      .btn-brutal:hover:not(:disabled) {
+        transform: translate(-1px, -1px);
+        box-shadow: 4px 4px 0 var(--border);
+      }
+      .btn-brutal:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+      .btn-secondary {
+        background: var(--bg-elevated);
+        color: var(--fg);
+      }
+      .btn-danger {
+        background: var(--danger);
+        color: #ffffff;
+      }
+      .preset-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .preset-chip {
+        font-family: var(--mono);
+        font-size: 11px;
+        padding: 6px 10px;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--fg);
+        cursor: pointer;
+      }
+      .preset-chip:hover {
+        background: var(--accent);
+      }
+      .clarify-box {
+        border: 2px solid var(--border);
+        background: #fffdf4;
+        padding: 16px;
+        margin-top: 16px;
+      }
+      .clarify-header {
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .clarify-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 12px;
+      }
+      .clarify-field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .clarify-field.is-flagged {
+        background: #fff3cd;
+        padding: 8px;
+        border: 1px solid var(--warning);
+      }
+      .clarify-label {
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .clarify-input,
+      .clarify-select {
+        padding: 8px 10px;
+        border: 2px solid var(--border);
+        background: #ffffff;
+        font-family: var(--mono);
+        font-size: 13px;
+      }
+      .clarify-checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--mono);
+        font-size: 12px;
+        padding-top: 6px;
+      }
+      .status-banner {
+        padding: 12px 14px;
+        border: 2px solid var(--border);
+        font-family: var(--mono);
+        font-size: 12px;
+        margin-bottom: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+      .status-loading {
+        background: var(--accent);
+        color: var(--fg);
+      }
+      .status-error {
+        background: #fff0f0;
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+      .result-metric-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .result-metric {
+        border: 2px solid var(--border);
+        padding: 10px 12px;
+        background: var(--bg);
+      }
+      .result-metric.highlight {
+        background: var(--accent);
+      }
+      .result-metric-label {
+        font-family: var(--mono);
+        font-size: 10px;
+        text-transform: uppercase;
+        color: var(--fg-muted);
+      }
+      .result-metric-value {
+        font-family: var(--mono);
+        font-size: 18px;
+        font-weight: 700;
+        margin-top: 4px;
+      }
+      .provenance-list {
+        margin-top: 14px;
+        border-top: 1px solid var(--border-subtle);
+        padding-top: 10px;
+        font-family: var(--mono);
+        font-size: 11px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .followup-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 14px;
+      }
+      @media (max-width: 960px) {
+        .advisor-shell {
+          grid-template-columns: 1fr;
+          padding: 18px 16px 48px;
+        }
+      }
+      @media (max-width: 640px) {
+        .clarify-grid,
+        .result-metric-grid {
+          grid-template-columns: 1fr;
+        }
+        .composer-actions {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .btn-brutal {
+          width: 100%;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="private-banner" role="region" aria-label="Private Prototype Notice">
+      <div>
+        <span class="private-badge">PRIVATE PROTOTYPE — PHASE 8B</span>
+        <span style="margin-left: 10px">Non-Public Conversational AI Advisor + Real-Time Market Intelligence • Deterministic Guard + Fee Engine v1.1.1</span>
+      </div>
+      <div>NOINDEX • NOFOLLOW • NOT EXPOSED IN PRODUCTION ROUTER</div>
+    </div>
+
+    <div
+      id="experimental-disclaimer-banner"
+      role="note"
+      aria-label="Experimental Prototype and Privacy Disclaimer"
+      style="max-width: 1280px; margin: 18px auto 0; padding: 12px 24px; border: 2px solid var(--border); background: #fffbe6; font-family: var(--mono); font-size: 12px; line-height: 1.5; color: var(--fg);"
+    >
+      <strong>EXPERIMENTAL PROTOTYPE NOTICE:</strong> This conversational AI Advisor is an experimental prototype for controlled private testing only. Although all fee and margin calculations run through ShopProfit's deterministic fee engine after input verification, you should independently verify all pricing, fee, tax, and business decisions before acting on them.
+      <br />
+      <strong>PRIVACY &amp; DATA MINIMIZATION:</strong> Do not enter personal names, Etsy shop URLs, or customer details. Use synthetic listing numbers unless you explicitly consent to test your own product numbers.
+    </div>
+
+    <main class="advisor-shell">
+      <!-- Left Column: Conversation Transcript, Question Composer & Clarification Editor -->
+      <section class="advisor-panel" aria-labelledby="conversation-heading">
+        <div class="advisor-panel-header">
+          <h1 id="conversation-heading" style="font-size: 13px; margin: 0">Conversational Pricing Advisor (Private Harness)</h1>
+          <span id="session-id-badge">Session: New</span>
+        </div>
+
+        <div class="advisor-panel-body">
+          <!-- Private Auth Header Input (For Local Private Harness Verification) -->
+          <div style="margin-bottom: 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px">
+            <label for="private-auth-key" style="font-family: var(--mono); font-size: 11px; text-transform: uppercase">
+              Private Harness Token (Header):
+            </label>
+            <input
+              id="private-auth-key"
+              type="password"
+              class="clarify-input"
+              style="flex: 1; min-width: 180px"
+              placeholder="Optional local PRIVATE_PROTOTYPE_KEY"
+              autocomplete="off"
+            />
+            <button id="reset-session-btn" type="button" class="btn-brutal btn-secondary" style="padding: 8px 12px">
+              Reset Session
+            </button>
+          </div>
+
+          <!-- Quick Test Presets -->
+          <div aria-label="Sample Seller Scenarios" class="preset-bar">
+            <button type="button" class="preset-chip" data-preset="I sell a handmade candle in the US for $32 plus $5 shipping. It costs me $9 to make, $1.50 to package, and $4.50 for postage. What is my net profit?">
+              1. Complete US Profit
+            </button>
+            <button type="button" class="preset-chip" data-preset="I sell a ceramic mug in the US for $28. It costs me $8 to make and $1 to package. What is my profit?">
+              2. Missing Buyer Shipping
+            </button>
+            <button type="button" class="preset-chip" data-preset="I sell a leather wallet in the US for $45 with free shipping. It costs me $12 to make, $2 to package, and postage costs me $5.25. What is my profit?">
+              3. Explicit Free Shipping
+            </button>
+            <button type="button" class="preset-chip" data-preset="What price do I need in the US for a 30% profit margin if production costs $10, free shipping, and postage costs me $4.50?">
+              4. Target 30% Margin
+            </button>
+            <button type="button" class="preset-chip" data-preset="Analyze Offsite Ads impact at 15% for a $40 item in the US with free shipping, $12 to make, and $5 postage cost.">
+              5. Offsite Ads (15%)
+            </button>
+            <button type="button" class="preset-chip" data-preset="A competitor sells a personalized leather journal in the US for $34 with free shipping. My cost is $11 to make and $4.50 postage. Can I match $34 or what price do I need for a 30% margin?">
+              6. Competitor Price Gap
+            </button>
+            <button type="button" class="preset-chip" data-preset="Research current Etsy market prices for handmade soy candles in the US and compare profit at $24, $28, and $34 with free shipping if my cost is $8 to make and $4.50 postage.">
+              7. Web Research + Price Band
+            </button>
+          </div>
+
+          <!-- Live Status / Error / Retry Banner -->
+          <div id="status-region" aria-live="polite"></div>
+
+          <!-- Transcript Container -->
+          <div id="transcript-container" class="transcript-list" role="log" aria-live="polite" aria-label="Conversation Transcript">
+            <div class="transcript-empty">
+              Ask an Etsy pricing or profit question below. All monetary calculations execute through the deterministic ShopProfit fee engine after input-integrity verification.
+            </div>
+          </div>
+
+          <!-- Structured Clarification & Editable Confirmation Boundary -->
+          <div id="clarification-container" hidden></div>
+
+          <!-- Natural Language Question Composer -->
+          <form id="question-form" class="composer-group" novalidate>
+            <label for="seller-question-input" class="clarify-label">
+              Seller Question (Ctrl+Enter or Cmd+Enter to send)
+            </label>
+            <textarea
+              id="seller-question-input"
+              class="composer-textarea"
+              placeholder="e.g., I sell a silver ring in the US for $48 with free shipping. It costs me $14 to make and $4.25 for postage. What is my profit?"
+              maxlength="1200"
+              required
+            ></textarea>
+            <div class="composer-actions">
+              <span style="font-family: var(--mono); font-size: 11px; color: var(--fg-muted)">
+                Zero client-side AI keys • Exact-cent deterministic fee engine
+              </span>
+              <button id="send-question-btn" type="submit" class="btn-brutal">
+                Send Question
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Right Column: Verified Deterministic Financial Results & Provenance Inspector -->
+      <aside class="advisor-panel" aria-labelledby="results-heading">
+        <div class="advisor-panel-header">
+          <h2 id="results-heading" style="font-size: 13px; margin: 0">Verified Calculation &amp; Provenance</h2>
+          <span id="verified-tool-badge">Idle</span>
+        </div>
+        <div class="advisor-panel-body" id="verified-result-container">
+          <div class="transcript-empty">
+            No calculation executed yet. Once all required inputs are verified or confirmed, the deterministic breakdown and field provenance will appear here.
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <script type="module">
+      import {
+        SUPPORTED_COUNTRIES,
+        FIELD_LABELS,
+        createPrivateAdvisorController
+      } from "/src/private-advisor-test.js";
+
+      const authInput = document.getElementById("private-auth-key");
+      const resetBtn = document.getElementById("reset-session-btn");
+      const statusRegion = document.getElementById("status-region");
+      const transcriptContainer = document.getElementById("transcript-container");
+      const clarificationContainer = document.getElementById("clarification-container");
+      const questionForm = document.getElementById("question-form");
+      const questionInput = document.getElementById("seller-question-input");
+      const sendBtn = document.getElementById("send-question-btn");
+      const sessionBadge = document.getElementById("session-id-badge");
+      const verifiedToolBadge = document.getElementById("verified-tool-badge");
+      const verifiedResultContainer = document.getElementById("verified-result-container");
+
+      // Restore session key if present in sessionStorage
+      const savedKey = sessionStorage.getItem("shopprofit_private_key");
+      if (savedKey) {
+        authInput.value = savedKey;
+      }
+      authInput.addEventListener("input", () => {
+        sessionStorage.setItem("shopprofit_private_key", authInput.value);
+      });
+
+      const controller = createPrivateAdvisorController({
+        async sendRequest(payload, headers) {
+          const dynamicHeaders = { ...headers };
+          if (authInput.value.trim()) {
+            dynamicHeaders.Authorization = `Bearer ${authInput.value.trim()}`;
+          }
+          const res = await fetch("/api/private/advisor-conversation", {
+            method: "POST",
+            headers: dynamicHeaders,
+            body: JSON.stringify(payload)
+          });
+          let body = {};
+          try {
+            body = await res.json();
+          } catch {
+            body = { ok: false, error: "invalid_response_json", message: "Server returned non-JSON response." };
+          }
+          return { status: res.status, body };
+        },
+        onStateChange: renderState
+      });
+
+      function clearElement(el) {
+        while (el.firstChild) {
+          el.removeChild(el.firstChild);
+        }
+      }
+
+      function renderStatusBanner(state) {
+        clearElement(statusRegion);
+        if (state.loading) {
+          const banner = document.createElement("div");
+          banner.className = "status-banner status-loading";
+          banner.textContent = "Validating inputs and running deterministic fee engine...";
+          statusRegion.appendChild(banner);
+          return;
+        }
+        if (state.error) {
+          const banner = document.createElement("div");
+          banner.className = "status-banner status-error";
+          const msgSpan = document.createElement("span");
+          msgSpan.textContent = `[${state.error.code}] ${state.error.message}`;
+          banner.appendChild(msgSpan);
+
+          if (state.lastFailedAction) {
+            const retryBtn = document.createElement("button");
+            retryBtn.type = "button";
+            retryBtn.className = "btn-brutal btn-secondary";
+            retryBtn.style.padding = "6px 12px";
+            retryBtn.textContent = "Retry";
+            retryBtn.addEventListener("click", () => controller.retryLastAction());
+            banner.appendChild(retryBtn);
+          }
+          statusRegion.appendChild(banner);
+        }
+      }
+
+      function renderTranscript(state) {
+        clearElement(transcriptContainer);
+        if (state.transcript.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "transcript-empty";
+          empty.textContent =
+            "Ask an Etsy pricing or profit question below. All monetary calculations execute through the deterministic ShopProfit fee engine after input-integrity verification.";
+          transcriptContainer.appendChild(empty);
+          return;
+        }
+
+        for (const turn of state.transcript) {
+          const card = document.createElement("div");
+          card.className = `turn-card ${
+            turn.role === "seller"
+              ? "turn-seller"
+              : turn.role === "system_error"
+                ? "turn-error"
+                : "turn-assistant"
+          }`;
+
+          const meta = document.createElement("div");
+          meta.className = "turn-meta";
+          const roleSpan = document.createElement("span");
+          roleSpan.textContent =
+            turn.role === "seller"
+              ? turn.type === "confirmation"
+                ? "Seller (Confirmed Inputs)"
+                : "Seller"
+              : turn.role === "system_error"
+                ? `Error (${turn.error || "failed"})`
+                : `ShopProfit Advisor (${turn.status || "response"})`;
+          const statusSpan = document.createElement("span");
+          statusSpan.textContent = turn.tool ? `Tool: ${turn.tool}` : "";
+          meta.appendChild(roleSpan);
+          meta.appendChild(statusSpan);
+
+          const textDiv = document.createElement("div");
+          textDiv.className = "turn-text";
+          textDiv.textContent = turn.text;
+
+          card.appendChild(meta);
+          card.appendChild(textDiv);
+          transcriptContainer.appendChild(card);
+        }
+        transcriptContainer.scrollTop = transcriptContainer.scrollHeight;
+      }
+
+      function renderClarificationCard(state) {
+        clearElement(clarificationContainer);
+        const pending = state.pendingClarification;
+        if (!pending) {
+          clarificationContainer.hidden = true;
+          return;
+        }
+        clarificationContainer.hidden = false;
+
+        const box = document.createElement("div");
+        box.className = "clarify-box";
+        box.setAttribute("role", "region");
+        box.setAttribute("aria-label", "Clarification and Input Confirmation");
+
+        const header = document.createElement("div");
+        header.className = "clarify-header";
+        const title = document.createElement("span");
+        title.textContent = "Clarification & Input Confirmation Required";
+        const tokenBadge = document.createElement("span");
+        tokenBadge.style.fontSize = "10px";
+        tokenBadge.textContent = pending.confirmationToken ? "HMAC Token Signed" : "";
+        header.appendChild(title);
+        header.appendChild(tokenBadge);
+        box.appendChild(header);
+
+        const origP = document.createElement("div");
+        origP.style.fontFamily = "var(--mono)";
+        origP.style.fontSize = "11px";
+        origP.style.marginBottom = "8px";
+        origP.textContent = `Preserved Seller Question: "${pending.originalMessage}"`;
+        box.appendChild(origP);
+
+        const flaggedSet = new Set([
+          ...(pending.missingFields || []),
+          ...(pending.ambiguousFields || []),
+          ...(pending.modelAssumptions || [])
+        ]);
+
+        if (flaggedSet.size > 0) {
+          const flagNote = document.createElement("div");
+          flagNote.style.fontFamily = "var(--mono)";
+          flagNote.style.fontSize = "11px";
+          flagNote.style.color = "var(--warning)";
+          flagNote.style.marginBottom = "10px";
+          flagNote.textContent = `Flagged for explicit seller confirmation: ${Array.from(flaggedSet).join(", ")}`;
+          box.appendChild(flagNote);
+        }
+
+        const grid = document.createElement("div");
+        grid.className = "clarify-grid";
+
+        // Country selector
+        const countryWrap = document.createElement("div");
+        countryWrap.className = `clarify-field ${flaggedSet.has("country") ? "is-flagged" : ""}`;
+        const countryLabel = document.createElement("label");
+        countryLabel.className = "clarify-label";
+        countryLabel.setAttribute("for", "confirm-field-country");
+        countryLabel.textContent = FIELD_LABELS.country;
+        const countrySelect = document.createElement("select");
+        countrySelect.id = "confirm-field-country";
+        countrySelect.className = "clarify-select";
+
+        const emptyOpt = document.createElement("option");
+        emptyOpt.value = "";
+        emptyOpt.textContent = "-- Select Country --";
+        countrySelect.appendChild(emptyOpt);
+
+        for (const c of SUPPORTED_COUNTRIES) {
+          const opt = document.createElement("option");
+          opt.value = c.code;
+          opt.textContent = `${c.code} — ${c.label}`;
+          if (state.editableFields.country === c.code) {
+            opt.selected = true;
+          }
+          countrySelect.appendChild(opt);
+        }
+        countrySelect.addEventListener("change", (e) => {
+          controller.updateEditableField("country", e.target.value);
+        });
+        countryWrap.appendChild(countryLabel);
+        countryWrap.appendChild(countrySelect);
+        grid.appendChild(countryWrap);
+
+        // Numeric fields that sellers can supply or edit/correct
+        const numericConfigs = [
+          { key: "itemPrice", step: "0.01", placeholder: "e.g. 32.00" },
+          { key: "shipping", step: "0.01", placeholder: "Buyer shipping charge (e.g. 5.00)" },
+          { key: "production", step: "0.01", placeholder: "COGS / materials (e.g. 9.00)" },
+          { key: "packaging", step: "0.01", placeholder: "Packaging cost (e.g. 1.50)" },
+          { key: "shippingCost", step: "0.01", placeholder: "Your postage cost (e.g. 4.50)" },
+          { key: "targetMarginPct", step: "0.1", placeholder: "Target % (e.g. 30 for 30%)" },
+          { key: "targetProfit", step: "0.01", placeholder: "Target profit (e.g. 12.00)" }
+        ];
+
+        for (const cfg of numericConfigs) {
+          const wrap = document.createElement("div");
+          wrap.className = `clarify-field ${flaggedSet.has(cfg.key) ? "is-flagged" : ""}`;
+          const lbl = document.createElement("label");
+          lbl.className = "clarify-label";
+          lbl.setAttribute("for", `confirm-field-${cfg.key}`);
+          lbl.textContent = FIELD_LABELS[cfg.key] || cfg.key;
+          const inp = document.createElement("input");
+          inp.id = `confirm-field-${cfg.key}`;
+          inp.type = "number";
+          inp.step = cfg.step;
+          inp.min = "0";
+          inp.className = "clarify-input";
+          inp.placeholder = cfg.placeholder;
+          inp.value =
+            state.editableFields[cfg.key] !== undefined && state.editableFields[cfg.key] !== null
+              ? String(state.editableFields[cfg.key])
+              : "";
+          inp.addEventListener("input", (e) => {
+            controller.updateEditableField(cfg.key, e.target.value);
+          });
+          wrap.appendChild(lbl);
+          wrap.appendChild(inp);
+          grid.appendChild(wrap);
+        }
+
+        // Order Type selector
+        const orderWrap = document.createElement("div");
+        orderWrap.className = `clarify-field ${flaggedSet.has("orderType") ? "is-flagged" : ""}`;
+        const orderLbl = document.createElement("label");
+        orderLbl.className = "clarify-label";
+        orderLbl.setAttribute("for", "confirm-field-orderType");
+        orderLbl.textContent = FIELD_LABELS.orderType;
+        const orderSel = document.createElement("select");
+        orderSel.id = "confirm-field-orderType";
+        orderSel.className = "clarify-select";
+        for (const val of ["domestic", "international"]) {
+          const o = document.createElement("option");
+          o.value = val;
+          o.textContent = val.toUpperCase();
+          if ((state.editableFields.orderType || "domestic") === val) o.selected = true;
+          orderSel.appendChild(o);
+        }
+        orderSel.addEventListener("change", (e) => {
+          controller.updateEditableField("orderType", e.target.value);
+        });
+        orderWrap.appendChild(orderLbl);
+        orderWrap.appendChild(orderSel);
+        grid.appendChild(orderWrap);
+
+        box.appendChild(grid);
+
+        // Explicit zero-cost confirmation checkboxes
+        const checkGroup = document.createElement("div");
+        checkGroup.style.marginTop = "12px";
+        checkGroup.style.display = "flex";
+        checkGroup.style.flexWrap = "wrap";
+        checkGroup.style.gap = "16px";
+
+        const freeShipRow = document.createElement("label");
+        freeShipRow.className = "clarify-checkbox-row";
+        const freeShipCb = document.createElement("input");
+        freeShipCb.id = "confirm-field-freeShipping";
+        freeShipCb.type = "checkbox";
+        freeShipCb.checked = state.editableFields.freeShipping === true;
+        freeShipCb.addEventListener("change", (e) => {
+          controller.updateEditableField("freeShipping", e.target.checked);
+          if (e.target.checked) {
+            controller.updateEditableField("shipping", 0);
+          }
+        });
+        const freeShipText = document.createElement("span");
+        freeShipText.textContent = FIELD_LABELS.freeShipping;
+        freeShipRow.appendChild(freeShipCb);
+        freeShipRow.appendChild(freeShipText);
+        checkGroup.appendChild(freeShipRow);
+
+        const zeroProdRow = document.createElement("label");
+        zeroProdRow.className = "clarify-checkbox-row";
+        const zeroProdCb = document.createElement("input");
+        zeroProdCb.id = "confirm-field-confirmZeroProduction";
+        zeroProdCb.type = "checkbox";
+        zeroProdCb.checked = state.editableFields.confirmZeroProduction === true;
+        zeroProdCb.addEventListener("change", (e) => {
+          controller.updateEditableField("confirmZeroProduction", e.target.checked);
+          if (e.target.checked) {
+            controller.updateEditableField("production", 0);
+          }
+        });
+        const zeroProdText = document.createElement("span");
+        zeroProdText.textContent = FIELD_LABELS.confirmZeroProduction;
+        zeroProdRow.appendChild(zeroProdCb);
+        zeroProdRow.appendChild(zeroProdText);
+        checkGroup.appendChild(zeroProdRow);
+
+        box.appendChild(checkGroup);
+
+        const actionsRow = document.createElement("div");
+        actionsRow.style.marginTop = "16px";
+        actionsRow.style.display = "flex";
+        actionsRow.style.justifyContent = "flex-end";
+        const confirmBtn = document.createElement("button");
+        confirmBtn.id = "confirm-calculate-btn";
+        confirmBtn.type = "button";
+        confirmBtn.className = "btn-brutal";
+        confirmBtn.disabled = state.loading;
+        confirmBtn.textContent = "Confirm Verified Inputs & Calculate";
+        confirmBtn.addEventListener("click", () => {
+          controller.submitConfirmation();
+        });
+        actionsRow.appendChild(confirmBtn);
+        box.appendChild(actionsRow);
+
+        clarificationContainer.appendChild(box);
+      }
+
+      function renderMarketIntelligenceSection(mi, container) {
+        if (!mi || typeof mi !== "object") return;
+
+        const intRep = mi.integratedOpportunityReport;
+
+        // Phase 8C Integrated Opportunity Report (8 Sections: A through H)
+        if (intRep) {
+          const box = document.createElement("div");
+          box.className = "provenance-list";
+          box.style.marginTop = "16px";
+          box.style.padding = "16px";
+          box.style.border = "2px solid var(--border)";
+          box.style.background = "#fffdf4";
+
+          const header = document.createElement("div");
+          header.style.display = "flex";
+          header.style.justifyContent = "space-between";
+          header.style.alignItems = "center";
+          header.style.marginBottom = "12px";
+          header.style.borderBottom = "1px solid var(--border)";
+          header.style.paddingBottom = "8px";
+
+          const title = document.createElement("strong");
+          title.style.fontSize = "14px";
+          title.textContent = "Phase 8C Integrated Market Opportunity & Profit Advisor";
+          const badge = document.createElement("span");
+          badge.className = "private-badge";
+          badge.style.fontSize = "10px";
+          badge.textContent = "8-Section Integrated Report";
+          header.appendChild(title);
+          header.appendChild(badge);
+          box.appendChild(header);
+
+          // Section A: Seller Objective
+          if (intRep.sellerObjective) {
+            const secA = document.createElement("div");
+            secA.style.marginBottom = "12px";
+            const hA = document.createElement("div");
+            hA.style.fontWeight = "700";
+            hA.style.color = "var(--primary, #000)";
+            hA.textContent = "A. Seller Objective";
+            secA.appendChild(hA);
+
+            const pCat = document.createElement("div");
+            pCat.textContent = `• Product Category: ${intRep.sellerObjective.productCategory || "Unspecified"}`;
+            const pObj = document.createElement("div");
+            pObj.textContent = `• Goal: ${intRep.sellerObjective.objective || "Research competition & evaluate profitable price"}`;
+            const pTgt = document.createElement("div");
+            pTgt.textContent = `• Target Margin: ${intRep.sellerObjective.targetMarginPct != null ? intRep.sellerObjective.targetMarginPct + "%" : "Not specified (using standard baseline)"}`;
+            const pProv = document.createElement("div");
+            pProv.style.fontSize = "11px";
+            pProv.style.color = "#666";
+            pProv.textContent = `• Provenance: ${intRep.sellerObjective.provenance || "seller_prompt"}`;
+            secA.appendChild(pCat);
+            secA.appendChild(pObj);
+            secA.appendChild(pTgt);
+            secA.appendChild(pProv);
+            box.appendChild(secA);
+          }
+
+          // Section B: Observable Market Evidence
+          if (intRep.marketEvidence) {
+            const secB = document.createElement("div");
+            secB.style.marginBottom = "12px";
+            const hB = document.createElement("div");
+            hB.style.fontWeight = "700";
+            hB.textContent = "B. Observable Market Evidence";
+            secB.appendChild(hB);
+
+            const obsDate = document.createElement("div");
+            obsDate.textContent = `• Observation Date: ${intRep.marketEvidence.observationDate || "Today"}`;
+            secB.appendChild(obsDate);
+
+            const opr = intRep.marketEvidence.observedPriceRange;
+            if (opr) {
+              const oprDiv = document.createElement("div");
+              oprDiv.style.fontWeight = "600";
+              const curr = opr.currency || "$";
+              oprDiv.textContent = `• Observed Price Range: Low ${curr}${Number(opr.low).toFixed(2)} | Mid ${curr}${Number(opr.mid).toFixed(2)} | High ${curr}${Number(opr.high).toFixed(2)} (Sample count: ${opr.sampleCount}, Provenance: ${opr.provenance || "public_search_snippets"})`;
+              secB.appendChild(oprDiv);
+            }
+
+            const claims = intRep.marketEvidence.claims || [];
+            for (const c of claims) {
+              const cDiv = document.createElement("div");
+              cDiv.textContent = `• Claim: ${c.claim} [${c.sourceClassification || "external"}] (${c.url || ""})`;
+              secB.appendChild(cDiv);
+            }
+
+            const discl = document.createElement("div");
+            discl.style.fontSize = "11px";
+            discl.style.fontStyle = "italic";
+            discl.style.color = "#888";
+            discl.style.marginTop = "4px";
+            discl.textContent = intRep.marketEvidence.volumeDisclaimer || "Listing prices represent asking prices and do not prove sales volume or transaction velocity.";
+            secB.appendChild(discl);
+            box.appendChild(secB);
+          }
+
+          // Section C: Competitor Observations
+          if (intRep.competitorObservations) {
+            const secC = document.createElement("div");
+            secC.style.marginBottom = "12px";
+            const hC = document.createElement("div");
+            hC.style.fontWeight = "700";
+            hC.textContent = "C. Competitor Observations";
+            secC.appendChild(hC);
+
+            const bmarks = intRep.competitorObservations.benchmarkPrices || [];
+            if (bmarks.length > 0) {
+              const bmDiv = document.createElement("div");
+              bmDiv.textContent = `• Benchmark Prices: ${bmarks.map((p) => `${intRep.competitorObservations.currency || "$"}${Number(p).toFixed(2)}`).join(", ")}`;
+              secC.appendChild(bmDiv);
+            }
+
+            const listings = intRep.competitorObservations.listingSamples || [];
+            for (const l of listings) {
+              const lDiv = document.createElement("div");
+              lDiv.textContent = `• Sample: "${l.title}" — ${l.currency || "$"}${Number(l.price).toFixed(2)} (${l.url || ""})`;
+              secC.appendChild(lDiv);
+            }
+
+            const cDiscl = document.createElement("div");
+            cDiscl.style.fontSize = "11px";
+            cDiscl.style.fontStyle = "italic";
+            cDiscl.style.color = "#888";
+            cDiscl.style.marginTop = "4px";
+            cDiscl.textContent = intRep.competitorObservations.disclaimer || "Competitor observations reflect public search results and are not internal Etsy transaction metrics.";
+            secC.appendChild(cDiscl);
+            box.appendChild(secC);
+          }
+
+          // Section D: Potential Differentiation Vectors
+          const diffAngles = Array.isArray(intRep.potentialDifferentiation)
+            ? intRep.potentialDifferentiation
+            : Array.isArray(intRep.potentialDifferentiation?.positioningAngles)
+              ? intRep.potentialDifferentiation.positioningAngles
+              : [];
+          if (diffAngles.length > 0) {
+            const secD = document.createElement("div");
+            secD.style.marginBottom = "12px";
+            const hD = document.createElement("div");
+            hD.style.fontWeight = "700";
+            hD.textContent = "D. Potential Differentiation (Hypotheses to Evaluate)";
+            secD.appendChild(hD);
+
+            if (intRep.potentialDifferentiation?.hypothesisLabel) {
+              const hypLabel = document.createElement("div");
+              hypLabel.style.fontSize = "11px";
+              hypLabel.style.fontStyle = "italic";
+              hypLabel.style.color = "#666";
+              hypLabel.textContent = `Classification: ${intRep.potentialDifferentiation.hypothesisLabel}`;
+              secD.appendChild(hypLabel);
+            }
+
+            for (const diff of diffAngles) {
+              const dDiv = document.createElement("div");
+              dDiv.textContent = `• ${diff}`;
+              secD.appendChild(dDiv);
+            }
+
+            if (intRep.potentialDifferentiation?.operationalNotice) {
+              const opNotice = document.createElement("div");
+              opNotice.style.fontSize = "11px";
+              opNotice.style.color = "#856404";
+              opNotice.style.marginTop = "4px";
+              opNotice.textContent = `Operational requirement: ${intRep.potentialDifferentiation.operationalNotice}`;
+              secD.appendChild(opNotice);
+            }
+            box.appendChild(secD);
+          }
+
+          // Section E: Deterministic Financial Comparison (fee-engine.js)
+          if (intRep.financialComparison) {
+            const secE = document.createElement("div");
+            secE.style.marginBottom = "12px";
+            const hE = document.createElement("div");
+            hE.style.fontWeight = "700";
+            hE.textContent = "E. Deterministic Financial Comparison (Authority: src/fee-engine.js)";
+            secE.appendChild(hE);
+
+            if (intRep.financialComparison.status === "completed" && Array.isArray(intRep.financialComparison.candidatePrices)) {
+              for (const cand of intRep.financialComparison.candidatePrices) {
+                const cBox = document.createElement("div");
+                cBox.style.marginTop = "6px";
+                cBox.style.padding = "8px";
+                cBox.style.border = "1px solid var(--border)";
+                cBox.style.background = "#fff";
+
+                const cTitle = document.createElement("strong");
+                cTitle.textContent = `${cand.label} Candidate Price: $${Number(cand.price).toFixed(2)}`;
+                cBox.appendChild(cTitle);
+
+                const cDetails = document.createElement("div");
+                cDetails.style.marginTop = "4px";
+                cDetails.textContent = `Break-even: $${Number(cand.breakEvenPrice).toFixed(2)} | Net Profit: $${Number(cand.netProfit).toFixed(2)} | Margin: ${Number(cand.marginPct).toFixed(1)}% | Etsy Fees: $${Number(cand.totalEtsyFees).toFixed(2)}`;
+                cBox.appendChild(cDetails);
+
+                if (cand.offsiteAdsComparison) {
+                  const adsDiv = document.createElement("div");
+                  adsDiv.style.fontSize = "11px";
+                  adsDiv.style.color = "#555";
+                  adsDiv.style.marginTop = "4px";
+                  adsDiv.textContent = `Offsite Ads Impact: 12% fee -> Profit $${Number(cand.offsiteAdsComparison.rate12?.netProfit || 0).toFixed(2)} (${Number(cand.offsiteAdsComparison.rate12?.marginPct || 0).toFixed(1)}%) | 15% fee -> Profit $${Number(cand.offsiteAdsComparison.rate15?.netProfit || 0).toFixed(2)} (${Number(cand.offsiteAdsComparison.rate15?.marginPct || 0).toFixed(1)}%)`;
+                  cBox.appendChild(adsDiv);
+                }
+
+                secE.appendChild(cBox);
+              }
+            } else if (intRep.financialComparison.missingCostNotice) {
+              const noticeDiv = document.createElement("div");
+              noticeDiv.style.padding = "8px";
+              noticeDiv.style.background = "#fff3cd";
+              noticeDiv.style.border = "1px solid #ffeeba";
+              noticeDiv.style.color = "#856404";
+              noticeDiv.textContent = intRep.financialComparison.missingCostNotice.message || "Financial comparison pending seller confirmation of cost inputs.";
+              secE.appendChild(noticeDiv);
+            }
+            box.appendChild(secE);
+          }
+
+          // Section F: Key Uncertainties and Risks
+          if (Array.isArray(intRep.keyUncertaintiesAndRisks) && intRep.keyUncertaintiesAndRisks.length > 0) {
+            const secF = document.createElement("div");
+            secF.style.marginBottom = "12px";
+            const hF = document.createElement("div");
+            hF.style.fontWeight = "700";
+            hF.textContent = "F. Key Uncertainties & Financial Risks";
+            secF.appendChild(hF);
+
+            for (const risk of intRep.keyUncertaintiesAndRisks) {
+              const rDiv = document.createElement("div");
+              rDiv.textContent = `• ${risk}`;
+              secF.appendChild(rDiv);
+            }
+            box.appendChild(secF);
+          }
+
+          // Section G: Recommended Next Experiment
+          if (intRep.recommendedNextExperiment) {
+            const secG = document.createElement("div");
+            secG.style.marginBottom = "12px";
+            secG.style.padding = "8px";
+            secG.style.border = "1px solid #b8daff";
+            secG.style.background = "#e8f4fd";
+
+            const hG = document.createElement("strong");
+            hG.textContent = "G. Recommended Next Business Experiment";
+            secG.appendChild(hG);
+
+            const expAction = document.createElement("div");
+            expAction.style.marginTop = "4px";
+            expAction.textContent = `• Action: ${intRep.recommendedNextExperiment.testAction || "Test initial pricing"}`;
+            secG.appendChild(expAction);
+
+            if (intRep.recommendedNextExperiment.capacityNotice) {
+              const capNotice = document.createElement("div");
+              capNotice.style.fontSize = "11px";
+              capNotice.style.color = "#856404";
+              capNotice.textContent = `• Capacity Constraint: ${intRep.recommendedNextExperiment.capacityNotice}`;
+              secG.appendChild(capNotice);
+            }
+
+            const expDuration = document.createElement("div");
+            expDuration.textContent = `• Duration: ${intRep.recommendedNextExperiment.duration || `${intRep.recommendedNextExperiment.durationDays || 14} days`}`;
+            secG.appendChild(expDuration);
+
+            const metrics = intRep.recommendedNextExperiment.metricsToTrack || [];
+            if (metrics.length > 0) {
+              const mDiv = document.createElement("div");
+              mDiv.textContent = `• Metrics to Track: ${metrics.join(", ")}`;
+              secG.appendChild(mDiv);
+            }
+            box.appendChild(secG);
+          }
+
+          // Section H: Verified Sources & Citations
+          if (Array.isArray(intRep.sources) && intRep.sources.length > 0) {
+            const secH = document.createElement("div");
+            const hH = document.createElement("div");
+            hH.style.fontWeight = "700";
+            hH.textContent = "H. Verified Sources & Citations";
+            secH.appendChild(hH);
+
+            for (const s of intRep.sources) {
+              const sDiv = document.createElement("div");
+              sDiv.style.fontSize = "11px";
+              sDiv.textContent = `• ${s.title || "Source"} — ${s.url} [${s.sourceClassification || "verified_external"}]`;
+              secH.appendChild(sDiv);
+            }
+            box.appendChild(secH);
+          }
+
+          container.appendChild(box);
+          return;
+        }
+
+        // Fallback for Phase 8B single-point or policy reports
+        const box = document.createElement("div");
+        box.className = "provenance-list";
+        box.style.marginTop = "16px";
+        box.style.padding = "12px";
+        box.style.border = "2px solid var(--border)";
+        box.style.background = "#fffdf4";
+
+        const header = document.createElement("div");
+        header.style.display = "flex";
+        header.style.justifyContent = "space-between";
+        header.style.alignItems = "center";
+        header.style.marginBottom = "8px";
+        const title = document.createElement("strong");
+        title.textContent = "Phase 8B Market & Competitor Intelligence";
+        const badge = document.createElement("span");
+        badge.className = "private-badge";
+        badge.style.fontSize = "10px";
+        badge.textContent = mi.capabilityMode || "market_intelligence";
+        header.appendChild(title);
+        header.appendChild(badge);
+        box.appendChild(header);
+
+        // Policy vs Engine Distinction
+        if (mi.policySeparation) {
+          const distRow = document.createElement("div");
+          distRow.style.marginBottom = "8px";
+          const auth = mi.policySeparation.verifiedEngineCalculation?.authority || "src/fee-engine.js";
+          const extCount = Array.isArray(mi.policySeparation.retrievedExternalPolicyGuidance?.sources)
+            ? mi.policySeparation.retrievedExternalPolicyGuidance.sources.length
+            : 0;
+          distRow.textContent = `Engine Authority: ${auth} | External Policy Sources: ${extCount} (never overrides fee-engine.js)`;
+          box.appendChild(distRow);
+        }
+
+        // Observed Market Price Range (Untrusted External Context)
+        const obsRange = mi.marketFindings?.observedPriceRange || mi.observedMarketPriceRange;
+        if (obsRange) {
+          const rangeRow = document.createElement("div");
+          rangeRow.style.marginBottom = "8px";
+          rangeRow.style.fontWeight = "700";
+          rangeRow.textContent = `Observed Public Price Range [${obsRange.provenance}]: Low ${obsRange.currency || "$"} ${Number(obsRange.low).toFixed(2)} • Mid ${obsRange.currency || "$"} ${Number(obsRange.mid).toFixed(2)} • High ${obsRange.currency || "$"} ${Number(obsRange.high).toFixed(2)} (n=${obsRange.sampleCount})`;
+          box.appendChild(rangeRow);
+        }
+
+        // Competitor Analysis
+        if (mi.competitorAnalysis && mi.competitorAnalysis.matchScenario) {
+          const compDiv = document.createElement("div");
+          compDiv.style.marginBottom = "8px";
+          const mc = mi.competitorAnalysis.matchScenario;
+          const reqPrice = mi.competitorAnalysis.requiredPriceForTargetMargin;
+          compDiv.textContent = `Competitor Match ($${Number(mi.competitorAnalysis.competitorPrice).toFixed(2)}): Net Profit $${Number(mc.netProfit).toFixed(2)} (${Number(mc.marginPct).toFixed(1)}% margin, ${mi.competitorAnalysis.matchViability}) • Target Margin Price: $${Number(reqPrice).toFixed(2)}`;
+          box.appendChild(compDiv);
+        }
+
+        // Market Range Profit Scenarios (Low / Mid / High)
+        const bandScenarios = mi.marketRangeProfitScenarios?.bandComparison?.scenarios;
+        if (Array.isArray(bandScenarios) && bandScenarios.length > 0) {
+          const mrDiv = document.createElement("div");
+          mrDiv.style.marginBottom = "8px";
+          const parts = bandScenarios.map(
+            (s) => `${s.label}: $${Number(s.netProfit).toFixed(2)} (${Number(s.marginPct).toFixed(1)}%)`
+          );
+          mrDiv.textContent = `Verified Profit Across Observed Range: ${parts.join(" | ")}`;
+          box.appendChild(mrDiv);
+        }
+
+        // Evidence Claims
+        const evList = mi.marketFindings?.evidenceClaims || mi.evidenceClaims || [];
+        if (Array.isArray(evList) && evList.length > 0) {
+          const evTitle = document.createElement("strong");
+          evTitle.textContent = "Observable Evidence (Verified Sources Only):";
+          box.appendChild(evTitle);
+          for (const ev of evList) {
+            const row = document.createElement("div");
+            row.textContent = `• [${ev.sourceClassification}] ${ev.claim} (${ev.url || ev.sourceUrl})`;
+            box.appendChild(row);
+          }
+        }
+
+        // Validated Source Citations
+        const citList = mi.citationIntegrity?.verifiedCitations || mi.sources || [];
+        if (Array.isArray(citList) && citList.length > 0) {
+          const citTitle = document.createElement("strong");
+          citTitle.style.marginTop = "6px";
+          citTitle.textContent = `Verified Citations (${citList.length}):`;
+          box.appendChild(citTitle);
+          for (const c of citList) {
+            const row = document.createElement("div");
+            row.textContent = `• ${c.title} — ${c.url} [${c.sourceClassification}]`;
+            box.appendChild(row);
+          }
+        }
+
+        // Uncertainty Notes
+        const uncList = mi.marketFindings?.uncertaintyNotes || mi.uncertaintyNotes || [];
+        if (Array.isArray(uncList) && uncList.length > 0) {
+          const uncTitle = document.createElement("strong");
+          uncTitle.style.marginTop = "6px";
+          uncTitle.textContent = "Explicit Uncertainty & Non-Inferred Metrics:";
+          box.appendChild(uncTitle);
+          for (const u of uncList) {
+            const row = document.createElement("div");
+            row.textContent = `• ${u}`;
+            box.appendChild(row);
+          }
+        }
+
+        // Concrete Next Experiment
+        const expText = mi.nextExperiment?.testAction || mi.nextExperiment?.action;
+        if (expText) {
+          const expDiv = document.createElement("div");
+          expDiv.style.marginTop = "8px";
+          expDiv.style.padding = "8px";
+          expDiv.style.border = "1px solid var(--border)";
+          expDiv.style.background = "#ffffff";
+          expDiv.textContent = `Next Experiment: ${expText}`;
+          box.appendChild(expDiv);
+        }
+
+        container.appendChild(box);
+      }
+
+      function renderVerifiedResult(state) {
+        clearElement(verifiedResultContainer);
+        const res = state.lastCompletedResult;
+        const mi = res?.marketIntelligence || state.lastMarketIntelligence || null;
+
+        if (!res || res.status !== "calculation_completed") {
+          verifiedToolBadge.textContent = mi ? "Market Research" : "Idle";
+          const empty = document.createElement("div");
+          empty.className = "transcript-empty";
+          empty.textContent =
+            "No calculation executed yet. Once all required inputs are verified or confirmed, the deterministic breakdown and field provenance will appear here.";
+          verifiedResultContainer.appendChild(empty);
+          if (mi) {
+            renderMarketIntelligenceSection(mi, verifiedResultContainer);
+          }
+          return;
+        }
+
+        verifiedToolBadge.textContent = res.tool;
+        const calc = res.calculation || {};
+        const curr = calc.currencySymbol || calc.currency || "$";
+
+        const summaryText = document.createElement("p");
+        summaryText.style.fontSize = "13px";
+        summaryText.style.lineHeight = "1.5";
+        summaryText.style.margin = "0 0 12px 0";
+        summaryText.textContent = res.explanation;
+        verifiedResultContainer.appendChild(summaryText);
+
+        const metricGrid = document.createElement("div");
+        metricGrid.className = "result-metric-grid";
+
+        const addMetric = (label, value, highlight = false) => {
+          const m = document.createElement("div");
+          m.className = `result-metric ${highlight ? "highlight" : ""}`;
+          const l = document.createElement("div");
+          l.className = "result-metric-label";
+          l.textContent = label;
+          const v = document.createElement("div");
+          v.className = "result-metric-value";
+          v.textContent = value;
+          m.appendChild(l);
+          m.appendChild(v);
+          metricGrid.appendChild(m);
+        };
+
+        if (res.tool === "calculate_profit" && calc.totals) {
+          addMetric("Net Profit", `${curr} ${calc.totals.netProfit.toFixed(2)}`, true);
+          addMetric("Profit Margin", `${calc.totals.marginPct.toFixed(2)}%`, true);
+          addMetric("Gross Revenue", `${curr} ${calc.totals.grossRevenue.toFixed(2)}`);
+          addMetric("Total Etsy Fees", `${curr} ${calc.totals.totalEtsyFees.toFixed(2)}`);
+          addMetric("Seller COGS + Postage", `${curr} ${calc.totals.totalSellerCosts.toFixed(2)}`);
+          if (typeof calc.totals.breakEvenPrice === "number") {
+            addMetric("Break-Even Price", `${curr} ${calc.totals.breakEvenPrice.toFixed(2)}`);
+          }
+        } else if (res.tool === "find_target_price" && typeof calc.requiredItemPrice === "number") {
+          addMetric("Required Item Price", `${curr} ${calc.requiredItemPrice.toFixed(2)}`, true);
+          if (calc.verifiedOutcomeAtTargetPrice) {
+            addMetric("Verified Net Profit", `${curr} ${calc.verifiedOutcomeAtTargetPrice.netProfit.toFixed(2)}`, true);
+            addMetric("Verified Margin", `${calc.verifiedOutcomeAtTargetPrice.marginPct.toFixed(2)}%`);
+            addMetric("Total Fees at Target", `${curr} ${calc.verifiedOutcomeAtTargetPrice.totalEtsyFees.toFixed(2)}`);
+          }
+        } else if (res.tool === "analyze_offsite_ads" && calc.tiers) {
+          addMetric("Profit (Standard 0%)", `${curr} ${calc.tiers.noOffsiteAds.netProfit.toFixed(2)}`, true);
+          addMetric("Profit (12% Offsite Ad)", `${curr} ${calc.tiers.mandatory12Pct.netProfit.toFixed(2)}`);
+          addMetric("Profit (15% Offsite Ad)", `${curr} ${calc.tiers.optional15Pct.netProfit.toFixed(2)}`, true);
+          addMetric("15% Offsite Ad Fee", `${curr} ${calc.tiers.optional15Pct.offsiteAdsFee.toFixed(2)}`);
+        } else if (res.tool === "compare_price_scenarios" && Array.isArray(calc.scenarios)) {
+          for (const sc of calc.scenarios) {
+            const pVal = sc.inputs?.itemPrice ?? sc.itemPrice ?? 0;
+            addMetric(
+              `${sc.label} (${curr} ${Number(pVal).toFixed(2)})`,
+              `${curr} ${sc.netProfit.toFixed(2)} (${sc.marginPct.toFixed(1)}%)`,
+              calc.bestScenarioByNetProfit && calc.bestScenarioByNetProfit.label === sc.label
+            );
+          }
+        }
+        verifiedResultContainer.appendChild(metricGrid);
+
+        if (mi) {
+          renderMarketIntelligenceSection(mi, verifiedResultContainer);
+        }
+
+        // Provenance Inspector
+        if (res.provenance && typeof res.provenance === "object") {
+          const provDiv = document.createElement("div");
+          provDiv.className = "provenance-list";
+          const provTitle = document.createElement("strong");
+          provTitle.textContent = "Verified Input Provenance:";
+          provDiv.appendChild(provTitle);
+
+          for (const [field, info] of Object.entries(res.provenance)) {
+            const row = document.createElement("div");
+            row.textContent = `• ${field}: ${JSON.stringify(info.value)} [${info.classification} / ${info.provenance}]`;
+            provDiv.appendChild(row);
+          }
+          verifiedResultContainer.appendChild(provDiv);
+        }
+
+        // Follow-up Scenarios
+        if (state.followUpScenarios && state.followUpScenarios.length > 0) {
+          const fWrap = document.createElement("div");
+          fWrap.className = "followup-list";
+          const fTitle = document.createElement("div");
+          fTitle.className = "clarify-label";
+          fTitle.textContent = "Run Follow-Up Scenario:";
+          fWrap.appendChild(fTitle);
+
+          for (const f of state.followUpScenarios) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "btn-brutal btn-secondary";
+            btn.style.textAlign = "left";
+            btn.style.padding = "8px 12px";
+            btn.textContent = `→ ${f.label}`;
+            btn.addEventListener("click", () => {
+              questionInput.value = f.prompt;
+              controller.submitQuestion(f.prompt);
+            });
+            fWrap.appendChild(btn);
+          }
+          verifiedResultContainer.appendChild(fWrap);
+        }
+      }
+
+      function renderState(state) {
+        sessionBadge.textContent = state.conversationId
+          ? `Session: ${state.conversationId.slice(0, 12)}...`
+          : "Session: New";
+        sendBtn.disabled = state.loading;
+        renderStatusBanner(state);
+        renderTranscript(state);
+        renderClarificationCard(state);
+        renderVerifiedResult(state);
+      }
+
+      questionForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const text = questionInput.value;
+        controller.submitQuestion(text);
+      });
+
+      questionInput.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+          e.preventDefault();
+          controller.submitQuestion(questionInput.value);
+        }
+      });
+
+      resetBtn.addEventListener("click", () => {
+        questionInput.value = "";
+        controller.resetConversation();
+      });
+
+      for (const chip of document.querySelectorAll("[data-preset]")) {
+        chip.addEventListener("click", () => {
+          const prompt = chip.getAttribute("data-preset");
+          questionInput.value = prompt;
+          questionInput.focus();
+        });
+      }
+    </script>
+  </body>
+</html>

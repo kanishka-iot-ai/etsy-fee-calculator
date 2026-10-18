@@ -8,6 +8,12 @@
 import { handleGetFees, handleGetCountryFee, handleGetVersion, PUBLIC_SECURITY_HEADERS } from "./api.js";
 import { handleAdvisorRequest } from "./advisor.js";
 import {
+  handleAdvisorConversationRequest,
+  AdvisorConfirmationCoordinatorDO,
+  createCoordinatorNamespaceSimulator,
+  createConversationSessionStore
+} from "./advisor-conversation.js";
+import {
   checkRateLimit,
   createRateLimitResponse,
   DEFAULT_WINDOW_MS,
@@ -115,9 +121,23 @@ export default {
         }
       }
 
-      // 3B. Controlled Profit Advisor Route (POST /v1/advisor; AI disabled by default)
+      // 3B. Controlled Profit Advisor Routes
       if (url.pathname === "/v1/advisor") {
         return await handleAdvisorRequest(request, env);
+      }
+
+      if (url.pathname === "/v1/advisor-conversation") {
+        const defaultCoordinator = env?.CONFIRMATION_COORDINATOR || createCoordinatorNamespaceSimulator();
+        const defaultStore = env?.SESSION_STORE || createConversationSessionStore();
+        const conversationEnv = {
+          ENABLE_CONVERSATIONAL_PROTOTYPE: env?.ENABLE_CONVERSATIONAL_PROTOTYPE ?? true,
+          REQUIRE_GLOBAL_COORDINATOR: false,
+          ALLOW_PUBLIC_WEB_SEARCH_FALLBACK: env?.ALLOW_PUBLIC_WEB_SEARCH_FALLBACK ?? true,
+          CONFIRMATION_COORDINATOR: defaultCoordinator,
+          SESSION_STORE: defaultStore,
+          ...env
+        };
+        return await handleAdvisorConversationRequest(request, conversationEnv);
       }
 
       // 4. Protected Admin Routes
@@ -232,3 +252,5 @@ export default {
     ctx.waitUntil(executeMonitorRun(env));
   }
 };
+
+export { AdvisorConfirmationCoordinatorDO };
