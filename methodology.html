@@ -10,19 +10,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/fonts/silkscreen-700-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
-  <script>
-    (function () {
-      try {
-        const saved = localStorage.getItem("shopprofit-theme");
-        if (saved === "dark" || (!saved && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
-          document.documentElement.classList.add("dark");
-          document.documentElement.style.colorScheme = "dark";
-          document.body ? document.body.classList.add("dark") : document.addEventListener("DOMContentLoaded", () => document.body.classList.add("dark"));
-        }
-      } catch (e) {}
-    })();
-  </script>
-  <meta property="og:type" content="article">
+<meta property="og:type" content="article">
   <meta property="og:site_name" content="ShopProfit">
   <meta property="og:title" content="Etsy Profit Calculator Methodology | How ShopProfit Calculates Profit">
   <meta property="og:description" content="Understand the formulas, inputs, Etsy fee data, and integer-cent mathematics behind every ShopProfit calculation.">

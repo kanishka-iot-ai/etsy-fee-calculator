@@ -166,7 +166,7 @@ function translatePage() {
       state.set(name, { source, output });
     });
   });
-  languageSelect.value = languagePreference;
+  if (languageSelect) languageSelect.value = languagePreference;
 }
 function applyLanguage() {
   const language = LANGUAGES[activeLanguage] || LANGUAGES.en;
@@ -269,15 +269,24 @@ function applyLanguage() {
       ar: "محلل أرباح وتوريد كتالوج Etsy بالجملة — ShopProfit"
     }
   };
+  const isResourceRoute = () => {
+    if (typeof location !== "undefined") {
+      const path = location.pathname.toLowerCase();
+      if (path.includes("faq") || path.includes("methodology") || path.includes("privacy") || path.includes("terms") || path.includes("contact")) return true;
+    }
+    const canonical = typeof document !== "undefined" ? (document.querySelector('link[rel="canonical"]')?.getAttribute("href") || "") : "";
+    if (canonical.includes("/faq") || canonical.includes("/methodology") || canonical.includes("/privacy") || canonical.includes("/terms") || canonical.includes("/contact")) return true;
+    return false;
+  };
   if (isFeesPage) {
     document.title = feesTitles[activeLanguage] || feesTitles.en;
   } else if (specializedRoute && specializedTitles[specializedRoute]) {
     document.title = specializedTitles[specializedRoute][activeLanguage] || specializedTitles[specializedRoute].en;
-  } else {
+  } else if (!isResourceRoute()) {
     document.title = routeTitles[routeCountry]?.[activeLanguage] || routeTitles[routeCountry]?.en || titles[activeLanguage] || titles.en;
   }
   const autoLabels = { en: "Auto", "zh-CN": "自动", "hi-IN": "स्वचालित", "fr-FR": "Auto", "de-DE": "Automatisch", "es-ES": "Auto", "ja-JP": "自動", ar: "تلقائي" };
-  const autoOption = languageSelect.querySelector('[value="auto"]');
+  const autoOption = languageSelect ? languageSelect.querySelector('[value="auto"]') : null;
   if (autoOption) {
     const baseAuto = autoLabels[activeLanguage] || autoLabels.en;
     const currentName = language.label || "English";
