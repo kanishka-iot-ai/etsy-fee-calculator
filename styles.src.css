@@ -55,21 +55,8 @@ a { color: inherit; text-decoration: none; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 .skip-link { position: fixed; z-index: 100; top: 8px; left: 8px; padding: 10px 14px; border-radius: 6px; color: white; background: var(--accent); transform: translateY(-150%); }
 .skip-link:focus { transform: translateY(0); }
-.site-header { position: sticky; z-index: 20; top: 0; height: 68px; border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent); background: color-mix(in srgb, var(--surface) 91%, transparent); backdrop-filter: blur(12px); transition: height .18s ease, border-color .18s ease; }
-
-.nav-wrap { width: min(1264px, calc(100% - 48px)); height: 100%; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 32px; }
-.brand { display: inline-flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 650; letter-spacing: -.035em; white-space: nowrap; }
-.brand-mark { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 7px; color: white; background: var(--accent); font-size: 15px; font-weight: 700; letter-spacing: -.08em; }
-.desktop-nav { display: flex; align-items: center; gap: 30px; margin-left: auto; margin-right: auto; }
-.desktop-nav a { color: var(--muted); font-size: 13px; transition: color .15s ease; }
-
 .nav-actions { display: flex; align-items: center; gap: 10px; }
-
-.country-nav { max-width: 150px; padding: 0 28px 0 10px; font-size: 12px; }
-.icon-button { display: grid; width: 36px; place-items: center; cursor: pointer; font-size: 17px; }
-
 .menu-toggle, .mobile-menu { display: none; }
-.hero { min-height: 304px; display: flex; align-items: center; justify-content: space-between; padding-block: 55px 42px; }
 
 .eyebrow { margin: 0 0 11px; color: var(--positive); font-size: 10px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
 h1, h2, h3, p { margin-top: 0; }

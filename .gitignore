@@ -9,3 +9,5 @@ backups/
 worker/backups/
 scratch/
 *.log
+*-validation-results.json
+test-protocol/
