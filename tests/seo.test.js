@@ -426,8 +426,7 @@ test("dedicated /fees/ route satisfies all AEO, GEO, schema, and internal linkin
   assert.equal(attr(fees, /<link rel="canonical" href="([^"]+)"/), "https://shopprofitcalculator.com/fees/");
   assert.match(fees, /<h1\b[^>]*>Etsy Fee Calculator<\/h1>/);
   assert.equal((fees.match(/<h1\b/g) || []).length, 1, "fees.html has exactly one H1");
-  assert.ok(fees.includes('id="sale-form"'), "fees.html contains interactive fee calculator");
-  assert.ok(fees.includes('id="result-heading"'), "fees.html contains fee breakdown ledger");
+  assert.ok(fees.includes("ShopProfit 2026 Sovereign Etsy Fee &amp; Take Rate Benchmark"), "fees.html contains sovereign benchmark");
   assert.ok(fees.includes("Direct Answer:"), "contains direct answer block for AEO");
   assert.ok(fees.includes("fee-stat-grid"), "contains key rate visual callouts");
   assert.ok(fees.includes("Scenario 1: $10 Digital Download"), "contains worked example 1");
@@ -561,10 +560,10 @@ test("/fees/ route satisfies all Phase 2 Step 2 search-intent, authority, and fe
   assert.match(html, /<h1\b[^>]*>Etsy Fee Calculator<\/h1>/);
   assert.equal((html.match(/<h1\b/g) || []).length, 1, "exactly one H1");
 
-  // 2. Interactive calculator integration
-  assert.ok(html.includes('id="sale-form"'), "interactive calculator form present");
-  assert.ok(html.includes('id="result-heading"'), "fee breakdown ledger present");
-  assert.ok(html.includes('id="net-profit"'), "net profit output present");
+  // 2. Dedicated sovereign fee guide & benchmarks (without duplicate calculator)
+  assert.ok(html.includes("ShopProfit 2026 Sovereign Etsy Fee &amp; Take Rate Benchmark"), "sovereign benchmark present");
+  assert.ok(html.includes('href="/#calculator"'), "direct link to interactive calculator present");
+  assert.ok(!html.includes('id="sale-form"'), "redundant calculator form removed from dedicated fees guide");
 
   // 3. Official fee rates & terminology
   assert.match(html, /6\.5% transaction fee/);

@@ -440,7 +440,7 @@ function setOutput(selector, value) {
 }
 
 function render() {
-  if (!isFeeDataLoaded) {
+  if (!isFeeDataLoaded || !$("#sale-form")) {
     return;
   }
   const state = getState();
@@ -780,9 +780,11 @@ function setTheme(theme) {
   const dark = theme === "dark";
   document.body.classList.toggle("dark", dark);
   document.documentElement.style.colorScheme = dark ? "dark" : "light";
-  $("#theme-toggle").setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
-  $("#theme-toggle").title = dark ? "Switch to light mode" : "Switch to dark mode";
-  $("meta[name=theme-color]").content = dark ? "#050505" : "#F2F1EC";
+  $("#theme-toggle")?.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
+  const toggleBtn = $("#theme-toggle");
+  if (toggleBtn) toggleBtn.title = dark ? "Switch to light mode" : "Switch to dark mode";
+  const metaTheme = $("meta[name=theme-color]");
+  if (metaTheme) metaTheme.content = dark ? "#050505" : "#F2F1EC";
   translatePage();
 }
 function setupPointerEffects() {
