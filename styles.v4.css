@@ -44,190 +44,200 @@
   display: block;
 }
 
+/* ==========================================================================
+   AI FLUID ORB — Bioluminescent Animated SVG Logo
+   Inspired by Spline / Aximoris 3D fluid orb
+   ========================================================================== */
+
+/* Size container classes */
+.ai-fluid-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  position: relative;
+  line-height: 1;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.ai-fluid-logo.nav-fluid-logo {
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+}
+
+.ai-fluid-logo.btn-fluid-logo {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
+.ai-fluid-logo.modal-fluid-logo {
+  width: 26px;
+  height: 26px;
+  margin-right: 10px;
+}
+
+.ai-fluid-logo svg,
+.ai-fluid-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  display: block;
+}
+
 /* Fluid Wave & Morphing Keyframes */
 .ai-fluid-core {
-  transform-origin: 24px 24px;
-  animation: fluidWaveRotation 8.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+  transform-origin: 100px 100px;
+  animation: fluidOrbSpin 12s linear infinite;
 }
 
 .ai-fluid-blob {
-  animation: fluidBlobMorph 4.2s ease-in-out infinite alternate;
-  transform-origin: 22px 18px;
+  animation: fluidBlobMorph 5s ease-in-out infinite alternate;
+  transform-origin: 80px 70px;
 }
 
 .ai-fluid-caustic {
-  animation: fluidPulse 2.6s ease-in-out infinite;
-  transform-origin: 21px 15px;
+  animation: fluidPulse 2.8s ease-in-out infinite;
+  transform-origin: 85px 70px;
 }
 
 .ai-fluid-satellite-1 {
-  transform-origin: 24px 24px;
-  animation: satelliteFloat1 4.5s ease-in-out infinite alternate;
+  animation: orbFloat1 4.2s ease-in-out infinite alternate;
 }
 
 .ai-fluid-satellite-2 {
-  transform-origin: 24px 24px;
-  animation: satelliteFloat2 3.8s ease-in-out infinite alternate;
+  animation: orbFloat2 3.6s ease-in-out infinite alternate;
+}
+
+.ai-fluid-satellite-3 {
+  animation: orbFloat3 5.1s ease-in-out infinite alternate;
+}
+
+.ai-fluid-satellite-4 {
+  animation: orbFloat1 3.2s ease-in-out 0.8s infinite alternate;
+}
+
+.ai-fluid-satellite-5 {
+  animation: orbFloat2 4.8s ease-in-out 0.4s infinite alternate;
 }
 
 .ai-fluid-rim {
-  animation: rimGlint 5.2s ease-in-out infinite;
+  animation: rimGlint 6s ease-in-out infinite;
 }
 
-@keyframes fluidWaveRotation {
-  0% { transform: rotate(0deg) scale(0.98); }
-  50% { transform: rotate(20deg) scale(1.02); }
-  100% { transform: rotate(-16deg) scale(0.99); }
+.ai-fluid-glow {
+  animation: glowPulse 4s ease-in-out infinite;
+}
+
+.ai-fluid-inner {
+  animation: innerVoidPulse 7s ease-in-out infinite;
+}
+
+/* Nav-size versions (much smaller transform-origins) */
+.ai-fluid-logo.nav-fluid-logo .ai-fluid-core { transform-origin: 24px 24px; }
+.ai-fluid-logo.nav-fluid-logo .ai-fluid-blob { transform-origin: 20px 16px; }
+.ai-fluid-logo.nav-fluid-logo .ai-fluid-caustic { transform-origin: 20px 15px; }
+
+/* Button-size versions */
+.ai-fluid-logo.btn-fluid-logo .ai-fluid-core { transform-origin: 24px 24px; }
+
+@keyframes fluidOrbSpin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 @keyframes fluidBlobMorph {
-  0% { transform: scale(1) translate(0, 0); }
-  50% { transform: scale(1.08, 0.92) translate(1px, -1px); }
-  100% { transform: scale(0.94, 1.06) translate(-1px, 1px); }
+  0%   { d: path("M60 20C80 10 110 12 125 30C140 48 138 75 125 92C112 109 88 118 68 112C48 106 30 90 26 70C22 50 40 30 60 20Z"); }
+  33%  { d: path("M55 18C78 5 115 8 132 28C149 48 144 80 130 96C116 112 86 120 64 114C42 108 24 88 22 66C20 44 32 31 55 18Z"); }
+  66%  { d: path("M65 22C86 12 108 15 122 34C136 53 134 78 120 94C106 110 82 116 62 108C42 100 28 84 26 64C24 44 44 32 65 22Z"); }
+  100% { d: path("M58 16C80 6 112 10 128 30C144 50 140 78 126 95C112 112 84 120 62 112C40 104 24 86 22 64C20 42 36 26 58 16Z"); }
 }
 
 @keyframes fluidPulse {
   0%, 100% {
-    opacity: 0.85;
-    transform: scale(0.95);
-    filter: drop-shadow(0 0 2px #00f5ff);
+    opacity: 0.82;
+    transform: scale(0.92);
+    filter: drop-shadow(0 0 4px #00f5ff);
   }
   50% {
     opacity: 1;
-    transform: scale(1.1);
-    filter: drop-shadow(0 0 6px #00f5ff) drop-shadow(0 0 10px #0066ff);
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 10px #00f5ff) drop-shadow(0 0 18px #0066ff);
   }
 }
 
-@keyframes satelliteFloat1 {
-  0% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(2px, -3px) scale(1.18); }
-  100% { transform: translate(-1px, 2px) scale(0.88); }
+@keyframes orbFloat1 {
+  0%   { transform: translate(0px, 0px) scale(1); opacity: 0.9; }
+  50%  { transform: translate(3px, -5px) scale(1.2); opacity: 1; }
+  100% { transform: translate(-2px, 3px) scale(0.85); opacity: 0.75; }
 }
 
-@keyframes satelliteFloat2 {
-  0% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-3px, 2px) scale(0.85); }
-  100% { transform: translate(2px, -1px) scale(1.12); }
+@keyframes orbFloat2 {
+  0%   { transform: translate(0px, 0px) scale(1); opacity: 0.85; }
+  50%  { transform: translate(-4px, 3px) scale(0.82); opacity: 0.7; }
+  100% { transform: translate(3px, -2px) scale(1.15); opacity: 1; }
+}
+
+@keyframes orbFloat3 {
+  0%   { transform: translate(0px, 0px) scale(1); opacity: 0.8; }
+  40%  { transform: translate(2px, -4px) scale(1.1); opacity: 1; }
+  100% { transform: translate(-3px, 2px) scale(0.9); opacity: 0.7; }
 }
 
 @keyframes rimGlint {
-  0%, 100% { opacity: 0.75; }
-  50% { opacity: 1; filter: drop-shadow(0 0 4px #ffffff); }
+  0%, 100% { opacity: 0.7; }
+  40%       { opacity: 1; filter: drop-shadow(0 0 6px rgba(255,255,255,0.8)); }
 }
 
-/* ==========================================================================
-   AI ADVISOR HERO CARD STAGE (Authentic Pinterest Obsidian Card Presentation)
-   ========================================================================== */
-.advisor-hero-card-stage {
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.55; r: 92; }
+  50%       { opacity: 0.85; r: 98; }
+}
+
+@keyframes innerVoidPulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.04); }
+}
+
+/* Hero SVG emblem — large centered orb */
+.advisor-hero__emblem {
   position: relative;
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto 28px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.hero-stage-backdrop-glow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 90%;
-  height: 80%;
-  background: radial-gradient(circle, rgba(0, 102, 255, 0.35) 0%, rgba(0, 245, 255, 0.18) 40%, transparent 70%);
-  filter: blur(36px);
-  pointer-events: none;
-  z-index: 0;
-  border-radius: 50%;
-}
-
-.hero-stage-card {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  height: 250px;
-  background: #000000;
-  border-radius: 28px;
-  border: 1px solid rgba(0, 210, 255, 0.32);
-  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8),
-              0 0 40px rgba(0, 102, 255, 0.28),
-              inset 0 0 24px rgba(0, 210, 255, 0.08);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  transition: transform 0.25s cubic-bezier(0.2, 0, 0.2, 1),
-              box-shadow 0.25s cubic-bezier(0.2, 0, 0.2, 1),
-              border-color 0.25s ease;
-}
-
-.hero-stage-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(0, 245, 255, 0.55);
-  box-shadow: 0 24px 60px -10px rgba(0, 0, 0, 0.9),
-              0 0 55px rgba(0, 130, 255, 0.42),
-              inset 0 0 30px rgba(0, 245, 255, 0.15);
-}
-
-.hero-stage-video {
-  width: 220px;
-  height: 220px;
-  object-fit: cover;
-  border-radius: 20px;
-  display: block;
-  pointer-events: none;
-  user-select: none;
-}
-
-.hero-stage-badge {
-  position: absolute;
-  bottom: 12px;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 4px 12px;
-  background: rgba(10, 14, 26, 0.85);
-  border: 1px solid rgba(0, 210, 255, 0.3);
-  border-radius: 9999px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  font: 700 9px/1 var(--mono, monospace);
-  color: #00f5ff;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  justify-content: center;
+  margin-bottom: 28px;
+  filter: drop-shadow(0 0 40px rgba(0, 102, 255, 0.45));
+  animation: heroEmblemFloat 6s ease-in-out infinite;
 }
 
-.stage-live-dot {
-  width: 6px;
-  height: 6px;
+@keyframes heroEmblemFloat {
+  0%, 100% { transform: translateY(0px); filter: drop-shadow(0 0 40px rgba(0,102,255,0.45)); }
+  50%       { transform: translateY(-8px); filter: drop-shadow(0 0 55px rgba(0,180,255,0.65)); }
+}
+
+.advisor-hero__emblem svg {
+  width: 200px;
+  height: 200px;
+  overflow: visible;
+}
+
+/* Atmospheric glow ring behind hero emblem */
+.advisor-hero__emblem::before {
+  content: "";
+  position: absolute;
+  inset: -24px;
   border-radius: 50%;
-  background: #00f5ff;
-  box-shadow: 0 0 8px #00f5ff;
-  animation: stageDotPulse 1.8s ease-in-out infinite;
+  background: radial-gradient(circle, rgba(0, 102, 255, 0.28) 0%, rgba(0, 245, 255, 0.12) 50%, transparent 100%);
+  filter: blur(20px);
+  z-index: 0;
+  animation: glowAtmosphere 5s ease-in-out infinite;
 }
 
-@keyframes stageDotPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.8); }
-}
-
-@media (max-width: 560px) {
-  .hero-stage-card {
-    height: 200px;
-    border-radius: 22px;
-  }
-  .hero-stage-video {
-    width: 170px;
-    height: 170px;
-  }
-  .hero-stage-badge {
-    bottom: 8px;
-    font-size: 8px;
-    padding: 3px 9px;
-  }
+@keyframes glowAtmosphere {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -236,11 +246,13 @@
   .ai-fluid-caustic,
   .ai-fluid-satellite-1,
   .ai-fluid-satellite-2,
+  .ai-fluid-satellite-3,
+  .ai-fluid-satellite-4,
+  .ai-fluid-satellite-5,
   .ai-fluid-rim,
-  .stage-live-dot {
-    animation: none !important;
-  }
-  .hero-stage-video {
+  .ai-fluid-glow,
+  .ai-fluid-inner,
+  .advisor-hero__emblem {
     animation: none !important;
   }
 }
@@ -318,7 +330,7 @@ body.dark .button-ai-advice:hover {
 
 /* Dedicated Advisor Page Hero */
 .advisor-hero {
-  padding: 48px 0 36px;
+  padding: 56px 0 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -330,17 +342,65 @@ body.dark .button-ai-advice:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 28px;
+  filter: drop-shadow(0 0 40px rgba(0, 102, 255, 0.45));
+  animation: heroEmblemFloat 6s ease-in-out infinite;
 }
 
+@keyframes heroEmblemFloat {
+  0%, 100% { transform: translateY(0px); filter: drop-shadow(0 0 40px rgba(0,102,255,0.45)); }
+  50%       { transform: translateY(-10px); filter: drop-shadow(0 0 58px rgba(0,180,255,0.7)); }
+}
+
+.advisor-hero__emblem svg {
+  width: 200px;
+  height: 200px;
+  overflow: visible;
+}
+
+/* Atmospheric glow ring behind hero emblem */
 .advisor-hero__emblem::before {
   content: "";
   position: absolute;
-  inset: -12px;
+  inset: -28px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, rgba(6, 182, 212, 0.1) 60%, transparent 100%);
-  filter: blur(8px);
+  background: radial-gradient(circle, rgba(0, 102, 255, 0.32) 0%, rgba(0, 245, 255, 0.14) 50%, transparent 100%);
+  filter: blur(22px);
   z-index: 0;
+  animation: glowAtmosphere 5s ease-in-out infinite;
+}
+
+@keyframes glowAtmosphere {
+  0%, 100% { opacity: 0.65; transform: scale(1); }
+  50%       { opacity: 1;    transform: scale(1.12); }
+}
+
+@media (max-width: 560px) {
+  .advisor-hero__emblem svg {
+    width: 150px;
+    height: 150px;
+  }
+  .advisor-hero__emblem {
+    margin-bottom: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .advisor-hero__emblem,
+  .ai-fluid-core,
+  .ai-fluid-blob,
+  .ai-fluid-caustic,
+  .ai-fluid-satellite-1,
+  .ai-fluid-satellite-2,
+  .ai-fluid-satellite-3,
+  .ai-fluid-satellite-4,
+  .ai-fluid-satellite-5,
+  .ai-fluid-rim,
+  .ai-fluid-glow,
+  .ai-fluid-inner {
+    animation: none !important;
+    filter: none !important;
+  }
 }
 
 .advisor-hero__badge {

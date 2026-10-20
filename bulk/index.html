@@ -105,7 +105,65 @@
         <a href="/#calculator">Calculator</a>
         <a class="active" href="/bulk/">Bulk Sourcing</a>
         <a href="/advisor/">
-          <span class="ai-fluid-logo nav-fluid-logo" aria-hidden="true"><svg class="ai-fluid-svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ai-fl-glow-bulk-nav" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#0066ff" stop-opacity="0.45"/><stop offset="60%" stop-color="#00d4ff" stop-opacity="0.18"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient><linearGradient id="ai-fl-body-bulk-nav" x1="8" y1="8" x2="40" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#00f5ff"/><stop offset="35%" stop-color="#0066ff"/><stop offset="70%" stop-color="#002288"/><stop offset="100%" stop-color="#050816"/></linearGradient><linearGradient id="ai-fl-rim-bulk-nav" x1="10" y1="6" x2="38" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/><stop offset="25%" stop-color="#00f5ff" stop-opacity="0.6"/><stop offset="60%" stop-color="#0033aa" stop-opacity="0.2"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0.8"/></linearGradient><radialGradient id="ai-fl-caustic-bulk-nav" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#ffffff"/><stop offset="30%" stop-color="#00f5ff"/><stop offset="70%" stop-color="#0055ff"/><stop offset="100%" stop-color="#002277"/></radialGradient></defs><circle cx="24" cy="24" r="22" fill="url(#ai-fl-glow-bulk-nav)"/><path class="ai-fluid-rim" d="M24 6C14.06 6 6 14.06 6 24C6 33.94 14.06 42 24 42C33.94 42 42 33.94 42 24C42 14.06 33.94 6 24 6ZM24 33C19.03 33 15 28.97 15 24C15 19.03 19.03 15 24 15C28.97 15 33 19.03 33 24C33 28.97 28.97 33 24 33Z" fill="#060913" stroke="url(#ai-fl-rim-bulk-nav)" stroke-width="0.8" opacity="0.92"/><g class="ai-fluid-core"><path class="ai-fluid-blob" d="M16 11C21 8 28 8 33 12C38 16 39 24 36 29C33 34 26 36 21 34C16 32 12 28 11 23C10 18 12 13 16 11Z" fill="url(#ai-fl-body-bulk-nav)"/><path d="M24 17C20.13 17 17 20.13 17 24C17 27.87 20.13 31 24 31C27.87 31 31 27.87 31 24C31 20.13 27.87 17 24 17Z" fill="#04060d"/><g class="ai-fluid-caustic"><circle cx="21" cy="15" r="5" fill="url(#ai-fl-caustic-bulk-nav)"/><circle cx="21" cy="15" r="3.2" fill="#00f5ff" opacity="0.9"/><circle cx="20.5" cy="14.5" r="1.4" fill="#ffffff"/><circle cx="29" cy="18" r="3.5" fill="url(#ai-fl-caustic-bulk-nav)"/><circle cx="29" cy="18" r="1.8" fill="#00f5ff"/><circle cx="28.7" cy="17.7" r="0.8" fill="#ffffff"/></g></g><circle class="ai-fluid-satellite-1" cx="36" cy="23" r="2.2" fill="#00d4ff" stroke="#ffffff" stroke-width="0.4"/><circle class="ai-fluid-satellite-2" cx="13" cy="27" r="1.6" fill="#00f5ff"/><circle class="ai-fluid-satellite-1" cx="31" cy="33" r="1.2" fill="#0088ff"/><path d="M12 18C13 14 17 9 22 7.5" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round" opacity="0.85"/><path d="M36 20C37.5 24 37 28 34.5 32" stroke="url(#ai-fl-rim-bulk-nav)" stroke-width="0.9" stroke-linecap="round" opacity="0.75"/></svg></span>
+          <span class="ai-fluid-logo nav-fluid-logo" aria-hidden="true">
+<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="bNavAtmo" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"  stop-color="#0066ff" stop-opacity="0.5"/>
+        <stop offset="100%" stop-color="#000"   stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="bNavBody" cx="38%" cy="35%" r="62%">
+        <stop offset="0%"   stop-color="#040818"/>
+        <stop offset="100%" stop-color="#000205"/>
+      </radialGradient>
+      <radialGradient id="bNavFluid" cx="28%" cy="24%" r="76%">
+        <stop offset="0%"   stop-color="#00f5ff"/>
+        <stop offset="30%"  stop-color="#0077ff"/>
+        <stop offset="70%"  stop-color="#002299"/>
+        <stop offset="100%" stop-color="#000a2e" stop-opacity="0.6"/>
+      </radialGradient>
+      <radialGradient id="bNavOrb" cx="35%" cy="32%" r="65%">
+        <stop offset="0%"   stop-color="#000510"/>
+        <stop offset="100%" stop-color="#000205"/>
+      </radialGradient>
+      <filter id="bNavGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur"/>
+        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+      </filter>
+      <clipPath id="bNavClip"><circle cx="24" cy="24" r="21"/></clipPath>
+    </defs>
+    <circle cx="24" cy="24" r="23" fill="url(#bNavAtmo)" opacity="0.6"/>
+    <circle cx="24" cy="24" r="21" fill="url(#bNavBody)" stroke="rgba(0,210,255,0.25)" stroke-width="0.5" class="ai-fluid-inner"/>
+    <g clip-path="url(#bNavClip)">
+      <g class="ai-fluid-core">
+        <path class="ai-fluid-blob"
+          d="M10 9C15 5 23 5 28 8C33 12 34 18 30 23C27 28 21 31 16 29C11 27 6 22 6 16C5 11 6 13 10 9Z"
+          fill="url(#bNavFluid)" filter="url(#bNavGlow)" opacity="0.95"/>
+        <g class="ai-fluid-caustic">
+          <ellipse cx="17" cy="13" rx="4.5" ry="3.5" fill="#00f5ff" opacity="0.9" filter="url(#bNavGlow)"/>
+          <ellipse cx="17" cy="13" rx="2.5" ry="2" fill="#fff" opacity="0.75"/>
+          <ellipse cx="20" cy="17" rx="3" ry="2.5" fill="#00d4ff" opacity="0.65" filter="url(#bNavGlow)"/>
+        </g>
+      </g>
+    </g>
+    <ellipse cx="26" cy="25" rx="7" ry="6.5" fill="url(#bNavOrb)" opacity="0.9" class="ai-fluid-inner"/>
+    <g class="ai-fluid-satellite-1">
+      <circle cx="34" cy="20" r="3.5" fill="url(#bNavOrb)" stroke="#00f5ff" stroke-width="0.6" filter="url(#bNavGlow)"/>
+      <circle cx="34" cy="20" r="2.5" fill="#000510" opacity="0.95"/>
+      <circle cx="33" cy="18.5" r="1" fill="#00f5ff" opacity="0.6"/>
+    </g>
+    <g class="ai-fluid-satellite-2">
+      <circle cx="36" cy="26" r="2.5" fill="url(#bNavOrb)" stroke="#00ccff" stroke-width="0.5" filter="url(#bNavGlow)"/>
+      <circle cx="36" cy="26" r="1.7" fill="#000510" opacity="0.95"/>
+      <circle cx="35" cy="24.5" r="0.7" fill="#00e5ff" opacity="0.55"/>
+    </g>
+    <g class="ai-fluid-satellite-3">
+      <circle cx="35" cy="31" r="1.8" fill="url(#bNavOrb)" stroke="#0088ff" stroke-width="0.4" filter="url(#bNavGlow)"/>
+      <circle cx="35" cy="31" r="1.2" fill="#000510" opacity="0.95"/>
+    </g>
+    <path class="ai-fluid-rim" d="M35 34 Q40 30 41 26 Q42 21 38.5 17" stroke="rgba(255,255,255,0.85)" stroke-width="0.8" stroke-linecap="round" fill="none" opacity="0.7"/>
+  </svg>
+</span>
           <span>AI Advisor</span>
         </a>
         <a href="/fees/">Fees</a>
@@ -127,7 +185,65 @@
       <a href="/#calculator">Calculator</a>
       <a class="active" href="/bulk/">Bulk Sourcing</a>
       <a href="/advisor/">
-          <span class="ai-fluid-logo nav-fluid-logo" aria-hidden="true"><svg class="ai-fluid-svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ai-fl-glow-bulk-nav" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#0066ff" stop-opacity="0.45"/><stop offset="60%" stop-color="#00d4ff" stop-opacity="0.18"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient><linearGradient id="ai-fl-body-bulk-nav" x1="8" y1="8" x2="40" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#00f5ff"/><stop offset="35%" stop-color="#0066ff"/><stop offset="70%" stop-color="#002288"/><stop offset="100%" stop-color="#050816"/></linearGradient><linearGradient id="ai-fl-rim-bulk-nav" x1="10" y1="6" x2="38" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/><stop offset="25%" stop-color="#00f5ff" stop-opacity="0.6"/><stop offset="60%" stop-color="#0033aa" stop-opacity="0.2"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0.8"/></linearGradient><radialGradient id="ai-fl-caustic-bulk-nav" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#ffffff"/><stop offset="30%" stop-color="#00f5ff"/><stop offset="70%" stop-color="#0055ff"/><stop offset="100%" stop-color="#002277"/></radialGradient></defs><circle cx="24" cy="24" r="22" fill="url(#ai-fl-glow-bulk-nav)"/><path class="ai-fluid-rim" d="M24 6C14.06 6 6 14.06 6 24C6 33.94 14.06 42 24 42C33.94 42 42 33.94 42 24C42 14.06 33.94 6 24 6ZM24 33C19.03 33 15 28.97 15 24C15 19.03 19.03 15 24 15C28.97 15 33 19.03 33 24C33 28.97 28.97 33 24 33Z" fill="#060913" stroke="url(#ai-fl-rim-bulk-nav)" stroke-width="0.8" opacity="0.92"/><g class="ai-fluid-core"><path class="ai-fluid-blob" d="M16 11C21 8 28 8 33 12C38 16 39 24 36 29C33 34 26 36 21 34C16 32 12 28 11 23C10 18 12 13 16 11Z" fill="url(#ai-fl-body-bulk-nav)"/><path d="M24 17C20.13 17 17 20.13 17 24C17 27.87 20.13 31 24 31C27.87 31 31 27.87 31 24C31 20.13 27.87 17 24 17Z" fill="#04060d"/><g class="ai-fluid-caustic"><circle cx="21" cy="15" r="5" fill="url(#ai-fl-caustic-bulk-nav)"/><circle cx="21" cy="15" r="3.2" fill="#00f5ff" opacity="0.9"/><circle cx="20.5" cy="14.5" r="1.4" fill="#ffffff"/><circle cx="29" cy="18" r="3.5" fill="url(#ai-fl-caustic-bulk-nav)"/><circle cx="29" cy="18" r="1.8" fill="#00f5ff"/><circle cx="28.7" cy="17.7" r="0.8" fill="#ffffff"/></g></g><circle class="ai-fluid-satellite-1" cx="36" cy="23" r="2.2" fill="#00d4ff" stroke="#ffffff" stroke-width="0.4"/><circle class="ai-fluid-satellite-2" cx="13" cy="27" r="1.6" fill="#00f5ff"/><circle class="ai-fluid-satellite-1" cx="31" cy="33" r="1.2" fill="#0088ff"/><path d="M12 18C13 14 17 9 22 7.5" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round" opacity="0.85"/><path d="M36 20C37.5 24 37 28 34.5 32" stroke="url(#ai-fl-rim-bulk-nav)" stroke-width="0.9" stroke-linecap="round" opacity="0.75"/></svg></span>
+          <span class="ai-fluid-logo nav-fluid-logo" aria-hidden="true">
+<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="bMobAtmo" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"  stop-color="#0066ff" stop-opacity="0.5"/>
+        <stop offset="100%" stop-color="#000"   stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="bMobBody" cx="38%" cy="35%" r="62%">
+        <stop offset="0%"   stop-color="#040818"/>
+        <stop offset="100%" stop-color="#000205"/>
+      </radialGradient>
+      <radialGradient id="bMobFluid" cx="28%" cy="24%" r="76%">
+        <stop offset="0%"   stop-color="#00f5ff"/>
+        <stop offset="30%"  stop-color="#0077ff"/>
+        <stop offset="70%"  stop-color="#002299"/>
+        <stop offset="100%" stop-color="#000a2e" stop-opacity="0.6"/>
+      </radialGradient>
+      <radialGradient id="bMobOrb" cx="35%" cy="32%" r="65%">
+        <stop offset="0%"   stop-color="#000510"/>
+        <stop offset="100%" stop-color="#000205"/>
+      </radialGradient>
+      <filter id="bMobGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur"/>
+        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+      </filter>
+      <clipPath id="bMobClip"><circle cx="24" cy="24" r="21"/></clipPath>
+    </defs>
+    <circle cx="24" cy="24" r="23" fill="url(#bMobAtmo)" opacity="0.6"/>
+    <circle cx="24" cy="24" r="21" fill="url(#bMobBody)" stroke="rgba(0,210,255,0.25)" stroke-width="0.5" class="ai-fluid-inner"/>
+    <g clip-path="url(#bMobClip)">
+      <g class="ai-fluid-core">
+        <path class="ai-fluid-blob"
+          d="M10 9C15 5 23 5 28 8C33 12 34 18 30 23C27 28 21 31 16 29C11 27 6 22 6 16C5 11 6 13 10 9Z"
+          fill="url(#bMobFluid)" filter="url(#bMobGlow)" opacity="0.95"/>
+        <g class="ai-fluid-caustic">
+          <ellipse cx="17" cy="13" rx="4.5" ry="3.5" fill="#00f5ff" opacity="0.9" filter="url(#bMobGlow)"/>
+          <ellipse cx="17" cy="13" rx="2.5" ry="2" fill="#fff" opacity="0.75"/>
+          <ellipse cx="20" cy="17" rx="3" ry="2.5" fill="#00d4ff" opacity="0.65" filter="url(#bMobGlow)"/>
+        </g>
+      </g>
+    </g>
+    <ellipse cx="26" cy="25" rx="7" ry="6.5" fill="url(#bMobOrb)" opacity="0.9" class="ai-fluid-inner"/>
+    <g class="ai-fluid-satellite-1">
+      <circle cx="34" cy="20" r="3.5" fill="url(#bMobOrb)" stroke="#00f5ff" stroke-width="0.6" filter="url(#bMobGlow)"/>
+      <circle cx="34" cy="20" r="2.5" fill="#000510" opacity="0.95"/>
+      <circle cx="33" cy="18.5" r="1" fill="#00f5ff" opacity="0.6"/>
+    </g>
+    <g class="ai-fluid-satellite-2">
+      <circle cx="36" cy="26" r="2.5" fill="url(#bMobOrb)" stroke="#00ccff" stroke-width="0.5" filter="url(#bMobGlow)"/>
+      <circle cx="36" cy="26" r="1.7" fill="#000510" opacity="0.95"/>
+      <circle cx="35" cy="24.5" r="0.7" fill="#00e5ff" opacity="0.55"/>
+    </g>
+    <g class="ai-fluid-satellite-3">
+      <circle cx="35" cy="31" r="1.8" fill="url(#bMobOrb)" stroke="#0088ff" stroke-width="0.4" filter="url(#bMobGlow)"/>
+      <circle cx="35" cy="31" r="1.2" fill="#000510" opacity="0.95"/>
+    </g>
+    <path class="ai-fluid-rim" d="M35 34 Q40 30 41 26 Q42 21 38.5 17" stroke="rgba(255,255,255,0.85)" stroke-width="0.8" stroke-linecap="round" fill="none" opacity="0.7"/>
+  </svg>
+</span>
           <span>AI Advisor</span>
         </a>
       <a href="/fees/">Fees</a>
@@ -161,7 +277,65 @@
           <button type="button" class="button button-quiet" id="load-demo-btn" title="Reload demo products">Reset Demo</button>
           <button type="button" class="button button-primary" id="open-upload-btn">+ Ingest Supplier CSV</button>
           <button type="button" class="button button-ai-advice" id="ai-portfolio-advice-btn" title="Run AI Portfolio Intelligence Audit on active catalog">
-            <span class="ai-fluid-logo btn-fluid-logo" aria-hidden="true"><svg class="ai-fluid-svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ai-fl-glow-bulk-btn" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#0066ff" stop-opacity="0.45"/><stop offset="60%" stop-color="#00d4ff" stop-opacity="0.18"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient><linearGradient id="ai-fl-body-bulk-btn" x1="8" y1="8" x2="40" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#00f5ff"/><stop offset="35%" stop-color="#0066ff"/><stop offset="70%" stop-color="#002288"/><stop offset="100%" stop-color="#050816"/></linearGradient><linearGradient id="ai-fl-rim-bulk-btn" x1="10" y1="6" x2="38" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/><stop offset="25%" stop-color="#00f5ff" stop-opacity="0.6"/><stop offset="60%" stop-color="#0033aa" stop-opacity="0.2"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0.8"/></linearGradient><radialGradient id="ai-fl-caustic-bulk-btn" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#ffffff"/><stop offset="30%" stop-color="#00f5ff"/><stop offset="70%" stop-color="#0055ff"/><stop offset="100%" stop-color="#002277"/></radialGradient></defs><circle cx="24" cy="24" r="22" fill="url(#ai-fl-glow-bulk-btn)"/><path class="ai-fluid-rim" d="M24 6C14.06 6 6 14.06 6 24C6 33.94 14.06 42 24 42C33.94 42 42 33.94 42 24C42 14.06 33.94 6 24 6ZM24 33C19.03 33 15 28.97 15 24C15 19.03 19.03 15 24 15C28.97 15 33 19.03 33 24C33 28.97 28.97 33 24 33Z" fill="#060913" stroke="url(#ai-fl-rim-bulk-btn)" stroke-width="0.8" opacity="0.92"/><g class="ai-fluid-core"><path class="ai-fluid-blob" d="M16 11C21 8 28 8 33 12C38 16 39 24 36 29C33 34 26 36 21 34C16 32 12 28 11 23C10 18 12 13 16 11Z" fill="url(#ai-fl-body-bulk-btn)"/><path d="M24 17C20.13 17 17 20.13 17 24C17 27.87 20.13 31 24 31C27.87 31 31 27.87 31 24C31 20.13 27.87 17 24 17Z" fill="#04060d"/><g class="ai-fluid-caustic"><circle cx="21" cy="15" r="5" fill="url(#ai-fl-caustic-bulk-btn)"/><circle cx="21" cy="15" r="3.2" fill="#00f5ff" opacity="0.9"/><circle cx="20.5" cy="14.5" r="1.4" fill="#ffffff"/><circle cx="29" cy="18" r="3.5" fill="url(#ai-fl-caustic-bulk-btn)"/><circle cx="29" cy="18" r="1.8" fill="#00f5ff"/><circle cx="28.7" cy="17.7" r="0.8" fill="#ffffff"/></g></g><circle class="ai-fluid-satellite-1" cx="36" cy="23" r="2.2" fill="#00d4ff" stroke="#ffffff" stroke-width="0.4"/><circle class="ai-fluid-satellite-2" cx="13" cy="27" r="1.6" fill="#00f5ff"/><circle class="ai-fluid-satellite-1" cx="31" cy="33" r="1.2" fill="#0088ff"/><path d="M12 18C13 14 17 9 22 7.5" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round" opacity="0.85"/><path d="M36 20C37.5 24 37 28 34.5 32" stroke="url(#ai-fl-rim-bulk-btn)" stroke-width="0.9" stroke-linecap="round" opacity="0.75"/></svg></span>
+            <span class="ai-fluid-logo btn-fluid-logo" aria-hidden="true">
+<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="bBtnAtmo" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"  stop-color="#0066ff" stop-opacity="0.5"/>
+        <stop offset="100%" stop-color="#000"   stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="bBtnBody" cx="38%" cy="35%" r="62%">
+        <stop offset="0%"   stop-color="#040818"/>
+        <stop offset="100%" stop-color="#000205"/>
+      </radialGradient>
+      <radialGradient id="bBtnFluid" cx="28%" cy="24%" r="76%">
+        <stop offset="0%"   stop-color="#00f5ff"/>
+        <stop offset="30%"  stop-color="#0077ff"/>
+        <stop offset="70%"  stop-color="#002299"/>
+        <stop offset="100%" stop-color="#000a2e" stop-opacity="0.6"/>
+      </radialGradient>
+      <radialGradient id="bBtnOrb" cx="35%" cy="32%" r="65%">
+        <stop offset="0%"   stop-color="#000510"/>
+        <stop offset="100%" stop-color="#000205"/>
+      </radialGradient>
+      <filter id="bBtnGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur"/>
+        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+      </filter>
+      <clipPath id="bBtnClip"><circle cx="24" cy="24" r="21"/></clipPath>
+    </defs>
+    <circle cx="24" cy="24" r="23" fill="url(#bBtnAtmo)" opacity="0.6"/>
+    <circle cx="24" cy="24" r="21" fill="url(#bBtnBody)" stroke="rgba(0,210,255,0.25)" stroke-width="0.5" class="ai-fluid-inner"/>
+    <g clip-path="url(#bBtnClip)">
+      <g class="ai-fluid-core">
+        <path class="ai-fluid-blob"
+          d="M10 9C15 5 23 5 28 8C33 12 34 18 30 23C27 28 21 31 16 29C11 27 6 22 6 16C5 11 6 13 10 9Z"
+          fill="url(#bBtnFluid)" filter="url(#bBtnGlow)" opacity="0.95"/>
+        <g class="ai-fluid-caustic">
+          <ellipse cx="17" cy="13" rx="4.5" ry="3.5" fill="#00f5ff" opacity="0.9" filter="url(#bBtnGlow)"/>
+          <ellipse cx="17" cy="13" rx="2.5" ry="2" fill="#fff" opacity="0.75"/>
+          <ellipse cx="20" cy="17" rx="3" ry="2.5" fill="#00d4ff" opacity="0.65" filter="url(#bBtnGlow)"/>
+        </g>
+      </g>
+    </g>
+    <ellipse cx="26" cy="25" rx="7" ry="6.5" fill="url(#bBtnOrb)" opacity="0.9" class="ai-fluid-inner"/>
+    <g class="ai-fluid-satellite-1">
+      <circle cx="34" cy="20" r="3.5" fill="url(#bBtnOrb)" stroke="#00f5ff" stroke-width="0.6" filter="url(#bBtnGlow)"/>
+      <circle cx="34" cy="20" r="2.5" fill="#000510" opacity="0.95"/>
+      <circle cx="33" cy="18.5" r="1" fill="#00f5ff" opacity="0.6"/>
+    </g>
+    <g class="ai-fluid-satellite-2">
+      <circle cx="36" cy="26" r="2.5" fill="url(#bBtnOrb)" stroke="#00ccff" stroke-width="0.5" filter="url(#bBtnGlow)"/>
+      <circle cx="36" cy="26" r="1.7" fill="#000510" opacity="0.95"/>
+      <circle cx="35" cy="24.5" r="0.7" fill="#00e5ff" opacity="0.55"/>
+    </g>
+    <g class="ai-fluid-satellite-3">
+      <circle cx="35" cy="31" r="1.8" fill="url(#bBtnOrb)" stroke="#0088ff" stroke-width="0.4" filter="url(#bBtnGlow)"/>
+      <circle cx="35" cy="31" r="1.2" fill="#000510" opacity="0.95"/>
+    </g>
+    <path class="ai-fluid-rim" d="M35 34 Q40 30 41 26 Q42 21 38.5 17" stroke="rgba(255,255,255,0.85)" stroke-width="0.8" stroke-linecap="round" fill="none" opacity="0.7"/>
+  </svg>
+</span>
             <span>AI Portfolio Advice</span>
           </button>
         </div>
@@ -551,7 +725,65 @@
     <div class="ai-portfolio-modal-dialog">
       <div class="ai-portfolio-header">
         <div style="display: flex; align-items: center; gap: 10px;">
-          <span class="ai-fluid-logo modal-fluid-logo" aria-hidden="true"><svg class="ai-fluid-svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ai-fl-glow-bulk-modal" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#0066ff" stop-opacity="0.45"/><stop offset="60%" stop-color="#00d4ff" stop-opacity="0.18"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient><linearGradient id="ai-fl-body-bulk-modal" x1="8" y1="8" x2="40" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#00f5ff"/><stop offset="35%" stop-color="#0066ff"/><stop offset="70%" stop-color="#002288"/><stop offset="100%" stop-color="#050816"/></linearGradient><linearGradient id="ai-fl-rim-bulk-modal" x1="10" y1="6" x2="38" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/><stop offset="25%" stop-color="#00f5ff" stop-opacity="0.6"/><stop offset="60%" stop-color="#0033aa" stop-opacity="0.2"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0.8"/></linearGradient><radialGradient id="ai-fl-caustic-bulk-modal" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#ffffff"/><stop offset="30%" stop-color="#00f5ff"/><stop offset="70%" stop-color="#0055ff"/><stop offset="100%" stop-color="#002277"/></radialGradient></defs><circle cx="24" cy="24" r="22" fill="url(#ai-fl-glow-bulk-modal)"/><path class="ai-fluid-rim" d="M24 6C14.06 6 6 14.06 6 24C6 33.94 14.06 42 24 42C33.94 42 42 33.94 42 24C42 14.06 33.94 6 24 6ZM24 33C19.03 33 15 28.97 15 24C15 19.03 19.03 15 24 15C28.97 15 33 19.03 33 24C33 28.97 28.97 33 24 33Z" fill="#060913" stroke="url(#ai-fl-rim-bulk-modal)" stroke-width="0.8" opacity="0.92"/><g class="ai-fluid-core"><path class="ai-fluid-blob" d="M16 11C21 8 28 8 33 12C38 16 39 24 36 29C33 34 26 36 21 34C16 32 12 28 11 23C10 18 12 13 16 11Z" fill="url(#ai-fl-body-bulk-modal)"/><path d="M24 17C20.13 17 17 20.13 17 24C17 27.87 20.13 31 24 31C27.87 31 31 27.87 31 24C31 20.13 27.87 17 24 17Z" fill="#04060d"/><g class="ai-fluid-caustic"><circle cx="21" cy="15" r="5" fill="url(#ai-fl-caustic-bulk-modal)"/><circle cx="21" cy="15" r="3.2" fill="#00f5ff" opacity="0.9"/><circle cx="20.5" cy="14.5" r="1.4" fill="#ffffff"/><circle cx="29" cy="18" r="3.5" fill="url(#ai-fl-caustic-bulk-modal)"/><circle cx="29" cy="18" r="1.8" fill="#00f5ff"/><circle cx="28.7" cy="17.7" r="0.8" fill="#ffffff"/></g></g><circle class="ai-fluid-satellite-1" cx="36" cy="23" r="2.2" fill="#00d4ff" stroke="#ffffff" stroke-width="0.4"/><circle class="ai-fluid-satellite-2" cx="13" cy="27" r="1.6" fill="#00f5ff"/><circle class="ai-fluid-satellite-1" cx="31" cy="33" r="1.2" fill="#0088ff"/><path d="M12 18C13 14 17 9 22 7.5" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round" opacity="0.85"/><path d="M36 20C37.5 24 37 28 34.5 32" stroke="url(#ai-fl-rim-bulk-modal)" stroke-width="0.9" stroke-linecap="round" opacity="0.75"/></svg></span>
+          <span class="ai-fluid-logo modal-fluid-logo" aria-hidden="true">
+<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="bModalAtmo" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"  stop-color="#0066ff" stop-opacity="0.5"/>
+        <stop offset="100%" stop-color="#000"   stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="bModalBody" cx="38%" cy="35%" r="62%">
+        <stop offset="0%"   stop-color="#040818"/>
+        <stop offset="100%" stop-color="#000205"/>
+      </radialGradient>
+      <radialGradient id="bModalFluid" cx="28%" cy="24%" r="76%">
+        <stop offset="0%"   stop-color="#00f5ff"/>
+        <stop offset="30%"  stop-color="#0077ff"/>
+        <stop offset="70%"  stop-color="#002299"/>
+        <stop offset="100%" stop-color="#000a2e" stop-opacity="0.6"/>
+      </radialGradient>
+      <radialGradient id="bModalOrb" cx="35%" cy="32%" r="65%">
+        <stop offset="0%"   stop-color="#000510"/>
+        <stop offset="100%" stop-color="#000205"/>
+      </radialGradient>
+      <filter id="bModalGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur"/>
+        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+      </filter>
+      <clipPath id="bModalClip"><circle cx="24" cy="24" r="21"/></clipPath>
+    </defs>
+    <circle cx="24" cy="24" r="23" fill="url(#bModalAtmo)" opacity="0.6"/>
+    <circle cx="24" cy="24" r="21" fill="url(#bModalBody)" stroke="rgba(0,210,255,0.25)" stroke-width="0.5" class="ai-fluid-inner"/>
+    <g clip-path="url(#bModalClip)">
+      <g class="ai-fluid-core">
+        <path class="ai-fluid-blob"
+          d="M10 9C15 5 23 5 28 8C33 12 34 18 30 23C27 28 21 31 16 29C11 27 6 22 6 16C5 11 6 13 10 9Z"
+          fill="url(#bModalFluid)" filter="url(#bModalGlow)" opacity="0.95"/>
+        <g class="ai-fluid-caustic">
+          <ellipse cx="17" cy="13" rx="4.5" ry="3.5" fill="#00f5ff" opacity="0.9" filter="url(#bModalGlow)"/>
+          <ellipse cx="17" cy="13" rx="2.5" ry="2" fill="#fff" opacity="0.75"/>
+          <ellipse cx="20" cy="17" rx="3" ry="2.5" fill="#00d4ff" opacity="0.65" filter="url(#bModalGlow)"/>
+        </g>
+      </g>
+    </g>
+    <ellipse cx="26" cy="25" rx="7" ry="6.5" fill="url(#bModalOrb)" opacity="0.9" class="ai-fluid-inner"/>
+    <g class="ai-fluid-satellite-1">
+      <circle cx="34" cy="20" r="3.5" fill="url(#bModalOrb)" stroke="#00f5ff" stroke-width="0.6" filter="url(#bModalGlow)"/>
+      <circle cx="34" cy="20" r="2.5" fill="#000510" opacity="0.95"/>
+      <circle cx="33" cy="18.5" r="1" fill="#00f5ff" opacity="0.6"/>
+    </g>
+    <g class="ai-fluid-satellite-2">
+      <circle cx="36" cy="26" r="2.5" fill="url(#bModalOrb)" stroke="#00ccff" stroke-width="0.5" filter="url(#bModalGlow)"/>
+      <circle cx="36" cy="26" r="1.7" fill="#000510" opacity="0.95"/>
+      <circle cx="35" cy="24.5" r="0.7" fill="#00e5ff" opacity="0.55"/>
+    </g>
+    <g class="ai-fluid-satellite-3">
+      <circle cx="35" cy="31" r="1.8" fill="url(#bModalOrb)" stroke="#0088ff" stroke-width="0.4" filter="url(#bModalGlow)"/>
+      <circle cx="35" cy="31" r="1.2" fill="#000510" opacity="0.95"/>
+    </g>
+    <path class="ai-fluid-rim" d="M35 34 Q40 30 41 26 Q42 21 38.5 17" stroke="rgba(255,255,255,0.85)" stroke-width="0.8" stroke-linecap="round" fill="none" opacity="0.7"/>
+  </svg>
+</span>
           <h2 class="modal-title" id="ai-portfolio-modal-title" style="margin: 0; font-size: 16px;">AI Portfolio Intelligence Audit</h2>
         </div>
         <button type="button" class="modal-close-btn" data-close-modal aria-label="Close modal">✕</button>
