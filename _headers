@@ -26,6 +26,10 @@ https://:version.:project.pages.dev/*
   Content-Type: text/plain; charset=utf-8
   Cache-Control: public, max-age=3600
 
+/styles.v2.css
+  Content-Type: text/css; charset=utf-8
+  Cache-Control: public, max-age=0, must-revalidate
+
 /styles.css
   Cache-Control: public, max-age=0, must-revalidate
   Cloudflare-CDN-Cache-Control: max-age=0, must-revalidate
