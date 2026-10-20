@@ -1416,6 +1416,25 @@ if (typeof document !== "undefined" && typeof window !== "undefined") {
 
   $("#reset")?.addEventListener("click", resetCalculator);
   $("#mobile-reset")?.addEventListener("click", resetCalculator);
+
+  const handleAskAiAdvisor = () => {
+    const priceVal = $("#price")?.value || "0";
+    const shipVal = $("#shipping")?.value || "0";
+    const itemCostVal = $("#item-cost")?.value || "0";
+    const postageVal = $("#shipping-cost")?.value || "0";
+    const netProfitText = $("#net-profit-ledger")?.textContent || "";
+    const marginText = $("#margin-card")?.textContent || "";
+    const isOffsite = $("#offsite-15")?.checked ? "with 15% Offsite Ads" : ($("#offsite-12")?.checked ? "with 12% Offsite Ads" : "without Offsite Ads");
+    const countryRule = resolveCountryFeeRule(activeCountryCode);
+    const countryName = countryRule?.name || activeCountryCode;
+
+    const prompt = "I am selling an item in " + countryName + " for $" + priceVal + " with $" + shipVal + " buyer shipping. My production cost is $" + itemCostVal + " and postage is $" + postageVal + " (" + isOffsite + "). Estimated net profit is " + netProfitText + " (" + marginText + "). Please audit my unit economics, identify fee risks, and suggest target pricing optimizations for higher profit margin.";
+
+    window.location.href = "/advisor/?q=" + encodeURIComponent(prompt);
+  };
+
+  $("#calc-ask-ai-btn")?.addEventListener("click", handleAskAiAdvisor);
+  $("#mobile-ask-ai-btn")?.addEventListener("click", handleAskAiAdvisor);
   $("#theme-toggle")?.addEventListener("click", () => {
     const next = document.body.classList.contains("dark") ? "light" : "dark";
     setTheme(next); store.set("shopprofit-theme", next);

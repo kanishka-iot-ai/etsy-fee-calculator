@@ -1654,6 +1654,205 @@ function handleExportXlsx() {
 }
 
 /**
+ * Opens the AI Portfolio Intelligence & Sourcing Advice Modal.
+ * Analyzes the active catalog dataset in memory and surfaces strategic recommendations.
+ * 100% private, zero network calls, safe text nodes only.
+ */
+function openAiPortfolioAdviceModal() {
+  const modal = document.getElementById("ai-portfolio-advice-modal");
+  const content = document.getElementById("ai-portfolio-advice-content");
+  if (!modal || !content) return;
+
+  content.replaceChildren();
+
+  const dataset = state.analyzedResults;
+  const summary = state.summary || summarizeCatalog(dataset);
+  const countryRule = resolveCountryFeeRule(state.settings.country);
+
+  if (!dataset || dataset.length === 0) {
+    const emptyCard = document.createElement("div");
+    emptyCard.className = "ai-portfolio-grade-card";
+    const msg = document.createElement("p");
+    msg.textContent = "No catalog products currently loaded. Please load a supplier catalog or the demo products to generate an AI portfolio audit.";
+    emptyCard.appendChild(msg);
+    content.appendChild(emptyCard);
+    modal.classList.add("modal--open");
+    return;
+  }
+
+  // Calculate deep catalog diagnostics
+  const totalCount = summary.totalCount || dataset.length;
+  const totalRevenue = summary.totalRevenue || 0;
+  const totalProfit = summary.totalProfit || 0;
+  const avgMargin = summary.averageMarginPct || 0;
+  const lossItems = dataset.filter((r) => r.netProfit < 0);
+  const adsRiskItems = dataset.filter((r) => r.offsiteRisk || (typeof r.netProfitWithAds === "number" && r.netProfitWithAds < 0));
+  const winnerItems = dataset.filter((r) => r.marginPct >= 30);
+
+  // Health Score Calculation
+  let healthScore = 100;
+  if (totalCount > 0) {
+    healthScore -= (lossItems.length / totalCount) * 45;
+    healthScore -= (adsRiskItems.length / totalCount) * 25;
+    if (avgMargin < 20) healthScore -= 15;
+  }
+  healthScore = Math.max(10, Math.min(100, Math.round(healthScore)));
+
+  let healthGrade = "A";
+  let gradeClass = "positive";
+  let gradeLabel = "Resilient & High-Margin Portfolio";
+  if (healthScore < 60) {
+    healthGrade = "C";
+    gradeClass = "negative";
+    gradeLabel = "Vulnerable to Fee Traps & Ads Risk";
+  } else if (healthScore < 80) {
+    healthGrade = "B";
+    gradeClass = "subtle";
+    gradeLabel = "Moderate Profit Stability (Adjustments Advised)";
+  }
+
+  // 1. Portfolio Health Grade Card
+  const gradeCard = document.createElement("div");
+  gradeCard.className = "ai-portfolio-grade-card";
+
+  const gradeLeft = document.createElement("div");
+  const gradeTitle = document.createElement("div");
+  gradeTitle.style.fontWeight = "700";
+  gradeTitle.style.fontSize = "15px";
+  gradeTitle.style.marginBottom = "4px";
+  gradeTitle.textContent = "Portfolio Health Score: " + healthScore + "/100";
+
+  const gradeSub = document.createElement("div");
+  gradeSub.style.fontSize = "12px";
+  gradeSub.style.color = "var(--muted)";
+  gradeSub.textContent = gradeLabel + " across " + totalCount + " catalog SKUs in " + countryRule.name + ".";
+  gradeLeft.append(gradeTitle, gradeSub);
+
+  const gradeBadge = document.createElement("div");
+  gradeBadge.className = "ai-portfolio-grade-badge status-" + gradeClass;
+  gradeBadge.style.background = healthScore >= 80 ? "#ecfdf5" : (healthScore >= 60 ? "#fef9c3" : "#fef2f2");
+  gradeBadge.style.color = healthScore >= 80 ? "#065f46" : (healthScore >= 60 ? "#854d0e" : "#991b1b");
+  gradeBadge.textContent = "GRADE " + healthGrade;
+
+  gradeCard.append(gradeLeft, gradeBadge);
+  content.appendChild(gradeCard);
+
+  // 2. Three Pillar Metric Cards
+  const pillarsWrap = document.createElement("div");
+  pillarsWrap.className = "ai-portfolio-pillars";
+
+  const p1 = document.createElement("div");
+  p1.className = "ai-pillar-card";
+  const p1Lbl = document.createElement("div");
+  p1Lbl.className = "ai-pillar-card__label";
+  p1Lbl.textContent = "Deficit Loss Items";
+  const p1Val = document.createElement("div");
+  p1Val.className = "ai-pillar-card__value";
+  p1Val.style.color = lossItems.length > 0 ? "var(--negative)" : "var(--positive)";
+  p1Val.textContent = String(lossItems.length);
+  const p1Sub = document.createElement("div");
+  p1Sub.className = "ai-pillar-card__sub";
+  p1Sub.textContent = lossItems.length > 0 ? "SKUs losing money on direct orders" : "Zero negative-margin items";
+  p1.append(p1Lbl, p1Val, p1Sub);
+
+  const p2 = document.createElement("div");
+  p2.className = "ai-pillar-card";
+  const p2Lbl = document.createElement("div");
+  p2Lbl.className = "ai-pillar-card__label";
+  p2Lbl.textContent = "15% Ads Vulnerable";
+  const p2Val = document.createElement("div");
+  p2Val.className = "ai-pillar-card__value";
+  p2Val.style.color = adsRiskItems.length > 0 ? "#d97706" : "var(--positive)";
+  p2Val.textContent = String(adsRiskItems.length);
+  const p2Sub = document.createElement("div");
+  p2Sub.className = "ai-pillar-card__sub";
+  p2Sub.textContent = adsRiskItems.length > 0 ? "SKUs at net loss if sold via Offsite Ads" : "All SKUs withstand 15% ad fee";
+  p2.append(p2Lbl, p2Val, p2Sub);
+
+  const p3 = document.createElement("div");
+  p3.className = "ai-pillar-card";
+  const p3Lbl = document.createElement("div");
+  p3Lbl.className = "ai-pillar-card__label";
+  p3Lbl.textContent = "Optimal Winners";
+  const p3Val = document.createElement("div");
+  p3Val.className = "ai-pillar-card__value";
+  p3Val.style.color = "var(--positive)";
+  p3Val.textContent = String(winnerItems.length);
+  const p3Sub = document.createElement("div");
+  p3Sub.className = "ai-pillar-card__sub";
+  p3Sub.textContent = ">=30% margin (" + ((winnerItems.length / Math.max(1, totalCount)) * 100).toFixed(0) + "% of catalog)";
+  p3.append(p3Lbl, p3Val, p3Sub);
+
+  pillarsWrap.append(p1, p2, p3);
+  content.appendChild(pillarsWrap);
+
+  // 3. Strategic Action Recommendations
+  const recSection = document.createElement("div");
+  recSection.className = "ai-recommendations-list";
+
+  const recHeader = document.createElement("strong");
+  recHeader.style.fontSize = "13px";
+  recHeader.textContent = "AI Executive Strategic Recommendations:";
+  recSection.appendChild(recHeader);
+
+  // Recommendation 1: Loss item mitigation
+  const rec1 = document.createElement("div");
+  rec1.className = "ai-rec-item";
+  const icon1 = document.createElement("span");
+  icon1.className = "ai-rec-icon";
+  icon1.textContent = "1.";
+  const text1 = document.createElement("span");
+  if (lossItems.length > 0) {
+    const firstLoss = lossItems[0];
+    const lossDiff = Math.abs(firstLoss.netProfit || 1).toFixed(2);
+    text1.textContent = "Immediate Action: " + lossItems.length + " SKU(s) (including \"" + (firstLoss.title || firstLoss.sku) + "\") produce negative take-home. Raise retail price by at least $" + lossDiff + " or renegotiate base supplier wholesale to cross the unit break-even threshold.";
+  } else {
+    text1.textContent = "Healthy Unit Economics: Zero SKUs are selling at an outright loss. All products currently cover base materials, postage, and Etsy platform deductions.";
+  }
+  rec1.append(icon1, text1);
+  recSection.appendChild(rec1);
+
+  // Recommendation 2: Offsite ads risk
+  const rec2 = document.createElement("div");
+  rec2.className = "ai-rec-item";
+  const icon2 = document.createElement("span");
+  icon2.className = "ai-rec-icon";
+  icon2.textContent = "2.";
+  const text2 = document.createElement("span");
+  if (adsRiskItems.length > 0) {
+    text2.textContent = "Offsite Ads Shielding: " + adsRiskItems.length + " SKU(s) are vulnerable to Etsy's 15% advertising deduction. If your shop volume is approaching $10,000 USD (where ads become mandatory), increase listing prices by 10-14% on these items to prevent uncompensated margin collapse.";
+  } else {
+    text2.textContent = "Offsite Ads Resilience: All catalog products have sufficient profit margins (>=15%) to comfortably absorb Etsy external advertising fees without causing a deficit.";
+  }
+  rec2.append(icon2, text2);
+  recSection.appendChild(rec2);
+
+  // Recommendation 3: Sourcing & pricing expansion
+  const rec3 = document.createElement("div");
+  rec3.className = "ai-rec-item";
+  const icon3 = document.createElement("span");
+  icon3.className = "ai-rec-icon";
+  icon3.textContent = "3.";
+  const text3 = document.createElement("span");
+  text3.textContent = "Capital Allocation: Prioritize inventory investments into the " + winnerItems.length + " Optimal Winner SKUs. Their average return on capital provides the buffer needed to fund store promotions and organic ranking velocity.";
+  rec3.append(icon3, text3);
+  recSection.appendChild(rec3);
+
+  content.appendChild(recSection);
+
+  // 4. Wire up Deep-Dive CTA
+  const deepDiveBtn = document.getElementById("ai-deep-dive-btn");
+  if (deepDiveBtn) {
+    deepDiveBtn.onclick = () => {
+      const promptText = "Audit my wholesale catalog of " + totalCount + " products in " + countryRule.name + ". Total gross revenue is $" + totalRevenue.toFixed(2) + ", estimated net profit is $" + totalProfit.toFixed(2) + " (" + avgMargin.toFixed(1) + "% margin). We have " + lossItems.length + " loss-making items and " + adsRiskItems.length + " items vulnerable to 15% Offsite Ads. What specific supplier pricing and catalog strategies should I implement to maximize total catalog profit?";
+      window.location.href = "/advisor/?q=" + encodeURIComponent(promptText);
+    };
+  }
+
+  modal.classList.add("modal--open");
+}
+
+/**
  * Opens the Executive PDF Profit Summary Modal with formatted C-level metrics.
  */
 function openExecutiveReportModal() {
@@ -2203,6 +2402,12 @@ export function initBulkPage() {
   const exportPdfBtn = document.getElementById("export-pdf-btn");
   if (exportPdfBtn) {
     exportPdfBtn.addEventListener("click", openExecutiveReportModal);
+  }
+
+  // AI Portfolio Advice Button
+  const aiPortfolioBtn = document.getElementById("ai-portfolio-advice-btn");
+  if (aiPortfolioBtn) {
+    aiPortfolioBtn.addEventListener("click", openAiPortfolioAdviceModal);
   }
 
   // Print Executive Report Buttons

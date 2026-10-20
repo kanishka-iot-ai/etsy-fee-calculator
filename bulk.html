@@ -104,7 +104,25 @@
       <nav class="desktop-nav" aria-label="Main navigation">
         <a href="/#calculator">Calculator</a>
         <a class="active" href="/bulk/">Bulk Sourcing</a>
-        <a href="/#seller-advisor">AI Advisor</a>
+        <a href="/advisor/">
+          <span class="ai-spark-mark nav-spark" aria-hidden="true">
+            <svg class="ai-spark-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle class="ai-orbit-ring" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3"/>
+              <path class="ai-spark-core" d="M12 2L13.8 8.2L20 10L13.8 11.8L12 18L10.2 11.8L4 10L10.2 8.2L12 2Z" fill="url(#ai-nav-grad-b)"/>
+              <circle class="ai-spark-particle" cx="12" cy="3" r="1.5" fill="#8b5cf6"/>
+              <circle class="ai-spark-particle p2" cx="19.5" cy="15" r="1.2" fill="#06b6d4"/>
+              <circle class="ai-spark-particle p3" cx="4.5" cy="15" r="1.2" fill="#c8ff00"/>
+              <defs>
+                <linearGradient id="ai-nav-grad-b" x1="4" y1="2" x2="20" y2="18" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#8b5cf6"/>
+                  <stop offset="0.5" stop-color="#06b6d4"/>
+                  <stop offset="1" stop-color="#c8ff00"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </span>
+          <span>AI Advisor</span>
+        </a>
         <a href="/fees/">Fees</a>
         <a href="/methodology/">Method</a>
         <a href="/faq/">FAQ</a>
@@ -123,7 +141,25 @@
     <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile navigation" hidden>
       <a href="/#calculator">Calculator</a>
       <a class="active" href="/bulk/">Bulk Sourcing</a>
-      <a href="/#seller-advisor">AI Advisor</a>
+      <a href="/advisor/">
+          <span class="ai-spark-mark nav-spark" aria-hidden="true">
+            <svg class="ai-spark-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle class="ai-orbit-ring" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3"/>
+              <path class="ai-spark-core" d="M12 2L13.8 8.2L20 10L13.8 11.8L12 18L10.2 11.8L4 10L10.2 8.2L12 2Z" fill="url(#ai-nav-grad-b)"/>
+              <circle class="ai-spark-particle" cx="12" cy="3" r="1.5" fill="#8b5cf6"/>
+              <circle class="ai-spark-particle p2" cx="19.5" cy="15" r="1.2" fill="#06b6d4"/>
+              <circle class="ai-spark-particle p3" cx="4.5" cy="15" r="1.2" fill="#c8ff00"/>
+              <defs>
+                <linearGradient id="ai-nav-grad-b" x1="4" y1="2" x2="20" y2="18" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#8b5cf6"/>
+                  <stop offset="0.5" stop-color="#06b6d4"/>
+                  <stop offset="1" stop-color="#c8ff00"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </span>
+          <span>AI Advisor</span>
+        </a>
       <a href="/fees/">Fees</a>
       <a href="/methodology/">Methodology</a>
       <a href="/faq/">FAQ</a>
@@ -145,6 +181,25 @@
         <div class="bulk-toolbar__group">
           <button type="button" class="button button-quiet" id="load-demo-btn">⚡ Load Demo Catalog</button>
           <button type="button" class="button button-primary" id="open-upload-btn">+ Ingest Supplier CSV</button>
+          <button type="button" class="button button-ai-advice" id="ai-portfolio-advice-btn" title="Run AI Portfolio Intelligence Audit on active catalog">
+            <span class="ai-spark-mark btn-spark" aria-hidden="true">
+              <svg class="ai-spark-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle class="ai-orbit-ring" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3"/>
+                <path class="ai-spark-core" d="M12 2L13.8 8.2L20 10L13.8 11.8L12 18L10.2 11.8L4 10L10.2 8.2L12 2Z" fill="url(#ai-port-grad)"/>
+                <circle class="ai-spark-particle" cx="12" cy="3" r="1.5" fill="#8b5cf6"/>
+                <circle class="ai-spark-particle p2" cx="19.5" cy="15" r="1.2" fill="#06b6d4"/>
+                <circle class="ai-spark-particle p3" cx="4.5" cy="15" r="1.2" fill="#c8ff00"/>
+                <defs>
+                  <linearGradient id="ai-port-grad" x1="4" y1="2" x2="20" y2="18" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#8b5cf6"/>
+                    <stop offset="0.5" stop-color="#06b6d4"/>
+                    <stop offset="1" stop-color="#c8ff00"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </span>
+            <span>AI Portfolio Advice</span>
+          </button>
         </div>
       </div>
     </section>
@@ -361,6 +416,7 @@
         <a href="/#calculator">Etsy profit calculator</a>
         <a href="/bulk/">Bulk Sourcing Analyzer</a>
         <a href="/fees/">Etsy fee calculator</a>
+        <a href="/advisor/">AI seller advisor</a>
         <a href="/etsy-pricing-calculator/">Etsy pricing calculator</a>
         <a href="/etsy-break-even-calculator/">Etsy break-even calculator</a>
         <a href="/etsy-offsite-ads-calculator/">Etsy Offsite Ads calculator</a>
@@ -386,6 +442,44 @@
       <span>Independent calculator. Not affiliated with Etsy.</span>
     </div>
   </footer>
+
+    <!-- AI Portfolio Advice Modal -->
+  <div class="modal-overlay" id="ai-portfolio-advice-modal" role="dialog" aria-modal="true" aria-labelledby="ai-portfolio-modal-title">
+    <div class="ai-portfolio-modal-dialog">
+      <div class="ai-portfolio-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="ai-spark-mark" style="width: 24px; height: 24px;" aria-hidden="true">
+            <svg class="ai-spark-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle class="ai-orbit-ring" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3"/>
+              <path class="ai-spark-core" d="M12 2L13.8 8.2L20 10L13.8 11.8L12 18L10.2 11.8L4 10L10.2 8.2L12 2Z" fill="url(#ai-spark-grad-modal)"/>
+              <circle class="ai-spark-particle" cx="12" cy="3" r="1.5" fill="#8b5cf6"/>
+              <circle class="ai-spark-particle p2" cx="19.5" cy="15" r="1.2" fill="#06b6d4"/>
+              <circle class="ai-spark-particle p3" cx="4.5" cy="15" r="1.2" fill="#c8ff00"/>
+              <defs>
+                <linearGradient id="ai-spark-grad-modal" x1="4" y1="2" x2="20" y2="18" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#8b5cf6"/>
+                  <stop offset="0.5" stop-color="#06b6d4"/>
+                  <stop offset="1" stop-color="#c8ff00"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </span>
+          <h2 class="modal-title" id="ai-portfolio-modal-title" style="margin: 0; font-size: 16px;">AI Portfolio Intelligence Audit</h2>
+        </div>
+        <button type="button" class="modal-close-btn" data-close-modal aria-label="Close modal">✕</button>
+      </div>
+      <div class="ai-portfolio-body" id="ai-portfolio-advice-content">
+        <!-- Rendered safely via text nodes in src/bulk-page.js -->
+      </div>
+      <div class="ai-portfolio-footer">
+        <button type="button" class="button button-quiet" data-close-modal>Close Audit</button>
+        <button type="button" class="button button-primary" id="ai-deep-dive-btn">
+          <span>Deep-Dive in AI Advisor</span>
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="/src/bulk-page.js"></script>
 </body>

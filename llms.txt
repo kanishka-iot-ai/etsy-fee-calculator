@@ -5,6 +5,7 @@
 ## Core Calculators & Tools
 
 - [Etsy Profit & Fee Calculator](https://shopprofitcalculator.com/): Real-time interactive calculator computing listing fees, transaction fees, payment processing, regulatory operating fees, and net profit with a binary-search target pricing solver.
+- [AI Etsy Business Advisor](https://shopprofitcalculator.com/advisor/): Verified AI intelligence engine providing deterministic pricing consultation, 15% Offsite Ads risk mitigation, and margin audits.
 - [Bulk Catalog & Sourcing Analyzer](https://shopprofitcalculator.com/bulk/): Spreadsheet-style bulk analysis tool processing up to 500 supplier SKUs with inline editing, CSV import/export, shortlist filtering, view presets, and itemized fee receipts.
 - [62-Market Etsy Fee Schedule](https://shopprofitcalculator.com/fees/): Complete itemized breakdown of Etsy seller fees across 62 countries, including domestic/international processing rates, regulatory operating fees, statutory deposit thresholds, and Offsite Ads tiers.
 - [Mathematical Methodology & Formulas](https://shopprofitcalculator.com/methodology/): Authoritative specification of the ShopProfit fee engine, binary-search break-even algorithm, and official Etsy documentation citations.

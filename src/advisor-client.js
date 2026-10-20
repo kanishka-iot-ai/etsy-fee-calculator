@@ -962,6 +962,24 @@ export function setupSellerAdvisor(options = {}) {
   renderClarificationCard();
   renderReport(null);
 
+  // Auto-populate & submit if ?q= or ?prompt= is present in URL search parameters
+  if (typeof window !== "undefined" && window.location && window.location.search) {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const initialPrompt = params.get("q") || params.get("prompt");
+      if (initialPrompt && initialPrompt.trim()) {
+        const text = initialPrompt.trim();
+        if (textarea) textarea.value = text;
+        setTimeout(() => {
+          submitQuestion(text);
+          container.scrollIntoView?.({ behavior: "smooth", block: "start" });
+        }, 50);
+      }
+    } catch {
+      // safe fallback if URLSearchParams fails
+    }
+  }
+
   return {
     submitQuestion,
     submitConfirmation,

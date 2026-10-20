@@ -14,6 +14,7 @@ const EXPECTED_SITEMAP_URLS = [
   "https://shopprofitcalculator.com/etsy-print-on-demand-calculator/",
   "https://shopprofitcalculator.com/fees/",
   "https://shopprofitcalculator.com/bulk/",
+  "https://shopprofitcalculator.com/advisor/",
   "https://shopprofitcalculator.com/methodology/",
   "https://shopprofitcalculator.com/faq/",
   "https://shopprofitcalculator.com/privacy",
@@ -23,10 +24,10 @@ const EXPECTED_SITEMAP_URLS = [
 
 const CANONICAL_PATHS = new Set(EXPECTED_SITEMAP_URLS.map(u => new URL(u).pathname));
 
-test("Phase 9C: sitemap.xml contains exactly the 16 expected canonical URLs in strict order", async () => {
+test("Phase 9C: sitemap.xml contains exactly the 17 expected canonical URLs in strict order", async () => {
   const sitemap = await readFile("sitemap.xml", "utf8");
   const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]);
-  assert.equal(locs.length, 16, "Sitemap must contain exactly 16 URLs");
+  assert.equal(locs.length, 17, "Sitemap must contain exactly 17 URLs");
   assert.deepEqual(locs, EXPECTED_SITEMAP_URLS, "Sitemap URLs must match expected canonical URLs");
 });
 
