@@ -11,14 +11,175 @@
  */
 
 import { DEFAULT_API_BASE } from "./fee-intelligence-client.js";
-import {
-  SUPPORTED_COUNTRIES,
-  FIELD_LABELS,
-  buildConfirmationPayloadFromForm,
-  buildFollowUpScenarios
-} from "./private-advisor-test.js";
 
-export { SUPPORTED_COUNTRIES, FIELD_LABELS, buildConfirmationPayloadFromForm, buildFollowUpScenarios };
+export const SUPPORTED_COUNTRIES = Object.freeze([
+  { code: "US", label: "United States (USD)" },
+  { code: "UK", label: "United Kingdom (GBP)" },
+  { code: "CA", label: "Canada (CAD)" },
+  { code: "AU", label: "Australia (AUD)" },
+  { code: "DE", label: "Germany (EUR)" },
+  { code: "FR", label: "France (EUR)" },
+  { code: "IT", label: "Italy (EUR)" },
+  { code: "ES", label: "Spain (EUR)" },
+  { code: "NL", label: "Netherlands (EUR)" },
+  { code: "IE", label: "Ireland (EUR)" },
+  { code: "AT", label: "Austria (EUR)" },
+  { code: "BE", label: "Belgium (EUR)" },
+  { code: "FI", label: "Finland (EUR)" },
+  { code: "PT", label: "Portugal (EUR)" },
+  { code: "GR", label: "Greece (EUR)" },
+  { code: "IN", label: "India (INR)" },
+  { code: "JP", label: "Japan (JPY)" },
+  { code: "TR", label: "Türkiye (TRY)" },
+  { code: "VN", label: "Vietnam (VND)" },
+  { code: "NZ", label: "New Zealand (NZD)" },
+  { code: "SG", label: "Singapore (SGD)" },
+  { code: "HK", label: "Hong Kong (HKD)" },
+  { code: "MX", label: "Mexico (MXN)" },
+  { code: "CH", label: "Switzerland (CHF)" },
+  { code: "SE", label: "Sweden (SEK)" },
+  { code: "NO", label: "Norway (NOK)" },
+  { code: "DK", label: "Denmark (DKK)" },
+  { code: "PL", label: "Poland (PLN)" }
+]);
+
+export const FIELD_LABELS = Object.freeze({
+  country: "Seller Country / Market",
+  itemPrice: "Item Listing Price",
+  shipping: "Buyer-Paid Shipping Charge",
+  freeShipping: "Explicit Free Shipping ($0 Buyer Charge)",
+  production: "Production / Materials Cost (COGS)",
+  confirmZeroProduction: "Digital / Zero Production Cost ($0 COGS)",
+  packaging: "Packaging Cost",
+  shippingCost: "Your Actual Postage / Label Cost",
+  targetProfit: "Target Net Profit Amount",
+  targetMarginPct: "Target Net Margin (%)",
+  orderType: "Order Type (Domestic vs International)",
+  offsiteAds: "Include Etsy Offsite Ads",
+  offsiteRate: "Offsite Ads Rate (12% or 15%)"
+});
+
+function parseOptionalNumber(raw) {
+  if (raw === undefined || raw === null) return undefined;
+  if (typeof raw === "number") {
+    return Number.isFinite(raw) ? raw : NaN;
+  }
+  const trimmed = String(raw).trim();
+  if (trimmed === "") return undefined;
+  const num = Number(trimmed);
+  return Number.isFinite(num) ? num : NaN;
+}
+
+export function buildConfirmationPayloadFromForm(formState = {}) {
+  const confirmedInputs = {};
+
+  if (typeof formState.country === "string" && formState.country.trim().length > 0) {
+    confirmedInputs.country = formState.country.trim().toUpperCase();
+  }
+
+  const numericKeys = [
+    "itemPrice",
+    "shipping",
+    "production",
+    "packaging",
+    "shippingCost",
+    "targetProfit",
+    "targetMarginPct",
+    "offsiteRate"
+  ];
+
+  for (const key of numericKeys) {
+    const parsed = parseOptionalNumber(formState[key]);
+    if (Number.isNaN(parsed)) {
+      return {
+        ok: false,
+        error: `Invalid numeric value for ${FIELD_LABELS[key] || key}. Please enter a valid number.`
+      };
+    }
+    if (parsed !== undefined) {
+      if (parsed < 0) {
+        return {
+          ok: false,
+          error: `${FIELD_LABELS[key] || key} cannot be negative.`
+        };
+      }
+      confirmedInputs[key] = parsed;
+    }
+  }
+
+  if (formState.freeShipping === true) {
+    confirmedInputs.freeShipping = true;
+    confirmedInputs.confirmZeroShipping = true;
+    confirmedInputs.shipping = 0;
+  } else if (confirmedInputs.shipping === 0) {
+    confirmedInputs.confirmZeroShipping = true;
+  }
+
+  if (formState.confirmZeroProduction === true) {
+    confirmedInputs.confirmZeroProduction = true;
+    confirmedInputs.production = 0;
+  }
+
+  if (formState.orderType === "domestic" || formState.orderType === "international") {
+    confirmedInputs.orderType = formState.orderType;
+  }
+
+  if (typeof formState.offsiteAds === "boolean") {
+    confirmedInputs.offsiteAds = formState.offsiteAds;
+  }
+
+  return {
+    ok: true,
+    confirmedInputs
+  };
+}
+
+export function buildFollowUpScenarios(calculationResult) {
+  const status = calculationResult?.state || calculationResult?.status;
+  if (!calculationResult || status !== "calculation_completed") {
+    return [];
+  }
+
+  const args = calculationResult.verifiedArguments || {};
+  const country = args.country || "US";
+  const price = typeof args.itemPrice === "number" ? args.itemPrice : 35;
+  const shipping = typeof args.shipping === "number" ? args.shipping : 0;
+  const prod = typeof args.production === "number" ? args.production : 10;
+  const shipCost = typeof args.shippingCost === "number" ? args.shippingCost : shipping;
+  const shipPhrase = shipping === 0 ? "free shipping" : `$${shipping} buyer shipping`;
+  const orderTypeSuffix =
+    (country === "CA" || country === "AU" || country === "NZ") && args.orderType
+      ? ` (${args.orderType} order)`
+      : "";
+
+  const followUps = [];
+
+  if (calculationResult.tool !== "analyze_offsite_ads") {
+    followUps.push({
+      label: "Test 15% Offsite Ads Impact",
+      prompt: `Analyze Offsite Ads impact at 15% for a $${price} item in ${country}${orderTypeSuffix} with ${shipPhrase}, $${prod} production cost, and $${shipCost} postage cost.`
+    });
+  }
+
+  if (calculationResult.tool !== "find_target_price") {
+    followUps.push({
+      label: "Find Price for 30% Margin",
+      prompt: `What price do I need in ${country}${orderTypeSuffix} for a 30% profit margin if production costs $${prod}, ${shipPhrase}, and postage costs me $${shipCost}?`
+    });
+  }
+
+  if (calculationResult.tool !== "compare_price_scenarios") {
+    const pLow = Math.max(5, Math.round((price - 5) * 100) / 100);
+    const pMid = price;
+    const pHigh = Math.round((price + 5) * 100) / 100;
+    followUps.push({
+      label: `Compare $${pLow} / $${pMid} / $${pHigh}`,
+      prompt: `Compare selling at $${pLow}, $${pMid}, and $${pHigh} in ${country}${orderTypeSuffix} with ${shipPhrase}, $${prod} production cost, and $${shipCost} postage cost.`
+    });
+  }
+
+  return followUps;
+}
 
 /**
  * Initializes the AI Seller Advisor component if present in the DOM.

@@ -39,8 +39,8 @@ base = replaceOnce(base, /<select class="country-nav" id="country-nav" aria-labe
   `<select class="country-nav" id="country-nav" aria-label="Seller location">${COUNTRY_ORDER.map((code) => `<option value="${code}">${GLOBAL_COUNTRY_RULES[code].name}</option>`).join("")}</select>`, "header country selector");
 base = replaceOnce(base, /<select id="country" name="country">[\s\S]*?<\/select>/,
   `<select id="country" name="country">${COUNTRY_ORDER.map((code) => `<option value="${code}">${GLOBAL_COUNTRY_RULES[code].name}</option>`).join("")}</select>`, "calculator country selector");
-base = replaceOnce(base, /<link rel="preload" href="\/fonts\/silkscreen-700-latin\.woff2" as="font" type="font\/woff2" crossorigin>/,
-  `<link rel="preload" href="/fonts/silkscreen-700-latin.woff2" as="font" type="font/woff2" crossorigin>`, "pixel font preload");
+base = replaceOnce(base, /<link rel="preload" href="\/fonts\/silkscreen-700-latin\.woff2" as="font" type="font\/woff2" crossorigin( fetchpriority="high")?>/,
+  `<link rel="preload" href="/fonts/silkscreen-700-latin.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high">`, "pixel font preload");
 const noScriptNote = `<noscript><p class="noscript-note">The fee guide, methodology, country table, and FAQs are available below. Entering and calculating a sale requires JavaScript; your entries are not submitted.</p></noscript>`;
 if (/<noscript>[\s\S]*?<\/noscript>/.test(base)) base = base.replace(/<noscript>[\s\S]*?<\/noscript>/, noScriptNote);
 else base = replaceOnce(base, /<\/main>/, `</main>\n  ${noScriptNote}`, "main closing tag");

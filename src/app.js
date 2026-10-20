@@ -21,15 +21,14 @@ import {
   asCents,
   OFFICIAL_TRANSACTION_RATE as TRANSACTION_RATE
 } from "./fee-engine.js";
-import {
-  BULK_LIMITS,
-  previewBulkCsv,
-  calculateBulkProducts,
-  filterAndSortBulkResults,
-  generateSampleCsv,
-  serializeBulkResultsToCsv,
-  formatBulkCurrency
-} from "./bulk-analyzer.js";
+// Lazy-loaded bulk module functions (only fetched if #bulk-analyzer is in DOM)
+let BULK_LIMITS = { MAX_FILE_BYTES: 1048576 };
+let previewBulkCsv = null;
+let calculateBulkProducts = null;
+let filterAndSortBulkResults = null;
+let generateSampleCsv = null;
+let serializeBulkResultsToCsv = null;
+let formatBulkCurrency = null;
 import { setupSellerAdvisor } from "./advisor-client.js";
 
 const DEFAULT_BASELINE_ORDER = Object.freeze([
@@ -1158,9 +1157,17 @@ function downloadTextCsv(csvContent, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-function setupBulkAnalyzer() {
+async function setupBulkAnalyzer() {
   const section = $("#bulk-analyzer");
   if (!section) return;
+  const bulkMod = await import("./bulk-analyzer.js");
+  BULK_LIMITS = bulkMod.BULK_LIMITS;
+  previewBulkCsv = bulkMod.previewBulkCsv;
+  calculateBulkProducts = bulkMod.calculateBulkProducts;
+  filterAndSortBulkResults = bulkMod.filterAndSortBulkResults;
+  generateSampleCsv = bulkMod.generateSampleCsv;
+  serializeBulkResultsToCsv = bulkMod.serializeBulkResultsToCsv;
+  formatBulkCurrency = bulkMod.formatBulkCurrency;
 
   const dropzone = $("#bulk-dropzone");
   const fileInput = $("#bulk-file-input");
