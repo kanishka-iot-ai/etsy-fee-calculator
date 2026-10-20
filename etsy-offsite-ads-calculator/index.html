@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://static.cloudflareinsights.com" crossorigin>
   <link rel="dns-prefetch" href="https://shopprofit-fee-intelligence.kanishka-bmchak.workers.dev">
   <link rel="preload" href="/fonts/silkscreen-700-latin.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high">
-  <link rel="stylesheet" href="/styles.v3.css">
+  <link rel="stylesheet" href="/styles.v4.css">
   <noscript><p class="noscript-note">The fee guide, methodology, country table, and FAQs are available below. Entering and calculating a sale requires JavaScript; your entries are not submitted.</p></noscript>
   <link rel="modulepreload" href="/src/app.js">
   <link rel="modulepreload" href="/src/fee-intelligence-client.js">
@@ -82,7 +82,54 @@
     <div class="nav-wrap">
       <a class="brand" href="#top" aria-label="ShopProfit home"><span class="brand-mark"><img src="/logo-mark.svg" alt="" aria-hidden="true"></span><span>ShopProfit</span></a>
       <nav class="desktop-nav" aria-label="Main navigation">
-        <a class="active" href="#calculator">Calculator</a><a href="/bulk/">Bulk Sourcing</a><a href="/advisor/"><span class="ai-spark-mark nav-spark" aria-hidden="true"><svg class="ai-spark-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle class="ai-orbit-ring" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3"/><path class="ai-spark-core" d="M12 2L13.8 8.2L20 10L13.8 11.8L12 18L10.2 11.8L4 10L10.2 8.2L12 2Z" fill="url(#ai-nav-grad-pill)"/><circle class="ai-spark-particle" cx="12" cy="3" r="1.5" fill="#8b5cf6"/><circle class="ai-spark-particle p2" cx="19.5" cy="15" r="1.2" fill="#06b6d4"/><circle class="ai-spark-particle p3" cx="4.5" cy="15" r="1.2" fill="#c8ff00"/><defs><linearGradient id="ai-nav-grad-pill" x1="4" y1="2" x2="20" y2="18" gradientUnits="userSpaceOnUse"><stop stop-color="#8b5cf6"/><stop offset="0.5" stop-color="#06b6d4"/><stop offset="1" stop-color="#c8ff00"/></linearGradient></defs></svg></span><span>AI Advisor</span></a><a href="/fees/">Fees</a><a href="/methodology/">Method</a><a href="/faq/">FAQ</a>
+        <a class="active" href="#calculator">Calculator</a><a href="/bulk/">Bulk Sourcing</a><a href="/advisor/"><span class="ai-fluid-logo nav-fluid-logo" aria-hidden="true">
+  <svg class="ai-fluid-svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="ai-glow-nav" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#0066ff" stop-opacity="0.45"/>
+        <stop offset="60%" stop-color="#00d4ff" stop-opacity="0.18"/>
+        <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="ai-body-nav" x1="8" y1="8" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#00f5ff"/>
+        <stop offset="35%" stop-color="#0066ff"/>
+        <stop offset="70%" stop-color="#002288"/>
+        <stop offset="100%" stop-color="#050816"/>
+      </linearGradient>
+      <linearGradient id="ai-rim-nav" x1="10" y1="6" x2="38" y2="42" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+        <stop offset="25%" stop-color="#00f5ff" stop-opacity="0.6"/>
+        <stop offset="60%" stop-color="#0033aa" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="#ffffff" stop-opacity="0.8"/>
+      </linearGradient>
+      <radialGradient id="ai-caustic-nav" cx="35%" cy="35%" r="65%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="30%" stop-color="#00f5ff"/>
+        <stop offset="70%" stop-color="#0055ff"/>
+        <stop offset="100%" stop-color="#002277"/>
+      </radialGradient>
+    </defs>
+    <circle cx="24" cy="24" r="22" fill="url(#ai-glow-nav)"/>
+    <path class="ai-fluid-rim" d="M24 6C14.06 6 6 14.06 6 24C6 33.94 14.06 42 24 42C33.94 42 42 33.94 42 24C42 14.06 33.94 6 24 6ZM24 33C19.03 33 15 28.97 15 24C15 19.03 19.03 15 24 15C28.97 15 33 19.03 33 24C33 28.97 28.97 33 24 33Z" fill="#060913" stroke="url(#ai-rim-nav)" stroke-width="0.8" opacity="0.92"/>
+    <g class="ai-fluid-core">
+      <path class="ai-fluid-blob" d="M16 11C21 8 28 8 33 12C38 16 39 24 36 29C33 34 26 36 21 34C16 32 12 28 11 23C10 18 12 13 16 11Z" fill="url(#ai-body-nav)"/>
+      <path d="M24 17C20.13 17 17 20.13 17 24C17 27.87 20.13 31 24 31C27.87 31 31 27.87 31 24C31 20.13 27.87 17 24 17Z" fill="#04060d"/>
+      <g class="ai-fluid-caustic">
+        <circle cx="21" cy="15" r="5" fill="url(#ai-caustic-nav)"/>
+        <circle cx="21" cy="15" r="3.2" fill="#00f5ff" opacity="0.9"/>
+        <circle cx="20.5" cy="14.5" r="1.4" fill="#ffffff"/>
+        <circle cx="29" cy="18" r="3.5" fill="url(#ai-caustic-nav)"/>
+        <circle cx="29" cy="18" r="1.8" fill="#00f5ff"/>
+        <circle cx="28.7" cy="17.7" r="0.8" fill="#ffffff"/>
+      </g>
+    </g>
+    <circle class="ai-fluid-satellite-1" cx="36" cy="23" r="2.2" fill="#00d4ff" stroke="#ffffff" stroke-width="0.4"/>
+    <circle class="ai-fluid-satellite-2" cx="13" cy="27" r="1.6" fill="#00f5ff"/>
+    <circle class="ai-fluid-satellite-1" cx="31" cy="33" r="1.2" fill="#0088ff"/>
+    <path d="M12 18C13 14 17 9 22 7.5" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round" opacity="0.85"/>
+    <path d="M36 20C37.5 24 37 28 34.5 32" stroke="url(#ai-rim-nav)" stroke-width="0.9" stroke-linecap="round" opacity="0.75"/>
+  </svg>
+</span><span>AI Advisor</span></a><a href="/fees/">Fees</a><a href="/methodology/">Method</a><a href="/faq/">FAQ</a>
       </nav>
       <div class="nav-actions">
         <label class="sr-only" for="country-nav">Seller location</label>
@@ -178,7 +225,54 @@
             <div class="net-total"><span>Net profit</span><output id="net-profit-ledger">$24.75</output></div>
           </div>
           <div class="result-pricing" aria-label="Pricing guidance"><div><span>Break-even</span><output id="summary-break-even">$7.65</output></div><div><span>Target price</span><output id="summary-required-price">$35.28</output></div></div>
-          <div class="result-actions"><button class="button button-primary copy-button" id="copy-breakdown" type="button">Copy breakdown</button><button class="button button-quiet reset-button" id="reset" type="button">Reset</button><button class="button button-secondary button-ai-consult" id="calc-ask-ai-btn" type="button" title="Analyze this item with AI Seller Advisor"><span class="ai-spark-mark btn-spark" aria-hidden="true"><svg class="ai-spark-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle class="ai-orbit-ring" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3"/><path class="ai-spark-core" d="M12 2L13.8 8.2L20 10L13.8 11.8L12 18L10.2 11.8L4 10L10.2 8.2L12 2Z" fill="url(#ai-calc-grad)"/><circle class="ai-spark-particle" cx="12" cy="3" r="1.5" fill="#8b5cf6"/><circle class="ai-spark-particle p2" cx="19.5" cy="15" r="1.2" fill="#06b6d4"/><circle class="ai-spark-particle p3" cx="4.5" cy="15" r="1.2" fill="#c8ff00"/><defs><linearGradient id="ai-calc-grad" x1="4" y1="2" x2="20" y2="18" gradientUnits="userSpaceOnUse"><stop stop-color="#8b5cf6"/><stop offset="0.5" stop-color="#06b6d4"/><stop offset="1" stop-color="#c8ff00"/></linearGradient></defs></svg></span><span>Ask AI Advisor</span></button></div>
+          <div class="result-actions"><button class="button button-primary copy-button" id="copy-breakdown" type="button">Copy breakdown</button><button class="button button-quiet reset-button" id="reset" type="button">Reset</button><button class="button button-secondary button-ai-consult" id="calc-ask-ai-btn" type="button" title="Analyze this item with AI Seller Advisor"><span class="ai-fluid-logo btn-fluid-logo" aria-hidden="true">
+  <svg class="ai-fluid-svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="ai-glow-btn" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#0066ff" stop-opacity="0.45"/>
+        <stop offset="60%" stop-color="#00d4ff" stop-opacity="0.18"/>
+        <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="ai-body-btn" x1="8" y1="8" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#00f5ff"/>
+        <stop offset="35%" stop-color="#0066ff"/>
+        <stop offset="70%" stop-color="#002288"/>
+        <stop offset="100%" stop-color="#050816"/>
+      </linearGradient>
+      <linearGradient id="ai-rim-btn" x1="10" y1="6" x2="38" y2="42" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+        <stop offset="25%" stop-color="#00f5ff" stop-opacity="0.6"/>
+        <stop offset="60%" stop-color="#0033aa" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="#ffffff" stop-opacity="0.8"/>
+      </linearGradient>
+      <radialGradient id="ai-caustic-btn" cx="35%" cy="35%" r="65%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="30%" stop-color="#00f5ff"/>
+        <stop offset="70%" stop-color="#0055ff"/>
+        <stop offset="100%" stop-color="#002277"/>
+      </radialGradient>
+    </defs>
+    <circle cx="24" cy="24" r="22" fill="url(#ai-glow-btn)"/>
+    <path class="ai-fluid-rim" d="M24 6C14.06 6 6 14.06 6 24C6 33.94 14.06 42 24 42C33.94 42 42 33.94 42 24C42 14.06 33.94 6 24 6ZM24 33C19.03 33 15 28.97 15 24C15 19.03 19.03 15 24 15C28.97 15 33 19.03 33 24C33 28.97 28.97 33 24 33Z" fill="#060913" stroke="url(#ai-rim-btn)" stroke-width="0.8" opacity="0.92"/>
+    <g class="ai-fluid-core">
+      <path class="ai-fluid-blob" d="M16 11C21 8 28 8 33 12C38 16 39 24 36 29C33 34 26 36 21 34C16 32 12 28 11 23C10 18 12 13 16 11Z" fill="url(#ai-body-btn)"/>
+      <path d="M24 17C20.13 17 17 20.13 17 24C17 27.87 20.13 31 24 31C27.87 31 31 27.87 31 24C31 20.13 27.87 17 24 17Z" fill="#04060d"/>
+      <g class="ai-fluid-caustic">
+        <circle cx="21" cy="15" r="5" fill="url(#ai-caustic-btn)"/>
+        <circle cx="21" cy="15" r="3.2" fill="#00f5ff" opacity="0.9"/>
+        <circle cx="20.5" cy="14.5" r="1.4" fill="#ffffff"/>
+        <circle cx="29" cy="18" r="3.5" fill="url(#ai-caustic-btn)"/>
+        <circle cx="29" cy="18" r="1.8" fill="#00f5ff"/>
+        <circle cx="28.7" cy="17.7" r="0.8" fill="#ffffff"/>
+      </g>
+    </g>
+    <circle class="ai-fluid-satellite-1" cx="36" cy="23" r="2.2" fill="#00d4ff" stroke="#ffffff" stroke-width="0.4"/>
+    <circle class="ai-fluid-satellite-2" cx="13" cy="27" r="1.6" fill="#00f5ff"/>
+    <circle class="ai-fluid-satellite-1" cx="31" cy="33" r="1.2" fill="#0088ff"/>
+    <path d="M12 18C13 14 17 9 22 7.5" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round" opacity="0.85"/>
+    <path d="M36 20C37.5 24 37 28 34.5 32" stroke="url(#ai-rim-btn)" stroke-width="0.9" stroke-linecap="round" opacity="0.75"/>
+  </svg>
+</span><span>Ask AI Advisor</span></button></div>
         </aside>
       </div>
       <details class="advanced-options" id="advanced-options" open>

@@ -4,7 +4,7 @@
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://shopprofit-fee-intelligence.kanishka-bmchak.workers.dev https://cloudflareinsights.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; media-src 'self' data:; connect-src 'self' https://shopprofit-fee-intelligence.kanishka-bmchak.workers.dev https://cloudflareinsights.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
   Cache-Control: public, max-age=0, must-revalidate
   Cloudflare-CDN-Cache-Control: max-age=3600
 
@@ -25,6 +25,10 @@ https://:version.:project.pages.dev/*
 /llms-full.txt
   Content-Type: text/plain; charset=utf-8
   Cache-Control: public, max-age=3600
+
+/styles.v4.css
+  Content-Type: text/css; charset=utf-8
+  Cache-Control: public, max-age=0, must-revalidate
 
 /styles.v3.css
   Content-Type: text/css; charset=utf-8
