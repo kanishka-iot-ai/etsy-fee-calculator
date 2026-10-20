@@ -271,10 +271,10 @@ function applyLanguage() {
   const isResourceRoute = () => {
     if (typeof location !== "undefined") {
       const path = location.pathname.toLowerCase();
-      if (path.includes("faq") || path.includes("methodology") || path.includes("privacy") || path.includes("terms") || path.includes("contact")) return true;
+      if (path.includes("faq") || path.includes("methodology") || path.includes("privacy") || path.includes("terms") || path.includes("contact") || path.includes("advisor")) return true;
     }
     const canonical = typeof document !== "undefined" ? (document.querySelector('link[rel="canonical"]')?.getAttribute("href") || "") : "";
-    if (canonical.includes("/faq") || canonical.includes("/methodology") || canonical.includes("/privacy") || canonical.includes("/terms") || canonical.includes("/contact")) return true;
+    if (canonical.includes("/faq") || canonical.includes("/methodology") || canonical.includes("/privacy") || canonical.includes("/terms") || canonical.includes("/contact") || canonical.includes("/advisor")) return true;
     return false;
   };
   if (isFeesPage) {
