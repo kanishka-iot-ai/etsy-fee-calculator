@@ -2532,7 +2532,8 @@ function initTheme() {
 
   let preferredTheme = "light";
   try {
-    preferredTheme = localStorage.getItem("shopprofit-theme") || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const saved = localStorage.getItem("shopprofit-theme");
+    preferredTheme = saved === "light" ? "light" : "dark";
   } catch (_e) {
     preferredTheme = "light";
   }

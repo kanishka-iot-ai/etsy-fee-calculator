@@ -787,6 +787,7 @@ function applyRouteContent() {
 function setTheme(theme) {
   const dark = theme === "dark";
   document.body.classList.toggle("dark", dark);
+  document.documentElement.classList.toggle("dark", dark);
   document.documentElement.style.colorScheme = dark ? "dark" : "light";
   $("#theme-toggle")?.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
   const toggleBtn = $("#theme-toggle");
@@ -1496,7 +1497,8 @@ if (typeof document !== "undefined" && typeof window !== "undefined") {
     if (event.key.toLowerCase() === "c") $("#copy-breakdown")?.click();
   });
 
-  const preferredTheme = store.get("shopprofit-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const savedTheme = store.get("shopprofit-theme");
+  const preferredTheme = savedTheme === "light" ? "light" : "dark";
   setTheme(preferredTheme);
   if ($("#country")) $("#country").value = activeCountryCode;
   if ($("#country-nav")) $("#country-nav").value = activeCountryCode;

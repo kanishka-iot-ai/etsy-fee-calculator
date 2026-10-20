@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#F2F1EC">
+  <meta name="theme-color" content="#050505">
   <meta name="description" content="Calculate your exact break-even price and sales volume on Etsy. Find the minimum floor price needed to cover all Etsy fees, material costs, and shipping.">
   <link rel="canonical" href="https://shopprofitcalculator.com/etsy-break-even-calculator/">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://static.cloudflareinsights.com" crossorigin>
   <link rel="dns-prefetch" href="https://shopprofit-fee-intelligence.kanishka-bmchak.workers.dev">
   <link rel="preload" href="/fonts/silkscreen-700-latin.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high">
-  <link rel="stylesheet" href="/styles.v2.css">
+  <link rel="stylesheet" href="/styles.v3.css">
   <noscript><p class="noscript-note">The fee guide, methodology, country table, and FAQs are available below. Entering and calculating a sale requires JavaScript; your entries are not submitted.</p></noscript>
   <link rel="modulepreload" href="/src/app.js">
   <link rel="modulepreload" href="/src/fee-intelligence-client.js">
@@ -76,7 +76,7 @@
   }
   </script>
 </head>
-<body data-route-country="US">
+<body class="dark">
   <a class="skip-link" href="#calculator">Skip to calculator</a>
   <header class="site-header" id="top">
     <div class="nav-wrap">
@@ -91,7 +91,7 @@
         <select class="language-nav" id="language-nav" aria-label="Language">
           <option value="auto">Auto</option><option value="en">English</option><option value="zh-CN">中文</option><option value="hi-IN">हिन्दी</option><option value="fr-FR">Français</option><option value="de-DE">Deutsch</option><option value="es-ES">Español</option><option value="ja-JP">日本語</option><option value="ar">العربية</option>
         </select>
-        <button class="icon-button theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" title="Toggle color theme"><span aria-hidden="true">◐</span></button>
+        <button class="icon-button theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light mode" title="Switch to light mode"><span aria-hidden="true">◐</span></button>
         <button class="icon-button menu-toggle" id="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu"><span class="menu-icon" aria-hidden="true"></span></button>
       </div>
     </div>
