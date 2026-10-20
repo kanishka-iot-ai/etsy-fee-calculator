@@ -6,6 +6,8 @@ import {
   summarizeCatalog,
   filterAndSortCatalog,
   exportCatalogToCsv,
+  solvePriceForTargetMargin,
+  computeSourcingHealthScore,
   EXPANDED_DEMO_CATALOG,
   GRID_COLUMNS,
   VIEW_PRESETS
@@ -129,4 +131,65 @@ test("Code safety invariants: src/bulk-catalog-analyzer.js has no innerHTML and 
   assert.equal(code.includes("insertAdjacentHTML"), false, "no insertAdjacentHTML");
   assert.equal(/\bfetch\s*\(/.test(code), false, "no fetch calls");
   assert.equal(/\bXMLHttpRequest\b/.test(code), false, "no XMLHttpRequest");
+});
+
+test("solvePriceForTargetMargin: exact target margin solver finds prices achieving target margin", () => {
+  const inputs = {
+    country: "US",
+    shipping: 5.00,
+    production: 10.00,
+    packaging: 1.50,
+    shippingCost: 4.50
+  };
+
+  const price30 = solvePriceForTargetMargin(0.30, inputs);
+  assert.ok(price30 > 0);
+  const { results: [item30] } = calculateCatalogBatch([{ ...inputs, itemPrice: price30 }]);
+  assert.ok(item30.marginPct >= 29.9, `30% target margin achieved, got ${item30.marginPct}%`);
+
+  const price40 = solvePriceForTargetMargin(0.40, inputs);
+  assert.ok(price40 > price30, "40% target margin requires higher price than 30%");
+  const { results: [item40] } = calculateCatalogBatch([{ ...inputs, itemPrice: price40 }]);
+  assert.ok(item40.marginPct >= 39.9, `40% target margin achieved, got ${item40.marginPct}%`);
+});
+
+test("computeSourcingHealthScore: accurately scores catalog and assigns grade", () => {
+  const { results, summary } = calculateCatalogBatch(EXPANDED_DEMO_CATALOG, { fallbackCountry: "US" });
+  const health = computeSourcingHealthScore(summary, results);
+
+  assert.ok(health.score >= 70 && health.score <= 100, `Health score is ${health.score}`);
+  assert.ok(["A+", "A", "B"].includes(health.grade), `Grade is ${health.grade}`);
+  assert.ok(health.gradeBadge.length > 0);
+  assert.ok(health.verdict.length > 0);
+  assert.equal(summary.sourcingHealth.score, health.score, "summary includes sourcingHealth");
+});
+
+test("calculateCatalogBatch: volumeDiscountRate lowers production cost and increases profit", () => {
+  const baseBatch = calculateCatalogBatch(EXPANDED_DEMO_CATALOG, { fallbackCountry: "US" });
+  const discountedBatch = calculateCatalogBatch(EXPANDED_DEMO_CATALOG, {
+    fallbackCountry: "US",
+    volumeDiscountRate: 0.20
+  });
+
+  assert.ok(discountedBatch.summary.totalProfit > baseBatch.summary.totalProfit, "20% discount increases total net profit");
+  assert.equal(discountedBatch.summary.volumeDiscountRate, 0.20);
+  const mug = discountedBatch.results[0];
+  assert.equal(mug.rawProductionCost, 8.50);
+  assert.equal(mug.productionCost, 6.80); // 8.50 * 0.8 = 6.80
+});
+
+test("filterAndSortCatalog: ads_safe and free_shipping filters work as expected", () => {
+  const { results } = calculateCatalogBatch(EXPANDED_DEMO_CATALOG, { fallbackCountry: "US" });
+
+  const adsSafe = filterAndSortCatalog(results, { filterTab: "ads_safe" });
+  assert.ok(adsSafe.length > 0);
+  for (const item of adsSafe) {
+    assert.ok(item.offsite15MarginPct >= 15);
+  }
+
+  const freeShipping = filterAndSortCatalog(results, { filterTab: "free_shipping" });
+  assert.ok(freeShipping.length > 0);
+  for (const item of freeShipping) {
+    assert.equal(item.shippingCharged, 0);
+  }
 });

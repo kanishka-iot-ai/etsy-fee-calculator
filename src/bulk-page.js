@@ -25,7 +25,9 @@ import {
   calculateCatalogBatch,
   summarizeCatalog,
   filterAndSortCatalog,
-  exportCatalogToCsv
+  exportCatalogToCsv,
+  solvePriceForTargetMargin,
+  computeSourcingHealthScore
 } from "./bulk-catalog-analyzer.js";
 
 import {
@@ -62,13 +64,16 @@ const state = {
   sortDir: "desc",
   viewMode: "split", // "split", "grid", "charts"
   chartsCollapsed: false,
+  originalPricesMap: new Map(),
+  activeSimulatorAction: null,
   settings: {
     country: "US",
     offsiteRate: 0,
     plusEnabled: false,
     salesPerMonth: 30,
     defaultPackaging: 0,
-    defaultPostage: 0
+    defaultPostage: 0,
+    volumeDiscountRate: 0
   },
   modal: null, // "upload", "columns", "adjustments", "receipt"
   selectedReceiptItem: null,
@@ -115,7 +120,8 @@ function recalculateAndRender() {
     fallbackCountry: state.settings.country,
     defaultOffsiteRate: state.settings.offsiteRate,
     plusEnabled: state.settings.plusEnabled,
-    salesPerMonth: state.settings.salesPerMonth
+    salesPerMonth: state.settings.salesPerMonth,
+    volumeDiscountRate: state.settings.volumeDiscountRate
   });
 
   state.analyzedResults = results;
@@ -125,6 +131,7 @@ function recalculateAndRender() {
   renderVisualAnalytics();
   renderFilterTabs();
   renderGrid();
+  updateSimulatorActiveStates();
 }
 
 /**
@@ -158,7 +165,15 @@ function renderKpiCards() {
     totalProfit: 0,
     averageMarginPct: 0,
     averageRoiPct: 0,
-    winnerCount: 0
+    winnerCount: 0,
+    sourcingHealth: null
+  };
+
+  const health = s.sourcingHealth || {
+    score: 0,
+    grade: "N/A",
+    gradeBadge: "No Data",
+    verdict: ""
   };
 
   const cards = [
@@ -187,6 +202,12 @@ function renderKpiCards() {
       value: String(s.winnerCount),
       badge: "Margin ≥ 30%",
       tone: "gold"
+    },
+    {
+      label: "Sourcing Health",
+      value: `${health.score}/100`,
+      badge: health.gradeBadge,
+      tone: health.grade.startsWith("A") ? "gold" : (health.grade === "B" ? "positive" : "warning")
     }
   ];
 
@@ -1127,15 +1148,19 @@ function renderFilterTabs() {
   const thinCount = state.summary ? state.summary.thinCount : 0;
   const lossCount = state.summary ? state.summary.lossCount : 0;
   const adsCount = state.summary ? state.summary.adsRiskCount : 0;
+  const adsSafeCount = state.analyzedResults.filter((r) => r.offsite15MarginPct >= 15).length;
+  const freeShipCount = state.analyzedResults.filter((r) => r.shippingCharged === 0).length;
 
   const tabs = [
     { id: "all", label: "All Products", count: allCount },
     { id: "favorites", label: "Shortlist", count: favCount, highlight: true },
     { id: "winners", label: "Optimal Margin (≥30%)", count: winCount },
+    { id: "ads_safe", label: "Ads Resilient (≥15% after ads)", count: adsSafeCount },
     { id: "high_roi", label: "High ROI (≥50%)", count: roiCount },
     { id: "thin_margin", label: "Compressed Margin (<15%)", count: thinCount },
     { id: "losses", label: "Operating Deficit (<0%)", count: lossCount },
-    { id: "ads_risk", label: "15% Ads Vulnerable", count: adsCount }
+    { id: "ads_risk", label: "15% Ads Vulnerable", count: adsCount },
+    { id: "free_shipping", label: "Free Shipping", count: freeShipCount }
   ];
 
   for (const tab of tabs) {
@@ -1532,6 +1557,169 @@ function renderGrid() {
 }
 
 /**
+ * Takes a snapshot of original catalog prices to allow instant reset.
+ */
+function snapshotOriginalPrices() {
+  state.originalPricesMap.clear();
+  state.rawProducts.forEach((p, idx) => {
+    const key = p.sku || p.id || `row_${idx}`;
+    const price = Number(p.itemPrice ?? p.item_price) || 0;
+    state.originalPricesMap.set(key, price);
+  });
+  state.activeSimulatorAction = null;
+}
+
+/**
+ * Applies exact binary search target margin solving across all products.
+ */
+function applyTargetMarginSimulation(targetRatio = 0.30, actionKey = "target-30") {
+  state.rawProducts.forEach((p, idx) => {
+    const countryCode = p.countryCode || p.country || state.settings.country;
+    const rule = resolveCountryFeeRule(countryCode, { orderType: p.orderOrigin || p.order_origin || "domestic" });
+    const currency = String(p.listingCurrency || p.currency || rule.currency || "USD").toUpperCase();
+
+    const rawCost = Number(p.productionCost ?? p.production_cost) || 0;
+    const effProduction = state.settings.volumeDiscountRate > 0
+      ? Math.max(0, Math.round(rawCost * (1 - state.settings.volumeDiscountRate) * 100) / 100)
+      : rawCost;
+
+    const offsiteRate = p.offsiteAdsRate !== undefined && p.offsiteAdsRate !== null
+      ? Number(p.offsiteAdsRate)
+      : (p.offsite_ads_tier !== undefined && p.offsite_ads_tier !== null ? Number(p.offsite_ads_tier) : state.settings.offsiteRate);
+
+    const inputs = {
+      country: countryCode,
+      shipping: Number(p.shippingCharged ?? p.shipping_charged) || 0,
+      giftWrap: Number(p.giftWrap ?? p.gift_wrap) || 0,
+      buyerSalesTax: Number(p.buyerSalesTax ?? p.buyer_sales_tax) || 0,
+      production: effProduction,
+      packaging: Number(p.packagingCost ?? p.packaging_cost) || 0,
+      shippingCost: Number(p.shippingCost ?? p.shipping_cost) || 0,
+      orderType: p.orderOrigin || p.order_origin || "domestic",
+      plusEnabled: state.settings.plusEnabled,
+      salesPerMonth: state.settings.salesPerMonth,
+      listingCurrency: currency,
+      paymentAccountCurrency: currency,
+      offsiteAds: offsiteRate > 0,
+      shopOffsiteAdsTier: offsiteRate
+    };
+
+    const solvedPrice = solvePriceForTargetMargin(targetRatio, inputs);
+    p.itemPrice = solvedPrice;
+    p.item_price = solvedPrice;
+  });
+
+  state.activeSimulatorAction = actionKey;
+  recalculateAndRender();
+}
+
+/**
+ * Applies a percentage markup or discount across all catalog products.
+ */
+function applyPercentagePriceAdjustment(multiplier = 1.10, actionKey = "markup-10") {
+  state.rawProducts.forEach((p) => {
+    const current = Number(p.itemPrice ?? p.item_price) || 0;
+    const currency = String(p.listingCurrency || p.currency || "USD").toUpperCase();
+    const digits = getCurrencyMinorUnitDigits(currency);
+    const adjusted = digits === 0
+      ? Math.max(1, Math.round(current * multiplier))
+      : Math.max(0.01, Math.round(current * multiplier * 100) / 100);
+    p.itemPrice = adjusted;
+    p.item_price = adjusted;
+  });
+
+  state.activeSimulatorAction = actionKey;
+  recalculateAndRender();
+}
+
+/**
+ * Resets all catalog prices back to their original supplier values.
+ */
+function resetOriginalPrices() {
+  state.rawProducts.forEach((p, idx) => {
+    const key = p.sku || p.id || `row_${idx}`;
+    if (state.originalPricesMap.has(key)) {
+      const orig = state.originalPricesMap.get(key);
+      p.itemPrice = orig;
+      p.item_price = orig;
+    }
+  });
+
+  state.activeSimulatorAction = null;
+  recalculateAndRender();
+}
+
+/**
+ * Synchronizes UI button states and volume tier dropdowns for the repricing simulator.
+ */
+function updateSimulatorActiveStates() {
+  const actions = ["target-30", "target-40", "markup-10", "discount-10"];
+  for (const act of actions) {
+    const btn = document.getElementById(`sim-${act}-btn`);
+    if (btn) {
+      if (state.activeSimulatorAction === act) {
+        btn.classList.add("is-active");
+      } else {
+        btn.classList.remove("is-active");
+      }
+    }
+  }
+
+  const simTier = document.getElementById("simulator-volume-discount");
+  if (simTier) {
+    simTier.value = String(state.settings.volumeDiscountRate || 0);
+  }
+
+  const adjTier = document.getElementById("setting-volume-discount");
+  if (adjTier) {
+    adjTier.value = String(state.settings.volumeDiscountRate || 0);
+  }
+}
+
+/**
+ * Attaches event listeners to the Sourcing Repricing Simulator bar.
+ */
+function setupSimulatorBarHandlers() {
+  document.getElementById("sim-target-30-btn")?.addEventListener("click", () => {
+    applyTargetMarginSimulation(0.30, "target-30");
+  });
+
+  document.getElementById("sim-target-40-btn")?.addEventListener("click", () => {
+    applyTargetMarginSimulation(0.40, "target-40");
+  });
+
+  document.getElementById("sim-markup-10-btn")?.addEventListener("click", () => {
+    applyPercentagePriceAdjustment(1.10, "markup-10");
+  });
+
+  document.getElementById("sim-discount-10-btn")?.addEventListener("click", () => {
+    applyPercentagePriceAdjustment(0.90, "discount-10");
+  });
+
+  document.getElementById("sim-reset-prices-btn")?.addEventListener("click", () => {
+    resetOriginalPrices();
+  });
+
+  const simVolumeSelect = document.getElementById("simulator-volume-discount");
+  if (simVolumeSelect) {
+    simVolumeSelect.addEventListener("change", (e) => {
+      const rate = parseFloat(e.target.value) || 0;
+      state.settings.volumeDiscountRate = rate;
+      recalculateAndRender();
+    });
+  }
+
+  const adjVolumeSelect = document.getElementById("setting-volume-discount");
+  if (adjVolumeSelect) {
+    adjVolumeSelect.addEventListener("change", (e) => {
+      const rate = parseFloat(e.target.value) || 0;
+      state.settings.volumeDiscountRate = rate;
+      recalculateAndRender();
+    });
+  }
+}
+
+/**
  * Loads the 10-item demo catalog.
  */
 function handleLoadDemo() {
@@ -1539,6 +1727,7 @@ function handleLoadDemo() {
     ...item,
     id: `SKU-${idx + 1}`
   }));
+  snapshotOriginalPrices();
   recalculateAndRender();
 }
 
@@ -1600,6 +1789,7 @@ function handleLoadSupplierPreset(presetKey) {
     ...item,
     id: `${presetKey.toUpperCase().slice(0, 3)}-${idx + 1}`
   }));
+  snapshotOriginalPrices();
 
   const select = document.getElementById("supplier-preset-select");
   if (select) select.value = presetKey;
@@ -2241,6 +2431,7 @@ function setupUploadWizard() {
     });
 
     state.rawProducts = parsedProducts;
+    snapshotOriginalPrices();
     recalculateAndRender();
 
     // Close modal
@@ -2505,6 +2696,9 @@ export function initBulkPage() {
 
   // Setup View Mode Switcher (Split, Grid, Charts)
   setupViewModeHandlers();
+
+  // Setup Sourcing Repricing Simulator Bar & Volume Tiers
+  setupSimulatorBarHandlers();
 
   // Load demo catalog initially so page is rich and instantly interactive!
   handleLoadDemo();

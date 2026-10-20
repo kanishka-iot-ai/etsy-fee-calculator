@@ -617,3 +617,131 @@ body.dark .advisor-hero-title {
   background: var(--surface-soft);
   border-top: 1px solid var(--border);
 }
+
+
+/* Wholesale Sourcing Repricing & Margin Simulator Bar */
+.bulk-simulator-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 18px;
+  margin: 16px 0 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+body.dark .bulk-simulator-bar {
+  background: #0d121c;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.simulator-bar__lead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.simulator-badge {
+  font-size: 9px;
+  font-weight: 800;
+  font-family: var(--mono);
+  letter-spacing: 0.08em;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  text-transform: uppercase;
+}
+body.dark .simulator-badge {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+.simulator-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg);
+}
+.simulator-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.btn-simulator-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--mono);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft, #f8fafc);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+body.dark .btn-simulator-action {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+}
+.btn-simulator-action:hover {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+body.dark .btn-simulator-action:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.btn-simulator-action.is-active {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #059669;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+body.dark .btn-simulator-action.is-active {
+  background: #059669;
+  color: #ffffff;
+  border-color: #34d399;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+.btn-simulator-action--reset {
+  color: var(--muted);
+  border-style: dashed;
+}
+.simulator-tier-select-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.simulator-tier-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.simulator-tier-select {
+  font-size: 11px;
+  padding: 5px 8px;
+  height: 32px;
+}
+@media (max-width: 900px) {
+  .bulk-simulator-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .simulator-actions {
+    justify-content: flex-start;
+  }
+  .simulator-tier-select-wrap {
+    justify-content: space-between;
+  }
+}

@@ -21,6 +21,171 @@ import {
   GLOBAL_COUNTRY_RULES
 } from "./fee-engine.js";
 
+/**
+ * Exact binary search solver that calculates the minimum required item price
+ * to achieve a specific target profit margin (e.g., 0.30 for 30% margin).
+ *
+ * @param {number} targetMarginRatio - Desired target margin as a ratio (e.g. 0.30 or 0.40)
+ * @param {Object} inputs - Base calculation inputs (country, costs, shipping, offsite ads, etc.)
+ * @returns {number} Minimum required item price in major currency units
+ */
+export function solvePriceForTargetMargin(targetMarginRatio = 0.30, inputs = {}) {
+  const target = Math.max(0, Math.min(0.90, Number(targetMarginRatio) || 0));
+  const currency = String(inputs.listingCurrency || inputs.currency || "USD").toUpperCase();
+  const digits = getCurrencyMinorUnitDigits(currency);
+  const factor = digits === 0 ? 1 : 100;
+
+  // Break-even price when target margin is zero
+  if (target <= 0) {
+    const beCents = solveRequiredPrice(0, { ...inputs, itemPrice: 0 });
+    return digits === 0 ? Math.round(beCents / 100) : Number((beCents / 100).toFixed(2));
+  }
+
+  // Find upper bound where margin is >= target
+  let high = 50 * factor;
+  let attempts = 0;
+  while (attempts < 22) {
+    const testPrice = high / factor;
+    const calc = calculateOrderFees({ ...inputs, itemPrice: testPrice });
+    const currentMargin = calc.totals.margin ?? 0;
+    if (currentMargin >= target) {
+      break;
+    }
+    high = Math.max(high + 1000, high * 2);
+    attempts++;
+  }
+
+  // Binary search integer cents/units
+  let low = 0;
+  while (low < high) {
+    const mid = Math.floor((low + high) / 2);
+    const testPrice = mid / factor;
+    const calc = calculateOrderFees({ ...inputs, itemPrice: testPrice });
+    const currentMargin = calc.totals.margin ?? 0;
+    if (currentMargin >= target) {
+      high = mid;
+    } else {
+      low = mid + 1;
+    }
+  }
+
+  return digits === 0 ? low : Number((low / 100).toFixed(2));
+}
+
+/**
+ * Computes an executive Wholesale Sourcing Health Score (0–100) and Grade (A+ through D).
+ * Evaluates catalog profitability ratio, average margin health, ads resilience, and loss exposure.
+ *
+ * @param {Object} summary - Catalog portfolio summary metrics
+ * @param {Array<Object>} items - Array of calculated catalog product items
+ * @returns {Object} Sourcing health grade, score, verdict, and underlying evaluation metrics
+ */
+export function computeSourcingHealthScore(summary = {}, items = []) {
+  const count = items.length;
+  if (count === 0) {
+    return Object.freeze({
+      score: 0,
+      grade: "N/A",
+      gradeBadge: "No Data",
+      verdict: "Load catalog records to evaluate portfolio sourcing health.",
+      profitableRatio: 0,
+      adsResilientRatio: 0,
+      winnerRatio: 0,
+      lossCount: 0
+    });
+  }
+
+  let profitableCount = 0;
+  let adsResilientCount = 0;
+  let winnerCount = 0;
+  let lossCount = 0;
+
+  for (const item of items) {
+    if (item.netProfit > 0) profitableCount++;
+    if (item.offsite15NetProfit > 0) adsResilientCount++;
+    if (item.marginPct >= 25 && item.netProfit >= 10) winnerCount++;
+    if (item.netProfit < 0) lossCount++;
+  }
+
+  const profitableRatio = (profitableCount / count) * 100;
+  const adsResilientRatio = (adsResilientCount / count) * 100;
+  const winnerRatio = (winnerCount / count) * 100;
+  const avgMargin = Number(summary.averageMarginPct) || 0;
+
+  // 1. Profitable Catalog Ratio (Max 30 pts)
+  let pScore = 0;
+  if (profitableRatio >= 100) pScore = 30;
+  else if (profitableRatio >= 90) pScore = 26;
+  else if (profitableRatio >= 75) pScore = 20;
+  else if (profitableRatio >= 50) pScore = 12;
+  else pScore = Math.max(0, Math.round(profitableRatio * 0.2));
+
+  // 2. Average Margin Health (Max 25 pts)
+  let mScore = 0;
+  if (avgMargin >= 35) mScore = 25;
+  else if (avgMargin >= 25) mScore = 21;
+  else if (avgMargin >= 20) mScore = 17;
+  else if (avgMargin >= 15) mScore = 13;
+  else if (avgMargin >= 5) mScore = 7;
+  else mScore = 0;
+
+  // 3. 15% Ads Resilience (Max 20 pts)
+  let aScore = 0;
+  if (adsResilientRatio >= 100) aScore = 20;
+  else if (adsResilientRatio >= 80) aScore = 16;
+  else if (adsResilientRatio >= 60) aScore = 12;
+  else if (adsResilientRatio >= 40) aScore = 8;
+  else aScore = Math.max(0, Math.round(adsResilientRatio * 0.15));
+
+  // 4. Winner Share (Max 15 pts)
+  let wScore = 0;
+  if (winnerRatio >= 40) wScore = 15;
+  else if (winnerRatio >= 25) wScore = 12;
+  else if (winnerRatio >= 10) wScore = 8;
+  else wScore = Math.max(0, Math.round(winnerRatio * 0.5));
+
+  // 5. Zero Loss Bonus (Max 10 pts)
+  let lScore = 0;
+  if (lossCount === 0) lScore = 10;
+  else if (lossCount === 1) lScore = 5;
+  else lScore = 0;
+
+  const totalScore = Math.min(100, Math.max(0, pScore + mScore + aScore + wScore + lScore));
+
+  let grade = "C";
+  let gradeBadge = "Grade C";
+  let verdict = "Catalog is margin-compressed. Repricing or wholesale volume discounts recommended.";
+
+  if (totalScore >= 90) {
+    grade = "A+";
+    gradeBadge = "Grade A+ (Elite Sourcing)";
+    verdict = "Exceptional portfolio health. High margin resilience under 15% Offsite Ads.";
+  } else if (totalScore >= 80) {
+    grade = "A";
+    gradeBadge = "Grade A (Strong Wholesale)";
+    verdict = "Robust wholesale margins and strong ROI across the majority of catalog SKUs.";
+  } else if (totalScore >= 70) {
+    grade = "B";
+    gradeBadge = "Grade B (Solid Portfolio)";
+    verdict = "Solid overall profitability, but several items are vulnerable to advertising fees.";
+  } else if (totalScore < 60) {
+    grade = "D";
+    gradeBadge = "Grade D (High Deficit Risk)";
+    verdict = "Urgent restructuring required. High deficit exposure or negative unit economics detected.";
+  }
+
+  return Object.freeze({
+    score: totalScore,
+    grade,
+    gradeBadge,
+    verdict,
+    profitableRatio,
+    adsResilientRatio,
+    winnerRatio,
+    lossCount
+  });
+}
+
 import {
   BULK_LIMITS,
   CSV_HEADER_ALIASES,
@@ -217,6 +382,7 @@ export function calculateCatalogBatch(validRows = [], options = {}) {
   const salesPerMonth = Math.max(1, Math.min(10_000, Number(options.salesPerMonth) || 30));
   const fallbackCountry = options.fallbackCountry || "US";
   const defaultOffsiteRate = Number(options.defaultOffsiteRate) || 0;
+  const volumeDiscountRate = Math.max(0, Math.min(0.90, Number(options.volumeDiscountRate) || 0));
 
   const results = validRows.map((row, index) => {
     const countryCode = row.countryCode || row.country || fallbackCountry;
@@ -228,7 +394,10 @@ export function calculateCatalogBatch(validRows = [], options = {}) {
     const giftWrap = Number(row.giftWrap ?? row.gift_wrap) || 0;
     const buyerSalesTax = Number(row.buyerSalesTax ?? row.buyer_sales_tax) || 0;
 
-    const productionCost = Number(row.productionCost ?? row.production_cost) || 0;
+    const rawProductionCost = Number(row.productionCost ?? row.production_cost) || 0;
+    const productionCost = volumeDiscountRate > 0
+      ? Math.max(0, Math.round(rawProductionCost * (1 - volumeDiscountRate) * 100) / 100)
+      : rawProductionCost;
     const packagingCost = Number(row.packagingCost ?? row.packaging_cost) || 0;
     const shippingCost = Number(row.shippingCost ?? row.shipping_cost) || 0;
 
@@ -336,6 +505,8 @@ export function calculateCatalogBatch(validRows = [], options = {}) {
       shippingCharged,
       grossRevenue,
       productionCost,
+      rawProductionCost,
+      volumeDiscountRate,
       packagingCost,
       shippingCost,
       totalSellerCosts,
@@ -355,7 +526,8 @@ export function calculateCatalogBatch(validRows = [], options = {}) {
   });
 
   const summary = summarizeCatalog(results);
-  return { results, summary };
+  const sourcingHealth = computeSourcingHealthScore(summary, results);
+  return { results, summary: Object.freeze({ ...summary, sourcingHealth, volumeDiscountRate }) };
 }
 
 /**
@@ -441,6 +613,8 @@ export function filterAndSortCatalog(results = [], options = {}) {
     if (filterTab === "thin_margin" && item.status !== "thin_margin") return false;
     if (filterTab === "losses" && item.netProfit >= 0) return false;
     if (filterTab === "ads_risk" && !item.becomesUnprofitableAt15Pct) return false;
+    if (filterTab === "ads_safe" && item.offsite15MarginPct < 15) return false;
+    if (filterTab === "free_shipping" && item.shippingCharged > 0) return false;
     if (filterTab === "profitable" && item.netProfit <= 0) return false;
 
     // 2. Global search match
